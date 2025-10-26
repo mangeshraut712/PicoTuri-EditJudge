@@ -32,7 +32,7 @@ except ModuleNotFoundError:
 try:
     from torchvision import models, transforms  # type: ignore[import-untyped]
 except ModuleNotFoundError:
-    models = transforms = None  # type: ignore[assignment]
+    models = transforms = None  # type: ignore[assignment, misc]  # noqa: E501
 
 try:
     import coremltools as ct  # type: ignore[import-untyped]
