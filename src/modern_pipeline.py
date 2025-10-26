@@ -20,11 +20,12 @@ import json
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, TypeAlias
+import importlib
 
 # Optional heavy dependencies -------------------------------------------------
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     import torch  # type: ignore[import-untyped]
     import torch.nn as nn  # type: ignore[import-untyped]
     import torch.optim as optim  # type: ignore[import-untyped]
@@ -32,34 +33,78 @@ if TYPE_CHECKING:
     from torchvision import models, transforms  # type: ignore[import-untyped]
     import coremltools as ct  # type: ignore[import-untyped]
     from PIL import Image  # type: ignore[import-untyped]
+    import pandas as pd  # type: ignore[import-untyped]
 
-try:  # pragma: no cover - optional dependency
-    import torch
-    import torch.nn as nn
-    import torch.optim as optim
-    from torch.utils.data import DataLoader, Dataset
-except ModuleNotFoundError:  # pragma: no cover
-    torch = nn = optim = DataLoader = Dataset = None  # type: ignore
 
-try:  # pragma: no cover
-    from torchvision import models, transforms
-except ModuleNotFoundError:
-    models = transforms = None  # type: ignore
+def _optional_import(module: str) -> Any:
+    try:
+        return importlib.import_module(module)
+    except ModuleNotFoundError:
+        return None
 
-try:  # pragma: no cover
-    import coremltools as ct
-except ModuleNotFoundError:
-    ct = None
 
-try:  # pragma: no cover
-    from PIL import Image
-except ModuleNotFoundError:
-    Image = None
+# Conditionally import optional modules
+torch = _optional_import("torch")
+if torch is not None:
+    nn = torch.nn  # type: ignore[attr-defined]
+    optim = torch.optim  # type: ignore[attr-defined]
+    data_module = _optional_import("torch.utils.data")
+    Dataset = getattr(data_module, "Dataset", None)  # type: ignore[assignment]
+    DataLoader = getattr(data_module, "DataLoader", None)  # type: ignore[assignment]
+else:  # pragma: no cover
+    nn = None
+    optim = None
+    Dataset = None  # type: ignore[assignment]
+    DataLoader = None  # type: ignore[assignment]
 
-try:  # pragma: no cover
-    import pandas as pd  # type: ignore
-except ModuleNotFoundError:  # pragma: no cover
-    pd = None
+torchvision = _optional_import("torchvision")
+if torchvision is not None:
+    models = getattr(torchvision, "models", None)  # type: ignore[assignment]
+    transforms = getattr(torchvision, "transforms", None)  # type: ignore[assignment]
+else:  # pragma: no cover
+    models = None
+    transforms = None
+
+ct = _optional_import("coremltools")
+
+pil_image_module = _optional_import("PIL.Image")
+Image = getattr(pil_image_module, "Image", None) if pil_image_module else None  # type: ignore[assignment]
+
+pd = _optional_import("pandas")
+
+
+
+TransformCompose: TypeAlias = Any
+if transforms is not None:  # pragma: no cover
+    TransformCompose = transforms.Compose  # type: ignore[attr-defined]
+
+
+Tensor: TypeAlias = Any
+if torch is not None:  # pragma: no cover - requires torch
+    Tensor = torch.Tensor  # type: ignore[attr-defined]
+
+BaseDataset = Dataset if Dataset is not None else object  # type: ignore[misc]
+
+if nn is not None:  # pragma: no cover - requires torch.nn
+    BaseModule = nn.Module  # type: ignore[attr-defined]
+else:
+    class BaseModule(object):  # type: ignore[too-many-ancestors]
+        """Fallback base class when torch.nn is unavailable."""
+
+        def to(self, device: str) -> "BaseModule":  # noqa: D401
+            return self
+
+        def eval(self) -> "BaseModule":  # noqa: D401
+            return self
+
+        def train(self, mode: bool = True) -> "BaseModule":  # noqa: D401
+            return self
+
+        def parameters(self):  # noqa: D401
+            return []
+
+        def __call__(self, *args: Any, **kwargs: Any) -> Any:
+            raise RuntimeError("PyTorch is required to execute the model.")
 
 # -----------------------------------------------------------------------------
 # 1. DATASET HANDLER FOR PICO-BANANA-400K
@@ -73,7 +118,7 @@ class ManifestRecord:
     instruction: str
 
 
-class PicoBananaDataset(Dataset if Dataset else object):  # type: ignore[misc]
+class PicoBananaDataset(BaseDataset):  # type: ignore[misc]
     """
     Dataset handler for Apple's Pico-Banana-400K manifests.
 
@@ -86,7 +131,7 @@ class PicoBananaDataset(Dataset if Dataset else object):  # type: ignore[misc]
         self,
         data_path: str,
         mode: str = "sft",
-        transform: Optional[transforms.Compose] = None,
+        transform: Optional[Any] = None,
     ) -> None:
         if Dataset is None or Image is None:
             raise ImportError(
@@ -148,7 +193,7 @@ class PicoBananaDataset(Dataset if Dataset else object):  # type: ignore[misc]
     def __len__(self) -> int:
         return len(self.data)
 
-    def __getitem__(self, idx: int) -> Tuple["torch.Tensor", "torch.Tensor", str]:
+    def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor, str]:
         if torch is None or Image is None:
             raise RuntimeError("PyTorch and Pillow must be installed to use PicoBananaDataset.")
 
@@ -161,8 +206,12 @@ class PicoBananaDataset(Dataset if Dataset else object):  # type: ignore[misc]
             source_img = self.transform(source_img)
             edited_img = self.transform(edited_img)
         else:
-            source_img = transforms.ToTensor()(source_img)  # type: ignore
-            edited_img = transforms.ToTensor()(edited_img)  # type: ignore
+            if transforms is None:
+                raise RuntimeError(
+                    "torchvision.transforms is required for default tensor conversion."
+                )
+            source_img = transforms.ToTensor()(source_img)  # type: ignore[attr-defined]
+            edited_img = transforms.ToTensor()(edited_img)  # type: ignore[attr-defined]
 
         return source_img, edited_img, item.instruction
 
@@ -172,7 +221,7 @@ class PicoBananaDataset(Dataset if Dataset else object):  # type: ignore[misc]
 # -----------------------------------------------------------------------------
 
 
-class ModernImageEditor(nn.Module if nn else object):  # type: ignore[misc]
+class ModernImageEditor(BaseModule):  # type: ignore[misc]
     """
     Diffusion-inspired image editing scaffold.
 
@@ -196,7 +245,11 @@ class ModernImageEditor(nn.Module if nn else object):  # type: ignore[misc]
             num_layers=6,
         )
 
-        resnet = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)  # type: ignore[attr-defined]
+        weights = getattr(models, "ResNet50_Weights", None)
+        if weights is not None:
+            resnet = models.resnet50(weights=weights.DEFAULT)  # type: ignore[attr-defined]
+        else:
+            resnet = models.resnet50(pretrained=True)  # type: ignore[arg-type]
         resnet.fc = nn.Identity()
         self.visual_encoder = resnet
 
@@ -208,8 +261,8 @@ class ModernImageEditor(nn.Module if nn else object):  # type: ignore[misc]
         )
 
     def forward(
-        self, source_img: "torch.Tensor", instruction_embedding: "torch.Tensor"
-    ) -> Tuple[Optional["torch.Tensor"], "torch.Tensor"]:
+        self, source_img: Tensor, instruction_embedding: Tensor
+    ) -> Tuple[Optional[Tensor], Tensor]:
         if torch is None:
             raise RuntimeError("PyTorch must be installed to use ModernImageEditor.")
 
@@ -248,7 +301,9 @@ class QualityAwareTrainer:
             "technical_quality": 0.15,
         }
 
-    def compute_weighted_quality(self, scores: "torch.Tensor") -> "torch.Tensor":  # type: ignore[type-var]
+    def compute_weighted_quality(self, scores: Tensor) -> Tensor:  # type: ignore[type-var]
+        if torch is None:
+            raise RuntimeError("PyTorch must be installed to compute quality scores.")
         weights = torch.tensor(  # type: ignore[union-attr]
             [
                 self.quality_weights["instruction_compliance"],
@@ -260,7 +315,7 @@ class QualityAwareTrainer:
         )
         return (scores * weights).sum(dim=-1)  # type: ignore[union-attr]
 
-    def train_with_dpo(self, dataloader: DataLoader, num_epochs: int = 1) -> None:
+    def train_with_dpo(self, dataloader: Any, num_epochs: int = 1) -> None:
         if torch is None or optim is None:
             raise RuntimeError("PyTorch must be installed to train the model.")
 
@@ -301,7 +356,7 @@ class AppleOptimizer:
 
     @staticmethod
     def quantize_model(model: ModernImageEditor, mode: str = "linear") -> ModernImageEditor:
-        if torch is None:
+        if torch is None or nn is None:
             raise RuntimeError("torch must be installed for quantisation.")
 
         quantised = torch.quantization.quantize_dynamic(
@@ -312,7 +367,7 @@ class AppleOptimizer:
         return quantised  # type: ignore[return-value]
 
     @staticmethod
-    def export_to_coreml(model: ModernImageEditor, example_input: "torch.Tensor", save_path: str) -> None:
+    def export_to_coreml(model: ModernImageEditor, example_input: Tensor, save_path: str) -> None:
         if torch is None or ct is None:
             raise RuntimeError(
                 "torch and coremltools are required to export to Core ML. "
@@ -364,8 +419,10 @@ def ensure_dependencies() -> None:
         )
 
 
-def build_default_transform() -> "transforms.Compose":
+def build_default_transform() -> TransformCompose:
     ensure_dependencies()
+    if transforms is None:
+        raise RuntimeError("torchvision.transforms is required for default preprocessing.")
     return transforms.Compose(  # type: ignore
         [
             transforms.Resize((512, 512)),
@@ -381,6 +438,8 @@ def main() -> None:
     quantise, and export a Core ML bundle manifest.
     """
     ensure_dependencies()
+    assert torch is not None
+    assert transforms is not None
 
     print("=" * 72)
     print("MODERN IMAGE EDITING PIPELINE - APPLE ECOSYSTEM STYLE")
@@ -398,6 +457,8 @@ def main() -> None:
 
     if len(dataset) > 0:
         print("\n[3/5] Training with quality-aware DPO (1 epoch)...")
+        if DataLoader is None:
+            raise RuntimeError("torch.utils.data.DataLoader is unavailable.")
         dataloader = DataLoader(dataset, batch_size=2, shuffle=True)
         trainer = QualityAwareTrainer(model, device="cuda" if torch.cuda.is_available() else "cpu")
         trainer.train_with_dpo(dataloader, num_epochs=1)
