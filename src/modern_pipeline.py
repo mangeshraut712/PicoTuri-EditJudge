@@ -20,19 +20,19 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-# Optional heavy dependencies with safe checking
+# Optional heavy dependencies with safe checking - type: ignore for mypy compatibility
 try:
     import torch  # type: ignore[import-untyped]
     import torch.nn as nn  # type: ignore[import-untyped]
-    import torch.optim as optim  # type: ignore[import-untyped]
+    import torch.optim as optim  # type: ignore[import-untyped]  # type: ignore[misc]
     from torch.utils.data import DataLoader, Dataset  # type: ignore[import-untyped]
 except ModuleNotFoundError:
-    torch = nn = optim = DataLoader = Dataset = None
+    torch = nn = optim = DataLoader = Dataset = None  # type: ignore[assignment,misc]
 
 try:
     from torchvision import models, transforms  # type: ignore[import-untyped]
 except ModuleNotFoundError:
-    models = transforms = None
+    models = transforms = None  # type: ignore[assignment]
 
 try:
     import coremltools as ct  # type: ignore[import-untyped]
@@ -49,33 +49,35 @@ try:
 except ModuleNotFoundError:
     pd = None
 
-# Type aliases for cleaner code
-Tensor = torch.Tensor if torch else Any
-TransformCompose = transforms.Compose if transforms else Any
+# Simplified base classes to avoid mypy redefinition conflicts
+class BaseDataset:  # type: ignore[misc]
+    """Base dataset class for when PyTorch is unavailable."""
+    pass
 
-# Base classes that work with or without PyTorch
-if nn and Dataset:
-    BaseDataset = Dataset
-    BaseModule = nn.Module
-else:
-    class BaseDataset(object):
-        pass
+class BaseModule:  # type: ignore[misc]
+    """Base module class for when PyTorch is unavailable."""
 
-    class BaseModule(object):
-        def to(self, device):
-            return self
+    def to(self, device) -> "BaseModule":
+        return self
 
-        def eval(self):
-            return self
+    def eval(self) -> "BaseModule":
+        return self
 
-        def train(self, mode=True):
-            return self
+    def train(self, mode: bool = True) -> "BaseModule":
+        return self
 
-        def parameters(self):
-            return []
+    def parameters(self) -> list:
+        return []
 
-        def __call__(self, *args, **kwargs):
-            raise RuntimeError("PyTorch is required to use this model.")
+    def __call__(self, *args, **kwargs):
+        raise RuntimeError("PyTorch is required to use this model.")
+
+# Override with actual PyTorch classes if available
+if nn:
+    BaseModule = nn.Module  # type: ignore[assignment,misc]
+
+if Dataset is not None:
+    BaseDataset = Dataset  # type: ignore[assignment,misc]
 
 # -----------------------------------------------------------------------------
 # 1. DATASET HANDLER FOR PICO-BANANA-400K
@@ -272,7 +274,7 @@ class QualityAwareTrainer:
             "technical_quality": 0.15,
         }
 
-    def compute_weighted_quality(self, scores: Tensor) -> Tensor:  # type: ignore[type-var]
+    def compute_weighted_quality(self, scores: Any) -> Any:  # type: ignore[type-var]
         if torch is None:
             raise RuntimeError("PyTorch must be installed to compute quality scores.")
         weights = torch.tensor(  # type: ignore[union-attr]
@@ -430,7 +432,7 @@ def main() -> None:
         print("\n[3/5] Training with quality-aware DPO (1 epoch)...")
         if DataLoader is None:
             raise RuntimeError("torch.utils.data.DataLoader is unavailable.")
-        dataloader = DataLoader(dataset, batch_size=2, shuffle=True)
+        dataloader: Any = DataLoader(dataset, batch_size=2, shuffle=True)  # type: ignore[arg-type]
         trainer = QualityAwareTrainer(model, device="cuda" if torch.cuda.is_available() else "cpu")
         trainer.train_with_dpo(dataloader, num_epochs=1)
     else:
