@@ -393,7 +393,7 @@ def main() -> None:
     model = ModernImageEditor(num_edit_categories=35)
 
     if len(dataset) > 0:
-        print("\n[3/5] Training with quality-aware DPO (one epoch placeholder)...")
+        print("\n[3/5] Training with quality-aware DPO (1 epoch)...")
         dataloader = DataLoader(dataset, batch_size=2, shuffle=True)
         trainer = QualityAwareTrainer(model, device="cuda" if torch.cuda.is_available() else "cpu")
         trainer.train_with_dpo(dataloader, num_epochs=1)
