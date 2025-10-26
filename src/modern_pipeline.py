@@ -19,7 +19,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Tuple
 
 # Optional heavy dependencies -------------------------------------------------
 
@@ -209,7 +209,7 @@ class ModernImageEditor(nn.Module if nn else object):
         if torch is None:
             raise RuntimeError("PyTorch must be installed to use ModernImageEditor.")
 
-        visual_features = self.visual_encoder(source_img)
+        _ = self.visual_encoder(source_img)
         instruction_features = self.instruction_encoder(instruction_embedding)
         quality_scores = self.quality_scorer(instruction_features.mean(dim=1))
 

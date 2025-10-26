@@ -18,13 +18,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    # Type-only imports for better IDE support
-    import torch  # type: ignore[import-untyped]
-    import torch.nn as nn  # type: ignore[import-untyped]
-    import torch.nn.functional as F  # type: ignore[import-untyped]
+from typing import Dict, Optional, Tuple
 
 # Runtime imports
 import torch  # type: ignore[import-untyped]
@@ -474,7 +468,6 @@ def train_with_pico_banana(
     """
 
     optimiser = torch.optim.AdamW(model.parameters(), lr=1e-4)
-    dpo_loss_fn = DPOLoss(beta=0.1)
 
     for epoch in range(num_epochs):
         for batch in train_dataloader:
@@ -486,7 +479,6 @@ def train_with_pico_banana(
                 continue
 
             filtered_source = source_imgs[mask]
-            filtered_edited = edited_imgs[mask]
 
             # Placeholder diffusion loss
             loss = torch.tensor(0.0, device=filtered_source.device)

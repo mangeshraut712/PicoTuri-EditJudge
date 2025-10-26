@@ -7,10 +7,9 @@ import json
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional, Sequence, TYPE_CHECKING
+from typing import Any, Dict, Iterable, Optional, Sequence
 
-if TYPE_CHECKING:  # pragma: no cover - import used only for type checkers
-    from sklearn.pipeline import Pipeline  # type: ignore
+# Type checking imports (none needed for this module)
 
 
 def export_coreml_manifest(
