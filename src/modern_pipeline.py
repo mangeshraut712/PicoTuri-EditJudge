@@ -17,11 +17,21 @@ invoked without the required packages.
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
 # Optional heavy dependencies -------------------------------------------------
+
+if TYPE_CHECKING:
+    import torch  # type: ignore[import-untyped]
+    import torch.nn as nn  # type: ignore[import-untyped]
+    import torch.optim as optim  # type: ignore[import-untyped]
+    from torch.utils.data import DataLoader, Dataset  # type: ignore[import-untyped]
+    from torchvision import models, transforms  # type: ignore[import-untyped]
+    import coremltools as ct  # type: ignore[import-untyped]
+    from PIL import Image  # type: ignore[import-untyped]
 
 try:  # pragma: no cover - optional dependency
     import torch
@@ -29,16 +39,12 @@ try:  # pragma: no cover - optional dependency
     import torch.optim as optim
     from torch.utils.data import DataLoader, Dataset
 except ModuleNotFoundError:  # pragma: no cover
-    torch = None
-    nn = None
-    optim = None
-    DataLoader = Dataset = None  # type: ignore
+    torch = nn = optim = DataLoader = Dataset = None  # type: ignore
 
 try:  # pragma: no cover
     from torchvision import models, transforms
 except ModuleNotFoundError:
-    models = None
-    transforms = None
+    models = transforms = None  # type: ignore
 
 try:  # pragma: no cover
     import coremltools as ct
@@ -55,8 +61,6 @@ try:  # pragma: no cover
 except ModuleNotFoundError:  # pragma: no cover
     pd = None
 
-import logging
-
 # -----------------------------------------------------------------------------
 # 1. DATASET HANDLER FOR PICO-BANANA-400K
 # -----------------------------------------------------------------------------
@@ -69,7 +73,7 @@ class ManifestRecord:
     instruction: str
 
 
-class PicoBananaDataset(Dataset if Dataset else object):
+class PicoBananaDataset(Dataset if Dataset else object):  # type: ignore[misc]
     """
     Dataset handler for Apple's Pico-Banana-400K manifests.
 
@@ -168,7 +172,7 @@ class PicoBananaDataset(Dataset if Dataset else object):
 # -----------------------------------------------------------------------------
 
 
-class ModernImageEditor(nn.Module if nn else object):
+class ModernImageEditor(nn.Module if nn else object):  # type: ignore[misc]
     """
     Diffusion-inspired image editing scaffold.
 
@@ -244,8 +248,8 @@ class QualityAwareTrainer:
             "technical_quality": 0.15,
         }
 
-    def compute_weighted_quality(self, scores: "torch.Tensor") -> "torch.Tensor":
-        weights = torch.tensor(
+    def compute_weighted_quality(self, scores: "torch.Tensor") -> "torch.Tensor":  # type: ignore[type-var]
+        weights = torch.tensor(  # type: ignore[union-attr]
             [
                 self.quality_weights["instruction_compliance"],
                 self.quality_weights["editing_realism"],
@@ -254,7 +258,7 @@ class QualityAwareTrainer:
             ],
             device=scores.device,
         )
-        return (scores * weights).sum(dim=-1)
+        return (scores * weights).sum(dim=-1)  # type: ignore[union-attr]
 
     def train_with_dpo(self, dataloader: DataLoader, num_epochs: int = 1) -> None:
         if torch is None or optim is None:
