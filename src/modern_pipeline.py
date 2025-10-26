@@ -62,10 +62,18 @@ else:
         pass
 
     class BaseModule(object):
-        def to(self, device): return self
-        def eval(self): return self
-        def train(self, mode=True): return self
-        def parameters(self): return []
+        def to(self, device):
+            return self
+
+        def eval(self):
+            return self
+
+        def train(self, mode=True):
+            return self
+
+        def parameters(self):
+            return []
+
         def __call__(self, *args, **kwargs):
             raise RuntimeError("PyTorch is required to use this model.")
 
