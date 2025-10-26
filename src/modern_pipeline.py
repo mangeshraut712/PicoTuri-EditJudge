@@ -14,97 +14,60 @@ TorchVision, or coremltools.  Each component raises informative errors when
 invoked without the required packages.
 """
 
-from __future__ import annotations
-
 import json
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, TypeAlias
-import importlib
+from typing import Any, Dict, List, Optional, Tuple
 
-# Optional heavy dependencies -------------------------------------------------
-
-if TYPE_CHECKING:  # pragma: no cover
+# Optional heavy dependencies with safe checking
+try:
     import torch  # type: ignore[import-untyped]
     import torch.nn as nn  # type: ignore[import-untyped]
     import torch.optim as optim  # type: ignore[import-untyped]
     from torch.utils.data import DataLoader, Dataset  # type: ignore[import-untyped]
+except ModuleNotFoundError:
+    torch = nn = optim = DataLoader = Dataset = None
+
+try:
     from torchvision import models, transforms  # type: ignore[import-untyped]
+except ModuleNotFoundError:
+    models = transforms = None
+
+try:
     import coremltools as ct  # type: ignore[import-untyped]
+except ModuleNotFoundError:
+    ct = None
+
+try:
     from PIL import Image  # type: ignore[import-untyped]
+except ModuleNotFoundError:
+    Image = None
+
+try:
     import pandas as pd  # type: ignore[import-untyped]
+except ModuleNotFoundError:
+    pd = None
 
+# Type aliases for cleaner code
+Tensor = torch.Tensor if torch else Any
+TransformCompose = transforms.Compose if transforms else Any
 
-def _optional_import(module: str) -> Any:
-    try:
-        return importlib.import_module(module)
-    except ModuleNotFoundError:
-        return None
-
-
-# Conditionally import optional modules
-torch = _optional_import("torch")
-if torch is not None:
-    nn = torch.nn  # type: ignore[attr-defined]
-    optim = torch.optim  # type: ignore[attr-defined]
-    data_module = _optional_import("torch.utils.data")
-    Dataset = getattr(data_module, "Dataset", None)  # type: ignore[assignment]
-    DataLoader = getattr(data_module, "DataLoader", None)  # type: ignore[assignment]
-else:  # pragma: no cover
-    nn = None
-    optim = None
-    Dataset = None  # type: ignore[assignment]
-    DataLoader = None  # type: ignore[assignment]
-
-torchvision = _optional_import("torchvision")
-if torchvision is not None:
-    models = getattr(torchvision, "models", None)  # type: ignore[assignment]
-    transforms = getattr(torchvision, "transforms", None)  # type: ignore[assignment]
-else:  # pragma: no cover
-    models = None
-    transforms = None
-
-ct = _optional_import("coremltools")
-
-pil_image_module = _optional_import("PIL.Image")
-Image = getattr(pil_image_module, "Image", None) if pil_image_module else None  # type: ignore[assignment]
-
-pd = _optional_import("pandas")
-
-
-
-TransformCompose: TypeAlias = Any
-if transforms is not None:  # pragma: no cover
-    TransformCompose = transforms.Compose  # type: ignore[attr-defined]
-
-
-Tensor: TypeAlias = Any
-if torch is not None:  # pragma: no cover - requires torch
-    Tensor = torch.Tensor  # type: ignore[attr-defined]
-
-BaseDataset = Dataset if Dataset is not None else object  # type: ignore[misc]
-
-if nn is not None:  # pragma: no cover - requires torch.nn
-    BaseModule = nn.Module  # type: ignore[attr-defined]
+# Base classes that work with or without PyTorch
+if nn and Dataset:
+    BaseDataset = Dataset
+    BaseModule = nn.Module
 else:
-    class BaseModule(object):  # type: ignore[too-many-ancestors]
-        """Fallback base class when torch.nn is unavailable."""
+    class BaseDataset(object):
+        pass
 
-        def to(self, device: str) -> "BaseModule":  # noqa: D401
-            return self
-
-        def eval(self) -> "BaseModule":  # noqa: D401
-            return self
-
-        def train(self, mode: bool = True) -> "BaseModule":  # noqa: D401
-            return self
-
-        def parameters(self):  # noqa: D401
-            return []
-
-        def __call__(self, *args: Any, **kwargs: Any) -> Any:
-            raise RuntimeError("PyTorch is required to execute the model.")
+    class BaseModule(object):
+        def to(self, device): return self
+        def eval(self): return self
+        def train(self, mode=True): return self
+        def parameters(self): return []
+        def __call__(self, *args, **kwargs):
+            raise RuntimeError("PyTorch is required to use this model.")
 
 # -----------------------------------------------------------------------------
 # 1. DATASET HANDLER FOR PICO-BANANA-400K
