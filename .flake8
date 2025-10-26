@@ -26,7 +26,7 @@ extend-ignore = E203,W503,E501
 per-file-ignores =
     __init__.py:F401
     tests/*:S101,D100,D101,D102,D103,D104
-ignore = E501,E203,W503,F401,F811
+ignore = E501,E203,W503,F401,F811,E302,E305
 
 [mypy]
 ignore_missing_imports = True
