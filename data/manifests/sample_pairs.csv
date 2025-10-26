@@ -1,0 +1,11 @@
+pair_id,instruction,original_image,edited_image,image_similarity,label,notes
+0001,"Brighten the living room photo","images/living_room_orig.jpg","images/living_room_edit.jpg",0.86,1,"Exposure lifted without artifacts."
+0002,"Add a red apple on the table","images/table_orig.jpg","images/table_edit.jpg",0.42,0,"Generative edit missing target object."
+0003,"Soften the background blur","images/portrait_orig.jpg","images/portrait_edit.jpg",0.78,1,"Portrait depth preserved."
+0004,"Remove the watermark in the corner","images/beach_orig.jpg","images/beach_edit.jpg",0.91,1,"Watermark gone, no obvious seams."
+0005,"Turn the sky purple","images/city_orig.jpg","images/city_edit.jpg",0.35,0,"Strong artifacts around skyline."
+0006,"Sharpen the product label","images/product_orig.jpg","images/product_edit.jpg",0.67,1,"Readable label, minor noise."
+0007,"Make it look like night time","images/park_orig.jpg","images/park_edit.jpg",0.44,0,"Color shift inconsistent, halos introduced."
+0008,"Remove the person from the doorway","images/door_orig.jpg","images/door_edit.jpg",0.55,0,"Residual outline remains."
+0009,"Increase contrast slightly","images/forest_orig.jpg","images/forest_edit.jpg",0.82,1,"Contrast boost with minimal noise."
+0010,"Change the mug color to blue","images/mug_orig.jpg","images/mug_edit.jpg",0.58,1,"Color shift successful."

@@ -1,0 +1,51 @@
+
+
+# Ignore Cursor AI rules
+.cursor/rules/codacy.mdc
+
+# Ignore VSCode AI rules
+.github/instructions/codacy.instructions.md
+
+# Python
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.venv/
+artifacts/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+.AppleDouble
+
+# Swift / Xcode
+DerivedData/
+*.xcworkspace/
+xcuserdata/
+
+# Output directories
+outputs/
+coreml_output/
+*.log
+
+# Third-party sources and datasets
+third_party/turicreate/
+third_party/pico-banana-400k/
+data/pico_banana/
+
+# Models and checkpoints
+models/
+*.joblib
+*.pt
+*.mlmodel
+*.h5
+*.pb
+
+# Temporary files
+*.tmp
+.cache/
