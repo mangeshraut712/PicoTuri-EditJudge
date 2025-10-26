@@ -17,15 +17,48 @@
   <table>
     <tr>
       <td align="center">
-        <img src="docs/images/ios-demo-preview.png" alt="iOS Demo Preview" width="200"/><br/>
+        <pre>
+┌─────────────────────────┐
+│    📱 iOS Demo App      │
+│                         │
+│  Input: "Brighten photo"│
+│                         │
+│  [Original Image] [Edit]│
+│                         │
+│  Quality Score: 85%     │
+│  ✅ ACCEPTED            │
+│                         │
+│  [Edit Image] [Compare] │
+└─────────────────────────┘
+        </pre><br/>
         <em>iOS SwiftUI Demo App</em>
       </td>
       <td align="center">
-        <img src="docs/images/ml-pipeline.png" alt="ML Pipeline" width="300"/><br/>
+        <pre>
+Text Instruction → TF-IDF → Feature Fusion ←← Image Similarity
+                       ↓
+             Logistic Regression Classifer
+                       ↓
+             Quality Score (0.0-1.0)
+                       ↓
+              Core ML Model Export
+        </pre><br/>
         <em>Multimodal Fusion Pipeline</em>
       </td>
       <td align="center">
-        <img src="docs/images/coreml-model.png" alt="Core ML Model" width="150"/><br/>
+        <pre>
+       🔧 Core ML Model
+   ┌─────────────────────┐
+   │ 🎯 PicoTuriEditJudge │
+   │                     │
+   │ Input: Text + Sim   │
+   │ Output: Quality     │
+   │                     │
+   │ Size: ~35MB         │
+   │ Device: Apple Si    │
+   │ Latency: <100ms     │
+   └─────────────────────┘
+        </pre><br/>
         <em>Core ML Model Export</em>
       </td>
     </tr>
