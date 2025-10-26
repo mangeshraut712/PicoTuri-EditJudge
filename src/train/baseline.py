@@ -116,7 +116,8 @@ def build_pipeline(seed: int, similarity_column: str = "image_similarity") -> Pi
     classifier = LogisticRegression(
         random_state=seed,
         class_weight="balanced",
-        max_iter=500,
+        solver="saga",
+        max_iter=1000,
     )
     return Pipeline(
         steps=[

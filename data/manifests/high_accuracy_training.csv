@@ -1,0 +1,1001 @@
+instruction,image_similarity,label
+brighten the photo,0.3496714153011233,0
+increase contrast,0.3261735698828815,0
+add more saturation,0.44476885381006925,0
+make colors warmer,0.5723029856408025,0
+sharpen the image,0.43658466252766637,0
+add vignette effect,0.4765863043050819,0
+boost highlights,0.6979212815507392,1
+deepen shadows,0.656743472915291,1
+adjust white balance,0.5730525614065047,0
+increase exposure,0.7142560043585964,1
+add color grading,0.6536582307187537,1
+enhance details,0.6934270246429743,1
+make it more vibrant,0.8041962271566034,1
+adjust brightness,0.6286719755342203,0
+improve contrast,0.6875082167486968,1
+brighten the photo,0.24377124707590273,0
+increase contrast,0.2387168879665576,0
+add more saturation,0.4114247332595274,0
+make colors warmer,0.3291975924478789,0
+sharpen the image,0.3187696298664708,0
+add vignette effect,0.6465648768921555,0
+boost highlights,0.5174223699513465,0
+deepen shadows,0.5867528204687924,0
+adjust white balance,0.4775251813786543,0
+increase exposure,0.6055617275474816,0
+add color grading,0.7110922589709866,1
+enhance details,0.6249006422577696,0
+make it more vibrant,0.8175698018345672,1
+adjust brightness,0.7599361310081195,1
+improve contrast,0.8308306250206724,1
+brighten the photo,0.2398293387770603,0
+increase contrast,0.5252278184508937,0
+add more saturation,0.3786502775262066,0
+make colors warmer,0.31422890710441,0
+sharpen the image,0.5422544912103189,0
+add vignette effect,0.37791563500289777,0
+boost highlights,0.5608863595004756,0
+deepen shadows,0.38403298761202254,0
+adjust white balance,0.4871813951101569,0
+increase exposure,0.6796861235869123,1
+add color grading,0.773846657999541,1
+enhance details,0.7571368281189971,1
+make it more vibrant,0.7684351717611759,1
+adjust brightness,0.7898896304410712,1
+improve contrast,0.7121478009632574,1
+brighten the photo,0.2280155791605291,0
+increase contrast,0.2939361229040212,0
+add more saturation,0.48571222262189157,0
+make colors warmer,0.4543618289568461,0
+sharpen the image,0.28369598446372657,0
+add vignette effect,0.5324083969394795,0
+boost highlights,0.5014917719583684,0
+deepen shadows,0.5123077999694042,0
+adjust white balance,0.6811676288840868,1
+increase exposure,0.763099952249595,1
+add color grading,0.7931280119116199,1
+enhance details,0.6560782476777361,1
+make it more vibrant,0.7490787624148786,1
+adjust brightness,0.8531263431403564,1
+improve contrast,0.957554512712236,1
+brighten the photo,0.252082576215471,0
+increase contrast,0.32143410233361824,0
+add more saturation,0.2693665025993972,0
+make colors warmer,0.3003793375919329,0
+sharpen the image,0.5412525822394197,0
+add vignette effect,0.6356240028570823,0
+boost highlights,0.5327989878419667,0
+deepen shadows,0.6803532897892025,1
+adjust white balance,0.6561636025047635,1
+increase exposure,0.5954880245394875,0
+add color grading,0.7361395605508414,1
+enhance details,0.8938036566465969,1
+make it more vibrant,0.7764173960890048,1
+adjust brightness,0.9764643655814007,1
+improve contrast,0.5980254895910256,0
+brighten the photo,0.38219025043752236,0
+increase contrast,0.3487047068238171,0
+add more saturation,0.3500992649534132,0
+make colors warmer,0.4291760776535502,0
+sharpen the image,0.2612431085399107,0
+add vignette effect,0.4780328112162488,0
+boost highlights,0.5757112571511747,0
+deepen shadows,0.7277894044741517,1
+adjust white balance,0.5681729781726352,0
+increase exposure,0.5791506397106811,0
+add color grading,0.6498242956415463,0
+enhance details,0.8315402117702074,1
+make it more vibrant,0.8128751109659684,1
+adjust brightness,0.7670239796232962,1
+improve contrast,0.9113267433113357,1
+brighten the photo,0.309707754934804,0
+increase contrast,0.4368644990532889,0
+add more saturation,0.3097946906122648,0
+make colors warmer,0.3872337853402232,0
+sharpen the image,0.42078918468678417,0
+add vignette effect,0.35364850518678814,0
+boost highlights,0.5696120277064577,0
+deepen shadows,0.606105527217989,0
+adjust white balance,0.620511345664246,0
+increase exposure,0.6365412866624852,0
+add color grading,0.5584629257949585,0
+enhance details,0.697935467723464,1
+make it more vibrant,0.745728548347323,1
+adjust brightness,0.7397722730778382,1
+improve contrast,0.8438714288333992,1
+brighten the photo,0.34040508568145383,0
+increase contrast,0.528618590121053,0
+add more saturation,0.3974577812831839,0
+make colors warmer,0.44575503907227637,0
+sharpen the image,0.45255540842338327,0
+add vignette effect,0.30812287847009584,0
+boost highlights,0.5373486124550784,0
+deepen shadows,0.5860230209941028,0
+adjust white balance,0.8663242112485287,1
+increase exposure,0.6407639035218877,0
+add color grading,0.7301547342333612,1
+enhance details,0.7365288230294756,1
+make it more vibrant,0.6631321962380468,1
+adjust brightness,0.9342822814515022,1
+improve contrast,0.9351933032686776,1
+brighten the photo,0.3791031947043047,0
+increase contrast,0.24906125452052608,0
+add more saturation,0.52027943109361,0
+make colors warmer,0.2798148937207719,0
+sharpen the image,0.518685709380027,0
+add vignette effect,0.7190455625809978,1
+boost highlights,0.44094636748693117,0
+deepen shadows,0.5233702270397229,0
+adjust white balance,0.6299651365087641,0
+increase exposure,0.60965243458838,0
+add color grading,0.5449336568933867,0
+enhance details,0.7468562974806027,1
+make it more vibrant,0.6737696286273895,1
+adjust brightness,0.8673592430635182,1
+improve contrast,0.7680575765766198,1
+brighten the photo,0.454993440501754,0
+increase contrast,0.26167467076637624,0
+add more saturation,0.34779384837943245,0
+make colors warmer,0.501351721736967,0
+sharpen the image,0.33691356835660446,0
+add vignette effect,0.522745993460413,0
+boost highlights,0.6707142754282429,1
+deepen shadows,0.4192516765438773,0
+adjust white balance,0.6384633858532304,0
+increase exposure,0.6859882794248423,1
+add color grading,0.778182287177731,1
+enhance details,0.6163049289121918,0
+make it more vibrant,0.6479543386915724,0
+adjust brightness,0.8721941565616899,1
+improve contrast,0.8896984673233187,1
+brighten the photo,0.32504928503458763,0
+increase contrast,0.37464482094969753,0
+add more saturation,0.3119975278421509,0
+make colors warmer,0.4432253697161003,0
+sharpen the image,0.4893072473298681,0
+add vignette effect,0.42856485819736323,0
+boost highlights,0.7265774511144757,1
+deepen shadows,0.6273832920911788,0
+adjust white balance,0.5008696502797352,0
+increase exposure,0.7256553608633829,1
+add color grading,0.6025318329772678,0
+enhance details,0.8187084603742452,1
+make it more vibrant,0.8958595579007405,1
+adjust brightness,0.737931768164829,1
+improve contrast,0.9563376129244323,1
+brighten the photo,0.34127809269364984,0
+increase contrast,0.42220601599944896,0
+add more saturation,0.5696792982653948,0
+make colors warmer,0.39546118839971295,0
+sharpen the image,0.384626383564251,0
+add vignette effect,0.4110485570374477,0
+boost highlights,0.45841897150345623,0
+deepen shadows,0.5722898290585896,0
+adjust white balance,0.6541151974816644,1
+increase exposure,0.6876690799330019,1
+add color grading,0.7827183249036024,1
+enhance details,0.7413001891877907,1
+make it more vibrant,0.9253534077157317,1
+adjust brightness,0.7935343166762044,1
+improve contrast,1.0,1
+brighten the photo,0.3625667347765006,0
+increase contrast,0.2542842443583717,0
+add more saturation,0.2729107501938888,0
+make colors warmer,0.4682472415243185,0
+sharpen the image,0.4376537214674149,0
+add vignette effect,0.5714000494092092,0
+boost highlights,0.5873237624573545,0
+deepen shadows,0.5727171087343128,0
+adjust white balance,0.5353206281931595,0
+increase exposure,0.5085152775314135,0
+add color grading,0.6553485047932979,1
+enhance details,0.8256398794323472,1
+make it more vibrant,0.8014093744130204,1
+adjust brightness,0.6954261221288013,1
+improve contrast,0.8773180925851183,1
+brighten the photo,0.33853173797288366,0
+increase contrast,0.25161425637988666,0
+add more saturation,0.3953725105945528,0
+make colors warmer,0.4258208718446,0
+sharpen the image,0.34570297021693763,0
+add vignette effect,0.5357787360348283,0
+boost highlights,0.5960784526368235,0
+deepen shadows,0.6883051243175278,1
+adjust white balance,0.7253802052034903,1
+increase exposure,0.5222330632042909,0
+add color grading,0.6062174960084876,0
+enhance details,0.791503526720866,1
+make it more vibrant,0.8313785950912209,1
+adjust brightness,0.8715047686306049,1
+improve contrast,1.0,1
+brighten the photo,0.3570890510693167,0
+increase contrast,0.4535565640180599,0
+add more saturation,0.47540017634932025,0
+make colors warmer,0.4851391251305798,0
+sharpen the image,0.4284730755359654,0
+add vignette effect,0.5758969220493267,0
+boost highlights,0.46271747854624284,0
+deepen shadows,0.5563181393259992,0
+adjust white balance,0.5714636452170896,0
+increase exposure,0.6681874139386321,1
+add color grading,0.9314658566673508,1
+enhance details,0.5532734807408252,0
+make it more vibrant,0.8486260190374514,1
+adjust brightness,0.6587284128810349,1
+improve contrast,0.8128068134210568,1
+brighten the photo,0.4088950596967366,0
+increase contrast,0.34642800190954626,0
+add more saturation,0.2722255222070694,0
+make colors warmer,0.34846962907400314,0
+sharpen the image,0.5279597748934676,0
+add vignette effect,0.42696333682828636,0
+boost highlights,0.5616458589581975,0
+deepen shadows,0.5845571839903815,0
+adjust white balance,0.5548399652394183,0
+increase exposure,0.8743944089325325,1
+add color grading,0.7633919022318011,1
+enhance details,0.5374857413342393,0
+make it more vibrant,0.7986454314769428,1
+adjust brightness,0.7538213535231613,1
+improve contrast,0.9452433334796225,1
+brighten the photo,0.22074792615672992,0
+increase contrast,0.3285263558533101,0
+add more saturation,0.4304987278980457,0
+make colors warmer,0.5065755194170122,0
+sharpen the image,0.3399703592944223,0
+add vignette effect,0.4665498764159052,0
+boost highlights,0.4925054688839044,0
+deepen shadows,0.5146670767426289,0
+adjust white balance,0.7965454240281097,1
+increase exposure,0.7004981710960955,1
+add color grading,0.5739116045664954,0
+enhance details,0.8317861947054777,1
+make it more vibrant,0.9922156197012634,1
+adjust brightness,0.9232465260551148,1
+improve contrast,0.7080630034045987,1
+brighten the photo,0.25157659271337485,0
+increase contrast,0.4666911149186622,0
+add more saturation,0.3092330534381219,0
+make colors warmer,0.46438194281462286,0
+sharpen the image,0.5374634053429337,0
+add vignette effect,0.4073069528421917,0
+boost highlights,0.53404746439382,0
+deepen shadows,0.2558732659930928,0
+adjust white balance,0.517561235866571,0
+increase exposure,0.6347431848606839,0
+add color grading,0.575221681803515,0
+enhance details,0.9032411303931636,1
+make it more vibrant,0.6369858622039367,0
+adjust brightness,0.7759955513303016,1
+improve contrast,0.8730740577286092,1
+brighten the photo,0.44412732890661155,0
+increase contrast,0.19641378488205602,0
+add more saturation,0.496316375215496,0
+make colors warmer,0.4210233061019587,0
+sharpen the image,0.36184913489520487,0
+add vignette effect,0.5462103474263271,0
+boost highlights,0.5599059695573471,0
+deepen shadows,0.5199783122841206,0
+adjust white balance,0.6269802084990019,0
+increase exposure,0.6214686403138239,0
+add color grading,0.7113517345251248,1
+enhance details,0.8062130674521046,1
+make it more vibrant,0.9386016816145353,1
+adjust brightness,0.6962184501173152,1
+improve contrast,1.0,1
+brighten the photo,0.1047912200477498,0
+increase contrast,0.32482149049644166,0
+add more saturation,0.43883172064845766,0
+make colors warmer,0.44809918677350324,0
+sharpen the image,0.39773004801794054,0
+add vignette effect,0.47918777496427245,0
+boost highlights,0.4906999065341167,0
+deepen shadows,0.5210635243055789,0
+adjust white balance,0.7049602097021025,1
+increase exposure,0.6957015485965047,1
+add color grading,0.6307090404739345,0
+enhance details,0.829959987543325,1
+make it more vibrant,0.810729952087661,1
+adjust brightness,0.901286211883896,1
+improve contrast,0.9229628841923613,1
+brighten the photo,0.21710049890779273,0
+increase contrast,0.283981895980303,0
+add more saturation,0.4547293605123262,0
+make colors warmer,0.48103702654334646,0
+sharpen the image,0.45790984060358514,0
+add vignette effect,0.5117327383308782,0
+boost highlights,0.6677664895788425,1
+deepen shadows,0.5208428611164171,0
+adjust white balance,0.6747097381170037,1
+increase exposure,0.6397807347566106,0
+add color grading,0.6782318796772779,1
+enhance details,0.8498776851987191,1
+make it more vibrant,0.862541634898803,1
+adjust brightness,0.901350963600064,1
+improve contrast,0.990547880715433,1
+brighten the photo,0.3021003841632759,0
+increase contrast,0.40819529712949637,0
+add more saturation,0.3489733243406544,0
+make colors warmer,0.4524166352488442,0
+sharpen the image,0.4469856945632315,0
+add vignette effect,0.5096995964992718,0
+boost highlights,0.5995157025436914,0
+deepen shadows,0.4981779316766528,0
+adjust white balance,0.829238727568546,1
+increase exposure,0.5593982618500297,0
+add color grading,0.5785811387212267,0
+enhance details,0.8558110873500068,1
+make it more vibrant,0.8591662693962936,1
+adjust brightness,0.8824119817052156,1
+improve contrast,0.9228345509264281,1
+brighten the photo,0.29877532271530854,0
+increase contrast,0.2502745628514168,0
+add more saturation,0.3875804558193726,0
+make colors warmer,0.35228382884878884,0
+sharpen the image,0.557511973341775,0
+add vignette effect,0.48529426184978613,0
+boost highlights,0.45745028032074886,0
+deepen shadows,0.5478614158347007,0
+adjust white balance,0.6612931454275625,1
+increase exposure,0.6036275447196024,0
+add color grading,0.6177779604433569,0
+enhance details,0.7643687211491912,1
+make it more vibrant,0.8044966571108723,1
+adjust brightness,0.7693056824628871,1
+improve contrast,0.8128961694381678,1
+brighten the photo,0.3232049937357636,0
+increase contrast,0.19519156585026756,0
+add more saturation,0.23925362256234448,0
+make colors warmer,0.3481555778747564,0
+sharpen the image,0.4386552848288152,0
+add vignette effect,0.5310907565598004,0
+boost highlights,0.6875356216949553,1
+deepen shadows,0.665765962320202,1
+adjust white balance,0.6040061470036573,0
+increase exposure,0.658098379209731,1
+add color grading,0.5997470635362191,0
+enhance details,0.738148686400761,1
+make it more vibrant,0.7511341361079862,1
+adjust brightness,0.8522718560338091,1
+improve contrast,0.7772769056447678,1
+brighten the photo,0.35193465142411723,0
+increase contrast,0.4932738913002578,0
+add more saturation,0.3691239851543142,0
+make colors warmer,0.4601711722098941,0
+sharpen the image,0.5290143991711113,0
+add vignette effect,0.45987795281141636,0
+boost highlights,0.5624092481810418,0
+deepen shadows,0.5812592400781795,0
+adjust white balance,0.6297676098548831,0
+increase exposure,0.5826990216144533,0
+add color grading,0.7024510174258942,1
+enhance details,0.7897998291245449,1
+make it more vibrant,0.9251143607795043,1
+adjust brightness,0.9159270826085207,1
+improve contrast,1.0,1
+brighten the photo,0.22326524371119505,0
+increase contrast,0.4272320636720678,0
+add more saturation,0.3983342005738352,0
+make colors warmer,0.6389802933217672,0
+sharpen the image,0.37917017146448484,0
+add vignette effect,0.4160278157819224,0
+boost highlights,0.4800607354555978,0
+deepen shadows,0.3676104275690194,0
+adjust white balance,0.5674244978319238,0
+increase exposure,0.5840867338446301,0
+add color grading,0.7150393786476207,1
+enhance details,0.7741755975777159,1
+make it more vibrant,0.9676170839215886,1
+adjust brightness,0.915042383818605,1
+improve contrast,0.8023096344337598,1
+brighten the photo,0.21015853286516417,0
+increase contrast,0.38919191715065055,0
+add more saturation,0.2479766792979358,0
+make colors warmer,0.6031458765854354,0
+sharpen the image,0.5779440120721286,0
+add vignette effect,0.45308243478952953,0
+boost highlights,0.3686865470909122,0
+deepen shadows,0.7153872374165414,1
+adjust white balance,0.6085460154747382,0
+increase exposure,0.7837816311973461,1
+add color grading,0.5405572341205632,0
+enhance details,0.6800624977046227,1
+make it more vibrant,0.7805243699718183,1
+adjust brightness,0.8246980593764742,1
+improve contrast,0.8149934528520757,1
+brighten the photo,0.3622849932347499,0
+increase contrast,0.23323795706174053,0
+add more saturation,0.36576205149787067,0
+make colors warmer,0.43202956317118985,0
+sharpen the image,0.5114438834058749,0
+add vignette effect,0.571161487808889,0
+boost highlights,0.4275357908162131,0
+deepen shadows,0.42658858292643786,0
+adjust white balance,0.7477676821898509,1
+increase exposure,0.6932314011979591,1
+add color grading,0.6251513463443445,0
+enhance details,0.8951151975522523,1
+make it more vibrant,0.7915674634292859,1
+adjust brightness,0.9379297184063827,1
+improve contrast,0.866751848141011,1
+brighten the photo,0.5060747924881988,0
+increase contrast,0.5155340842443205,0
+add more saturation,0.35510358515209267,0
+make colors warmer,0.5171570950954355,0
+sharpen the image,0.5245375949585147,0
+add vignette effect,0.6368631557532349,0
+boost highlights,0.4435076539419896,0
+deepen shadows,0.648605145999844,0
+adjust white balance,0.7258424486849588,1
+increase exposure,0.4841260513576885,0
+add color grading,0.5816741487334225,0
+enhance details,0.5360767822239899,0
+make it more vibrant,0.7530593165555443,1
+adjust brightness,0.8917542255795963,1
+improve contrast,1.0,1
+brighten the photo,0.3074094780419775,0
+increase contrast,0.5028615545571291,0
+add more saturation,0.24198985417851085,0
+make colors warmer,0.2496617560644845,0
+sharpen the image,0.4544452301103381,0
+add vignette effect,0.5384065448939307,0
+boost highlights,0.5367305251905907,0
+deepen shadows,0.3732557899960124,0
+adjust white balance,0.6110879960487211,0
+increase exposure,0.5295530499495146,0
+add color grading,0.7669672548830038,1
+enhance details,0.7766598246096849,1
+make it more vibrant,0.6860120213672645,1
+adjust brightness,0.7686133082663307,1
+improve contrast,0.7540786478111049,1
+brighten the photo,0.2937320902726828,0
+increase contrast,0.4355142320501238,0
+add more saturation,0.2814273953664456,0
+make colors warmer,0.47040465155178446,0
+sharpen the image,0.4069742381627559,0
+add vignette effect,0.4207127167737656,0
+boost highlights,0.5292969640045443,0
+deepen shadows,0.47647576775806266,0
+adjust white balance,0.5646350694652817,0
+increase exposure,0.540212210741115,0
+add color grading,0.8964725132916389,1
+enhance details,0.7435263551971728,1
+make it more vibrant,0.7100274492007415,1
+adjust brightness,0.8413979910734223,1
+improve contrast,0.8487671950309171,1
+brighten the photo,0.2779030400466777,0
+increase contrast,0.4014166700043425,0
+add more saturation,0.4557507710047305,0
+make colors warmer,0.3669498852389472,0
+sharpen the image,0.402418175935532,0
+add vignette effect,0.4724948302848356,0
+boost highlights,0.3098078835264415,0
+deepen shadows,0.42848089378014487,0
+adjust white balance,0.7566874267444524,1
+increase exposure,0.8244967713501283,1
+add color grading,0.6750963960443621,1
+enhance details,0.7976556963055766,1
+make it more vibrant,0.8111250154543537,1
+adjust brightness,1.0,1
+improve contrast,0.9719574911434578,1
+brighten the photo,0.2872082408519233,0
+increase contrast,0.24444595593995738,0
+add more saturation,0.21935536797424274,0
+make colors warmer,0.4403463635867223,0
+sharpen the image,0.38436492547156964,0
+add vignette effect,0.3577746290402326,0
+boost highlights,0.47534271157574737,0
+deepen shadows,0.47184519963856053,0
+adjust white balance,0.7887141635072565,1
+increase exposure,0.748163975694945,1
+add color grading,0.6992027358683383,1
+enhance details,0.8879944138890026,1
+make it more vibrant,0.7877368307647619,1
+adjust brightness,0.7338715798671737,1
+improve contrast,1.0,1
+brighten the photo,0.3538910043684659,0
+increase contrast,0.2362753845673543,0
+add more saturation,0.3609661321916392,0
+make colors warmer,0.33243817466152425,0
+sharpen the image,0.3217200269035663,0
+add vignette effect,0.5926177547531641,0
+boost highlights,0.7309416640470131,1
+deepen shadows,0.4401432426180859,0
+adjust white balance,0.676296923669057,1
+increase exposure,0.5949357430878172,0
+add color grading,0.6512874616235304,1
+enhance details,0.6807606075761131,1
+make it more vibrant,0.6936009230320184,1
+adjust brightness,0.8248521627944828,1
+improve contrast,0.7769049883588963,1
+brighten the photo,0.3270456825779839,0
+increase contrast,0.33497618905508625,0
+add more saturation,0.35610519531335905,0
+make colors warmer,0.3292436337958402,0
+sharpen the image,0.40232286694316666,0
+add vignette effect,0.5755391225825757,0
+boost highlights,0.5900917187624382,0
+deepen shadows,0.48224447552014493,0
+adjust white balance,0.6299332305429226,0
+increase exposure,0.7351387123371789,1
+add color grading,0.5330594718878627,0
+enhance details,0.7943360192379935,1
+make it more vibrant,0.7137376241054154,1
+adjust brightness,0.877059866859316,1
+improve contrast,0.7836740843457484,1
+brighten the photo,0.11951178993354808,0
+increase contrast,0.1772457562116837,0
+add more saturation,0.3848084946661382,0
+make colors warmer,0.44597225017214814,0
+sharpen the image,0.3695683374895591,0
+add vignette effect,0.5638592458777374,0
+boost highlights,0.37384799377310407,0
+deepen shadows,0.5733920201352685,0
+adjust white balance,0.49889838002375436,0
+increase exposure,0.594816389219784,0
+add color grading,0.7047398671316414,1
+enhance details,0.6539586634716048,1
+make it more vibrant,0.7415444455770175,1
+adjust brightness,0.9206292809214441,1
+improve contrast,0.8023108130476853,1
+brighten the photo,0.38356921120651416,0
+increase contrast,0.22702931453423814,0
+add more saturation,0.4329804177915283,0
+make colors warmer,0.56415686206579,0
+sharpen the image,0.21283554998727103,0
+add vignette effect,0.42031047445295233,0
+boost highlights,0.597707212718054,0
+deepen shadows,0.5596954613957008,0
+adjust white balance,0.6571145873371309,1
+increase exposure,0.5996014813284178,0
+add color grading,0.7086589787472899,1
+enhance details,0.724432276460792,1
+make it more vibrant,0.8967782061659808,1
+adjust brightness,0.8454420843301214,1
+improve contrast,0.8937602662075204,1
+brighten the photo,0.25881230338775324,0
+increase contrast,0.2912393775927506,0
+add more saturation,0.3367441812180379,0
+make colors warmer,0.4594452142378297,0
+sharpen the image,0.4179015519179737,0
+add vignette effect,0.5289774856896413,0
+boost highlights,0.7475400798645438,1
+deepen shadows,0.6671124703431693,1
+adjust white balance,0.5873976467832159,0
+increase exposure,0.7801213922163944,1
+add color grading,0.6591924626978448,1
+enhance details,0.5361875464822146,0
+make it more vibrant,0.6791913689082596,1
+adjust brightness,0.6329208078974145,0
+improve contrast,0.8248486515958693,1
+brighten the photo,0.30184183791895514,0
+increase contrast,0.5076437312275283,0
+add more saturation,0.41269273737641626,0
+make colors warmer,0.39808994711911355,0
+sharpen the image,0.5429405581183488,0
+add vignette effect,0.27888646909921144,0
+boost highlights,0.5635614558108566,0
+deepen shadows,0.6570865193886968,1
+adjust white balance,0.47214137542201584,0
+increase exposure,0.7743754043206929,1
+add color grading,0.7338496407494414,1
+enhance details,0.6984712086099198,1
+make it more vibrant,0.8432781866106285,1
+adjust brightness,1.0,1
+improve contrast,0.8781866255058496,1
+brighten the photo,0.3248220586300336,0
+increase contrast,0.29406391004597554,0
+add more saturation,0.29501556305352084,0
+make colors warmer,0.5030335816544246,0
+sharpen the image,0.37439161740911325,0
+add vignette effect,0.5071566237219393,0
+boost highlights,0.49223425532348836,0
+deepen shadows,0.6278979825746392,0
+adjust white balance,0.6533662105286948,1
+increase exposure,0.7637539944257898,1
+add color grading,0.6489983601145253,0
+enhance details,0.7130125064706628,1
+make it more vibrant,0.6821236284217693,1
+adjust brightness,0.7755706739923889,1
+improve contrast,0.8977300493044853,1
+brighten the photo,0.3756988616645352,0
+increase contrast,0.2477834675822374,0
+add more saturation,0.46696059201056606,0
+make colors warmer,0.555563785880495,0
+sharpen the image,0.50134349032237,0
+add vignette effect,0.6876795812558066,1
+boost highlights,0.46262108008964276,0
+deepen shadows,0.4555345296688584,0
+adjust white balance,0.44212797510957214,0
+increase exposure,0.8096044311489182,1
+add color grading,0.7654365656354057,1
+enhance details,0.7344415329089545,1
+make it more vibrant,0.807996862631982,1
+adjust brightness,0.7074510952701624,1
+improve contrast,1.0,1
+brighten the photo,0.31292211819752275,0
+increase contrast,0.35093947946048926,0
+add more saturation,0.45257666238986927,0
+make colors warmer,0.4681009231736713,0
+sharpen the image,0.4823884024279131,0
+add vignette effect,0.4209525544554688,0
+boost highlights,0.5871468357135996,0
+deepen shadows,0.7682024496475035,1
+adjust white balance,0.7545420046154978,1
+increase exposure,0.8193186626639397,1
+add color grading,0.6488784323568815,0
+enhance details,0.6410395179741419,0
+make it more vibrant,0.7674213079900352,1
+adjust brightness,0.8255724912288696,1
+improve contrast,0.9694191518470949,1
+brighten the photo,0.13075353702851805,0
+increase contrast,0.4929550319460614,0
+add more saturation,0.36419921014210105,0
+make colors warmer,0.37731189300525797,0
+sharpen the image,0.3587895624739832,0
+add vignette effect,0.334514332813423,0
+boost highlights,0.6223170583961914,0
+deepen shadows,0.5873317967188405,0
+adjust white balance,0.4910039100258946,0
+increase exposure,0.5304921227936383,0
+add color grading,0.6664215300709871,1
+enhance details,0.9069021525289394,1
+make it more vibrant,0.7540408648636395,1
+adjust brightness,0.6696857046881894,1
+improve contrast,0.8354256935914057,1
+brighten the photo,0.27272764302523295,0
+increase contrast,0.0703113357058428,0
+add more saturation,0.3745705133482188,0
+make colors warmer,0.3969065469791322,0
+sharpen the image,0.5296206364813418,0
+add vignette effect,0.6848956094945345,1
+boost highlights,0.6526565029547757,1
+deepen shadows,0.553111130944517,0
+adjust white balance,0.509347409125833,0
+increase exposure,0.917335980324986,1
+add color grading,0.7059218434014488,1
+enhance details,0.7413929291912946,1
+make it more vibrant,0.7775874912889997,1
+adjust brightness,0.8398084760767855,1
+improve contrast,0.8455639588076058,1
+brighten the photo,0.24263379931197637,0
+increase contrast,0.28531410587596073,0
+add more saturation,0.3767246729784002,0
+make colors warmer,0.36565752288662345,0
+sharpen the image,0.3887154217322835,0
+add vignette effect,0.5106430227691897,0
+boost highlights,0.5145022782579145,0
+deepen shadows,0.7303992988582689,1
+adjust white balance,0.3549030191606988,0
+increase exposure,0.769150685192246,1
+add color grading,0.8246085192497629,1
+enhance details,0.532660976759185,0
+make it more vibrant,0.7457312405919652,1
+adjust brightness,0.7828559134004209,1
+improve contrast,0.719248830528218,1
+brighten the photo,0.22221833124091245,0
+increase contrast,0.2289424154534171,0
+add more saturation,0.5552270443423623,0
+make colors warmer,0.5135678393147461,0
+sharpen the image,0.5871555094994159,0
+add vignette effect,0.5721672064043235,0
+boost highlights,0.42709482287827716,0
+deepen shadows,0.5275479733720227,0
+adjust white balance,0.6689374561227918,1
+increase exposure,0.5377872191108054,0
+add color grading,0.7712998430172388,1
+enhance details,0.7159674601841866,1
+make it more vibrant,0.7425179192450403,1
+adjust brightness,0.8910959968203492,1
+improve contrast,0.904426331148604,1
+brighten the photo,0.263903383418092,0
+increase contrast,0.45593298033642476,0
+add more saturation,0.2718936672400103,0
+make colors warmer,0.4815935606944264,0
+sharpen the image,0.5193101257968383,0
+add vignette effect,0.469045356068601,0
+boost highlights,0.5726133022242118,0
+deepen shadows,0.45488864236146975,0
+adjust white balance,0.7124027019206901,1
+increase exposure,0.641509786355701,0
+add color grading,0.647727697948096,0
+enhance details,0.844900922583689,1
+make it more vibrant,0.7095656309457241,1
+adjust brightness,0.679153870363644,1
+improve contrast,0.7043370826476097,1
+brighten the photo,0.36060099513456395,0
+increase contrast,0.21195706475037165,0
+add more saturation,0.5554794181984365,0
+make colors warmer,0.21180705921162776,0
+sharpen the image,0.6296456368290038,0
+add vignette effect,0.5211017467202619,0
+boost highlights,0.5303286888129608,0
+deepen shadows,0.5255080913191051,0
+adjust white balance,0.6599136114352071,1
+increase exposure,0.6562365297575151,1
+add color grading,0.8103301882016521,1
+enhance details,0.751422764866204,1
+make it more vibrant,0.7950301761461878,1
+adjust brightness,0.7836387787786144,1
+improve contrast,0.8543054376278933,1
+brighten the photo,0.3307801768892059,0
+increase contrast,0.16898316073433742,0
+add more saturation,0.2451814577894287,0
+make colors warmer,0.49432640940227146,0
+sharpen the image,0.47708654381279414,0
+add vignette effect,0.48160166636473206,0
+boost highlights,0.5418433933065393,0
+deepen shadows,0.6147581705361672,0
+adjust white balance,0.5660240319690638,0
+increase exposure,0.5821695274597687,0
+add color grading,0.7195845255097681,1
+enhance details,0.6421627222384968,0
+make it more vibrant,0.8208252755714472,1
+adjust brightness,0.649741639576216,0
+improve contrast,0.9629155637325645,1
+brighten the photo,0.3472597482413043,0
+increase contrast,0.36560297343138753,0
+add more saturation,0.4782690983945514,0
+make colors warmer,0.5865474444462577,0
+sharpen the image,0.561437006501813,0
+add vignette effect,0.3159125768668355,0
+boost highlights,0.4120423033264299,0
+deepen shadows,0.5175181422304322,0
+adjust white balance,0.6226091050210834,0
+increase exposure,0.7117659020469123,1
+add color grading,0.6274256186846534,0
+enhance details,0.7586766764477079,1
+make it more vibrant,0.7044617067646678,1
+adjust brightness,0.7588482197008053,1
+improve contrast,0.7193338903151778,1
+brighten the photo,0.20767667538890955,0
+increase contrast,0.2048315394383666,0
+add more saturation,0.2824126747022667,0
+make colors warmer,0.525364179660784,0
+sharpen the image,0.36506011111680564,0
+add vignette effect,0.7632382064837391,1
+boost highlights,0.589331790088089,0
+deepen shadows,0.5984836123694874,0
+adjust white balance,0.5341642219818786,0
+increase exposure,0.730030987940899,1
+add color grading,0.6424362173762226,0
+enhance details,0.7522009814645362,1
+make it more vibrant,1.0,1
+adjust brightness,0.8103940100275351,1
+improve contrast,0.9749273326285677,1
+brighten the photo,0.22968235748741123,0
+increase contrast,0.3365011509503038,0
+add more saturation,0.557080063563551,0
+make colors warmer,0.35730329422122326,0
+sharpen the image,0.6412448557996928,0
+add vignette effect,0.5707751935455475,0
+boost highlights,0.4837533224105733,0
+deepen shadows,0.6432407739055521,0
+adjust white balance,0.7172554449626729,1
+increase exposure,0.7221809962217196,1
+add color grading,0.5429775280109543,0
+enhance details,0.6672862824175131,1
+make it more vibrant,0.7552481364448496,1
+adjust brightness,0.8125566570899955,1
+improve contrast,0.922067209755068,1
+brighten the photo,0.31777010009332535,0
+increase contrast,0.20646556412898984,0
+add more saturation,0.41801978510059634,0
+make colors warmer,0.4810585745283823,0
+sharpen the image,0.515979044793104,0
+add vignette effect,0.6080780725554622,0
+boost highlights,0.6233922154548904,0
+deepen shadows,0.6259180079228437,0
+adjust white balance,0.6129834288541353,0
+increase exposure,0.4939039066484008,0
+add color grading,0.7429618219132585,1
+enhance details,0.7607687687163112,1
+make it more vibrant,0.8071578837195373,1
+adjust brightness,0.692325142417969,1
+improve contrast,0.7518943459591738,1
+brighten the photo,0.40531528533329036,0
+increase contrast,0.33604448461433445,0
+add more saturation,0.44815006973726246,0
+make colors warmer,0.42283183761304594,0
+sharpen the image,0.4629756139495743,0
+add vignette effect,0.5938283805975998,0
+boost highlights,0.4883955271782626,0
+deepen shadows,0.5896120776940984,0
+adjust white balance,0.5737724711294957,0
+increase exposure,0.6165503772567683,0
+add color grading,0.669082787653136,1
+enhance details,0.7622133771633712,1
+make it more vibrant,0.7321251378336523,1
+adjust brightness,0.9455756125573521,1
+improve contrast,0.7705392697780498,1
+brighten the photo,0.2813128355838641,0
+increase contrast,0.2960268941725825,0
+add more saturation,0.5246977884353733,0
+make colors warmer,0.4396554776511574,0
+sharpen the image,0.5631844539468635,0
+add vignette effect,0.3514439626963028,0
+boost highlights,0.5667050265869259,0
+deepen shadows,0.6689630795623438,1
+adjust white balance,0.6282283989275425,0
+increase exposure,0.766548037506535,1
+add color grading,0.6482711549899627,0
+enhance details,0.880934744018558,1
+make it more vibrant,1.0,1
+adjust brightness,0.7837161439560342,1
+improve contrast,0.815449747859923,1
+brighten the photo,0.4453384477117701,0
+increase contrast,0.4979572145730712,0
+add more saturation,0.32771399728467315,0
+make colors warmer,0.37798131829041426,0
+sharpen the image,0.4318215391139492,0
+add vignette effect,0.36555494889657225,0
+boost highlights,0.44813480535158023,0
+deepen shadows,0.4795859233247933,0
+adjust white balance,0.5432202434895872,0
+increase exposure,0.6565315112613218,1
+add color grading,0.723421473253652,1
+enhance details,0.8950500492814077,1
+make it more vibrant,0.6801645959261209,1
+adjust brightness,0.9184322398476584,1
+improve contrast,0.8386011155774492,1
+brighten the photo,0.2950536290347567,0
+increase contrast,0.4074819492166603,0
+add more saturation,0.26772779784377015,0
+make colors warmer,0.4582409746184051,0
+sharpen the image,0.47664522082130556,0
+add vignette effect,0.5492451264008149,0
+boost highlights,0.5689168643907818,0
+deepen shadows,0.8255300139910895,1
+adjust white balance,0.5562260015748683,0
+increase exposure,0.6069003044998181,0
+add color grading,0.6376859473575235,0
+enhance details,0.6844522880839745,1
+make it more vibrant,0.7162612872693482,1
+adjust brightness,0.9389016531107552,1
+improve contrast,1.0,1
+brighten the photo,0.24292537062505237,0
+increase contrast,0.2567644426895771,0
+add more saturation,0.4271415556386404,0
+make colors warmer,0.3647776955719028,0
+sharpen the image,0.5232931817755511,0
+add vignette effect,0.52029230208513,0
+boost highlights,0.38842558850027686,0
+deepen shadows,0.7347505201330062,1
+adjust white balance,0.7995877673095522,1
+increase exposure,0.5987211309515613,0
+add color grading,0.6612298440064015,1
+enhance details,0.7685865390724905,1
+make it more vibrant,0.8134456789987026,1
+adjust brightness,0.8858544272672831,1
+improve contrast,1.0,1
+brighten the photo,0.28230527725059507,0
+increase contrast,0.2601702755461546,0
+add more saturation,0.24206807719854728,0
+make colors warmer,0.3469069960058081,0
+sharpen the image,0.45668730271262026,0
+add vignette effect,0.6794557863517787,1
+boost highlights,0.4882388700963829,0
+deepen shadows,0.6023787951638899,0
+adjust white balance,0.6183577103927248,0
+increase exposure,0.7788393273448083,1
+add color grading,0.9526932425873622,1
+enhance details,0.6869131227079679,1
+make it more vibrant,0.7310560557481778,1
+adjust brightness,0.9244160877069073,1
+improve contrast,0.9281891489626313,1
+brighten the photo,0.4846707325736034,0
+increase contrast,0.39839281853259634,0
+add more saturation,0.34407079092129406,0
+make colors warmer,0.4790654830692309,0
+sharpen the image,0.5708703580582908,0
+add vignette effect,0.5820482181197364,0
+boost highlights,0.5907274031107298,0
+deepen shadows,0.6866674689589155,1
+adjust white balance,0.7369295590445673,1
+increase exposure,0.7982158991037527,1
+add color grading,0.7648709887589642,1
+enhance details,0.7232881919683145,1
+make it more vibrant,0.7946713686433323,1
+adjust brightness,0.9406508966508358,1
+improve contrast,0.7783064329012765,1
+brighten the photo,0.3368673308872901,0
+increase contrast,0.3006661187672639,0
+add more saturation,0.38287448229348175,0
+make colors warmer,0.5478451862607299,0
+sharpen the image,0.4791099068019903,0
+add vignette effect,0.5046436548156149,0
+boost highlights,0.4040143859020081,0
+deepen shadows,0.6546253566027221,1
+adjust white balance,0.6845484181141075,1
+increase exposure,0.8763254723305459,1
+add color grading,0.6692221765047,1
+enhance details,0.7619150327663938,1
+make it more vibrant,0.8049383683710756,1
+adjust brightness,0.9777453279763475,1
+improve contrast,0.8504704467613049,1
+brighten the photo,0.3279021525770339,0
+increase contrast,0.40078965097165387,0
+add more saturation,0.39866091231563583,0
+make colors warmer,0.37535663854494716,0
+sharpen the image,0.4794089992898307,0
+add vignette effect,0.6073631749859772,0
+boost highlights,0.437348470058894,0
+deepen shadows,0.5932969674146876,0
+adjust white balance,0.5499879185060826,0
+increase exposure,0.7795046628924842,1
+add color grading,0.5476813095216224,0
+enhance details,0.6841078152728411,1
+make it more vibrant,0.8177211875064521,1
+adjust brightness,0.9765524029234341,1
+improve contrast,0.8534249738927013,1
+brighten the photo,0.24448004733068016,0
+increase contrast,0.528115706944059,0
+add more saturation,0.2351986099583756,0
+make colors warmer,0.20011940433799177,0
+sharpen the image,0.5040014450053332,0
+add vignette effect,0.4497945775647389,0
+boost highlights,0.4378767182869287,0
+deepen shadows,0.6508356447299354,1
+adjust white balance,0.6443800713771198,0
+increase exposure,0.6035921369263271,0
+add color grading,0.5719695601329104,0
+enhance details,0.8272457328280145,1
+make it more vibrant,0.8450201177958662,1
+adjust brightness,0.8100824136220618,1
+improve contrast,1.0,1
+brighten the photo,0.19299152336738473,0
+increase contrast,0.18744748290752608,0
+add more saturation,0.31080919301187554,0
+make colors warmer,0.4154413983644502,0
+sharpen the image,0.48433394493226917,0
+add vignette effect,0.475876394214367,0
+boost highlights,0.5752055396514297,0
+deepen shadows,0.45484605758095564,0
+adjust white balance,0.764376460407326,1
+increase exposure,0.651784882160743,1
+add color grading,0.8117295831588127,1
+enhance details,0.7742725346377703,1
+make it more vibrant,0.8256753219153784,1
+adjust brightness,0.8769767280232205,1
+improve contrast,0.9047708560017316,1
+brighten the photo,0.3642722759867544,0
+increase contrast,0.4729152530132431,0
+add more saturation,0.399652116970147,0
+make colors warmer,0.4909003757588512,0
+sharpen the image,0.4510264305712773,0
+add vignette effect,0.6440117215449472,0
+boost highlights,0.47236076979407304,0
+deepen shadows,0.7600940432910817,1
+adjust white balance,0.6159842049355656,0
+increase exposure,0.5169224897881951,0
+add color grading,0.7128104414910789,1
+enhance details,0.671894834252512,1
+make it more vibrant,0.8640643548988725,1
+adjust brightness,0.7547376020697609,1
+improve contrast,0.8153816566785221,1
+brighten the photo,0.11104592690544687,0
+increase contrast,0.2947693680750923,0
+add more saturation,0.13761206733710432,0
+make colors warmer,0.26160971765142765,0
+sharpen the image,0.5360414656144297,0
+add vignette effect,0.5785800158650832,0
+boost highlights,0.5825457561784965,0
+deepen shadows,0.4833023856870788,0
+adjust white balance,0.615228864385802,0
+increase exposure,0.6596397460909431,1
+add color grading,0.5841635310807457,0
+enhance details,0.890339830176715,1
+make it more vibrant,0.8677362290575672,1
+adjust brightness,0.7979035826170336,1
+improve contrast,0.8626885838994531,1
+brighten the photo,0.32083828079475524,0
+increase contrast,0.13582651315757088,0
+add more saturation,0.3552822617479403,0
+make colors warmer,0.35180157520022015,0
+sharpen the image,0.3598379990105084,0
+add vignette effect,0.4718899707114045,0
+boost highlights,0.7197686526849523,1
+deepen shadows,0.6440842861267011,0
+adjust white balance,0.5628821010217203,0
+increase exposure,0.7172582781356158,1
