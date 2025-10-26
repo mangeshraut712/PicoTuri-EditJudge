@@ -52,10 +52,10 @@ def main():
             Path(sample_file), test_size=0.5, seed=42, compute_similarity=False
         )
 
-        print(".3f")
-        print(".3f")
-        print(".3f")
-        print(".3f")
+        print(f"Accuracy: {artifacts.metrics['accuracy']:.3f}")
+        print(f"F1 Score: {artifacts.metrics['f1']:.3f}")
+        print(f"ROC AUC: {artifacts.metrics.get('roc_auc', float('nan')):.3f}")
+        print(f"Training samples: {artifacts.train_size}, Test samples: {artifacts.test_size}")
     except Exception as e:
         print(f"❌ Training failed: {e}")
         return False
@@ -72,7 +72,7 @@ def main():
 
         print("🔮 Predictions on sample inputs:")
         for i, pred in enumerate(predictions):
-            print(".3f")
+            print(f"   Sample {i+1}: {pred:.3f}")
     except Exception as e:
         print(f"⚠️ Prediction test failed: {e}")
 
@@ -83,7 +83,7 @@ def main():
     print("📱 Core ML status:")
     if ios_model.exists():
         size_kb = ios_model.stat().st_size / 1024
-        print(".0f")
+        print(f"   Model size: {size_kb:.0f} KB")
         print("   Ready for iOS demo!")
     elif manifest.exists():
         print("   Manifest ready - use Python 3.12 with coremltools to build .mlmodel")
