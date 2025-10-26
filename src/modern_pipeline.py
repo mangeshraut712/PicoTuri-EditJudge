@@ -156,7 +156,7 @@ class PicoBananaDataset(BaseDataset):  # type: ignore[misc]
     def __len__(self) -> int:
         return len(self.data)
 
-    def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor, str]:
+    def __getitem__(self, idx: int) -> Tuple[Any, Any, str]:
         if torch is None or Image is None:
             raise RuntimeError("PyTorch and Pillow must be installed to use PicoBananaDataset.")
 
@@ -224,8 +224,8 @@ class ModernImageEditor(BaseModule):  # type: ignore[misc]
         )
 
     def forward(
-        self, source_img: Tensor, instruction_embedding: Tensor
-    ) -> Tuple[Optional[Tensor], Tensor]:
+        self, source_img: Any, instruction_embedding: Any
+    ) -> Tuple[Optional[Any], Any]:
         if torch is None:
             raise RuntimeError("PyTorch must be installed to use ModernImageEditor.")
 
@@ -330,7 +330,7 @@ class AppleOptimizer:
         return quantised  # type: ignore[return-value]
 
     @staticmethod
-    def export_to_coreml(model: ModernImageEditor, example_input: Tensor, save_path: str) -> None:
+    def export_to_coreml(model: ModernImageEditor, example_input: Any, save_path: str) -> None:
         if torch is None or ct is None:
             raise RuntimeError(
                 "torch and coremltools are required to export to Core ML. "
@@ -382,7 +382,7 @@ def ensure_dependencies() -> None:
         )
 
 
-def build_default_transform() -> TransformCompose:
+def build_default_transform() -> Any:
     ensure_dependencies()
     if transforms is None:
         raise RuntimeError("torchvision.transforms is required for default preprocessing.")
