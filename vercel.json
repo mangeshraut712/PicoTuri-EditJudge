@@ -8,6 +8,23 @@
       "config": {
         "distDir": "dist"
       }
+    },
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ],
   "env": {
@@ -15,11 +32,5 @@
     "NODE_VERSION": "18.x",
     "PYTHONUNBUFFERED": "1",
     "PYTHONPATH": "/var/task"
-  },
-  "functions": {
-    "api/**/*.py": {
-      "maxDuration": 60,
-      "memory": 3008
-    }
   }
 }
