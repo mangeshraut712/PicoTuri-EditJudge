@@ -187,10 +187,10 @@ class TrainingHead:
 
     def train(
         self,
-        train_features: np.ndarray,
-        train_labels: np.ndarray,
-        val_features: Optional[np.ndarray] = None,
-        val_labels: Optional[np.ndarray] = None,
+        train_features,
+        train_labels,
+        val_features=None,
+        val_labels=None,
         epochs: int = 100,
         batch_size: int = 32,
         learning_rate: float = 1e-3,
@@ -222,6 +222,12 @@ class TrainingHead:
                 train_features, train_labels, test_size=validation_split,
                 random_state=42, stratify=train_labels
             )
+
+        # Ensure features and labels are numpy arrays
+        train_features = np.array(train_features)
+        val_features = np.array(val_features)
+        train_labels = np.array(train_labels)
+        val_labels = np.array(val_labels)
 
         # Create datasets and loaders
         train_dataset = EditJudgeDataset(train_features, train_labels)
@@ -413,6 +419,8 @@ class TrainingHead:
         if apply_calibration and self.calibrator is not None:
             if self.calibration_method == "platt":
                 predictions = self.calibrator.predict_proba(predictions.reshape(-1, 1))[:, 1]
+            elif self.calibration_method == "isotonic":
+                predictions = self.calibrator.transform(predictions)
             else:
                 predictions = self.calibrator.transform(predictions)
         elif apply_calibration and self.temperature is not None:

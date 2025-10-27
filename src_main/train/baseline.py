@@ -169,12 +169,12 @@ def train_baseline_model(
     return artifacts, (X_test, y_test)
 
 
-def evaluate_model(pipeline: Pipeline, X_test: pd.DataFrame, y_test: pd.Series) -> Dict[str, float]:
+def evaluate_model(pipeline: Pipeline, X_test, y_test) -> Dict[str, float]:
     """Evaluate the trained model."""
     y_pred = pipeline.predict(X_test)
     metrics = {
         "accuracy": accuracy_score(y_test, y_pred),
-        "f1": f1_score(y_test, y_pred, zero_division=0),
+        "f1": f1_score(y_test, y_pred, zero_division=0.0),
     }
 
     try:

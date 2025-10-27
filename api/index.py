@@ -219,9 +219,6 @@ def internal_error(error):
 # Vercel serverless function handler
 def handler(event, context):
     """Handle Vercel serverless function requests."""
-    from werkzeug.middleware.dispatcher import DispatcherMiddleware
-    from werkzeug.serving import make_server
-    
     # For Vercel, we need to handle the request differently
     # This is a simplified handler - in production, use vercel-wsgi or similar
     

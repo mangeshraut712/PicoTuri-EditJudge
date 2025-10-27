@@ -10,13 +10,13 @@ import numpy as np
 from pathlib import Path
 import logging
 import yaml
-from typing import Dict, List, Optional, Tuple
+from typing import Dict
 import time
 
 # Import our modules
 from src_main.features_text.bert import BERTTextEmbedder
 from src_main.features_image.clip import CLIPImageEmbedder
-from src_main.fuse.stack import FeatureFusionStack, FusionMLPHead
+from src_main.fuse.stack import FusionMLPHead
 
 logger = logging.getLogger(__name__)
 
@@ -141,7 +141,7 @@ class ONNXExporter:
         try:
             torch.onnx.export(
                 embedder.model.visual,
-                dummy_input,
+                (dummy_input,),
                 output_path,
                 input_names=onnx_config['input_names'],
                 output_names=onnx_config['output_names'],
@@ -201,7 +201,7 @@ class ONNXExporter:
         try:
             torch.onnx.export(
                 model,
-                dummy_input,
+                (dummy_input,),
                 output_path,
                 input_names=onnx_config['input_names'],
                 output_names=onnx_config['output_names'],
