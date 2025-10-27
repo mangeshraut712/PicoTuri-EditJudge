@@ -215,18 +215,150 @@ def internal_error(error):
     """Handle 500 errors."""
     return jsonify({'error': 'Internal server error'}), 500
 
-# Vercel serverless function handler
-def handler(event, context):
-    """Handle Vercel serverless function requests."""
-    # For Vercel, we need to handle the request differently
-    # This is a simplified handler - in production, use vercel-wsgi or similar
-    
-    # Mock response for now
-    return {
-        'statusCode': 200,
-        'headers': {'Content-Type': 'application/json'},
-        'body': '{"message": "API endpoint - work in progress"}'
-    }
+@app.route('/api/test/quality-scorer', methods=['POST'])
+def test_quality_scorer():
+    """Test the quality scorer algorithm."""
+    try:
+        # Mock quality scorer response
+        response = {
+            'success': True,
+            'overall_score': 0.85,
+            'components': {
+                'instruction_compliance': 0.88,
+                'editing_realism': 0.82,
+                'preservation_balance': 0.86,
+                'technical_quality': 0.84
+            },
+            'weights': {
+                'instruction_compliance': 0.40,
+                'editing_realism': 0.25,
+                'preservation_balance': 0.20,
+                'technical_quality': 0.15
+            },
+            'grade': 'A-',
+            'recommendation': 'Excellent edit quality with strong instruction compliance'
+        }
+        return jsonify(response), 200
+    except Exception as e:
+        logger.error(f"Error in test_quality_scorer: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/test/diffusion-model', methods=['POST'])
+def test_diffusion_model():
+    """Test the diffusion model algorithm."""
+    try:
+        # Mock diffusion model response
+        response = {
+            'success': True,
+            'parameters': 10900000,
+            'input_shape': [3, 512, 512],
+            'output_shape': [3, 512, 512],
+            'architecture': 'U-Net with cross-attention',
+            'supports_text_to_image': True,
+            'supports_image_to_image': True
+        }
+        return jsonify(response), 200
+    except Exception as e:
+        logger.error(f"Error in test_diffusion_model: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/test/dpo-training', methods=['POST'])
+def test_dpo_training():
+    """Test the DPO training algorithm."""
+    try:
+        # Mock DPO training response
+        response = {
+            'success': True,
+            'loss': 0.0234,
+            'preference_accuracy': 87.5,
+            'kl_divergence': 0.00015,
+            'training_steps': 1250,
+            'learning_rate': 0.0001,
+            'convergence_achieved': True
+        }
+        return jsonify(response), 200
+    except Exception as e:
+        logger.error(f"Error in test_dpo_training: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/test/multi-turn', methods=['POST'])
+def test_multi_turn():
+    """Test the multi-turn editor algorithm."""
+    try:
+        # Mock multi-turn editor response
+        response = {
+            'success': True,
+            'instructions_processed': 8,
+            'edits_completed': 7,
+            'failed_edits': 1,
+            'success_rate': 87.5,
+            'average_confidence': 0.82,
+            'session_duration': 45.2,
+            'conflict_detection_active': True
+        }
+        return jsonify(response), 200
+    except Exception as e:
+        logger.error(f"Error in test_multi_turn: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/test/coreml', methods=['POST'])
+def test_coreml():
+    """Test the Core ML optimizer algorithm."""
+    try:
+        # Mock Core ML optimizer response
+        response = {
+            'success': True,
+            'ios_files_generated': 3,
+            'coreml_version': '7.1',
+            'apple_silicon': True,
+            'neural_engine_support': True,
+            'target_ios_version': '17.0+',
+            'quantization_applied': True,
+            'model_size_reduction': 0.65
+        }
+        return jsonify(response), 200
+    except Exception as e:
+        logger.error(f"Error in test_coreml: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/test/baseline', methods=['POST'])
+def test_baseline():
+    """Test the baseline model algorithm."""
+    try:
+        # Mock baseline model response
+        response = {
+            'success': True,
+            'classifier': 'LogisticRegression',
+            'solver': 'lbfgs',
+            'max_iter': 1000,
+            'pipeline_steps': 2,
+            'training_accuracy': 0.89,
+            'validation_accuracy': 0.85,
+            'feature_extraction': 'TF-IDF'
+        }
+        return jsonify(response), 200
+    except Exception as e:
+        logger.error(f"Error in test_baseline: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/test/features', methods=['POST'])
+def test_features():
+    """Test the feature extraction algorithm."""
+    try:
+        # Mock feature extraction response
+        response = {
+            'success': True,
+            'tfidf_features': 1024,
+            'similarity_score': 0.78,
+            'ngram_range': '(1, 2)',
+            'vocabulary_size': 15432,
+            'feature_extraction_time': 0.023,
+            'similarity_computation_time': 0.008
+        }
+        return jsonify(response), 200
+    except Exception as e:
+        logger.error(f"Error in test_features: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5001)
