@@ -365,7 +365,7 @@ if __name__ == '__main__':
 
 # Vercel WSGI handler
 try:
-    from vercel_wsgi import handle_wsgi
+    from vercel_wsgi import handle_wsgi  # type: ignore[import]
     handler = handle_wsgi(app)
 except ImportError:
     # Fallback if vercel_wsgi is not available
