@@ -8,29 +8,15 @@
       "config": {
         "distDir": "dist"
       }
-    },
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "50mb",
-        "includeFiles": "api/requirements.txt"
-      }
     }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.py"
-    },
     {
       "src": "/(.*)",
       "dest": "/$1"
     }
   ],
   "env": {
-    "PYTHON_VERSION": "3.12",
-    "NODE_VERSION": "18.x",
-    "PYTHONUNBUFFERED": "1"
+    "NODE_VERSION": "18.x"
   }
 }
