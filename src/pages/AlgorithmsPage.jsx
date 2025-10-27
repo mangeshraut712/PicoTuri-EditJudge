@@ -180,10 +180,10 @@ function AlgorithmsPage() {
           </div>
         )}
 
-        {/* Algorithm Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+        {/* Algorithm Grid - Improved Layout */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6 mb-8">
           {algorithms.map((algo) => (
-            <EnhancedAlgorithmCard
+            <AlgorithmCard
               key={algo.name}
               {...algo}
               onTest={() => testAlgorithm(algo.name, algo.endpoint)}
@@ -230,66 +230,129 @@ function StatCard({ icon, title, value, subtitle, color, trend }) {
   )
 }
 
-function EnhancedAlgorithmCard({ name, icon, description, details, color, category, hasImages, imageType, onTest, testing, result, onSelect }) {
-  const [expanded, setExpanded] = useState(false)
+function AlgorithmCard({ name, icon, description, details, color, category, hasImages, imageType, onTest, testing, result, onSelect }) {
+  const [showDetails, setShowDetails] = useState(false)
+
+  // Different layout types based on algorithm characteristics
+  const getLayoutType = () => {
+    if (category === 'Assessment') return 'vertical-compact' // Quality Scorer - needs detailed component breakdown
+    if (category === 'Generation') return 'horizontal-visual' // Diffusion Model - show architecture
+    if (category === 'Training') return 'vertical-metrics' // DPO Training - show training metrics
+    if (category === 'Interaction') return 'horizontal-stats' // Multi-Turn - show session stats
+    if (category === 'Deployment') return 'vertical-features' // Core ML - show optimization features
+    if (category === 'Baseline') return 'horizontal-pipeline' // Baseline - show pipeline
+    if (category === 'Features') return 'vertical-analysis' // Feature Extraction - show analysis
+    return 'vertical-compact'
+  }
+
+  const layoutType = getLayoutType()
 
   return (
-    <div className="glass rounded-2xl p-6 card-hover flex flex-col relative overflow-hidden group">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-bl-full"></div>
+    <div className="glass rounded-2xl p-6 card-hover relative overflow-hidden min-h-[400px] flex flex-col">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-50"></div>
 
-      <div className="flex items-start justify-between mb-4">
-        <div className="text-4xl">{icon}</div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs px-2 py-1 rounded-full bg-white/10">{category}</span>
-          {hasImages && (
-            <button
-              onClick={onSelect}
-              className="text-xs px-2 py-1 rounded-full bg-blue-500/20 hover:bg-blue-500/30 transition-all"
-            >
-              <Eye className="w-3 h-3 inline mr-1" />
-              Images
-            </button>
-          )}
+      {/* Header Section - Always at top */}
+      <div className="relative z-10 flex items-start justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className={`text-3xl p-2 rounded-xl bg-gradient-to-r ${color} shadow-lg`}>
+            {icon}
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-white">{name}</h3>
+            <span className="text-xs px-2 py-1 rounded-full bg-white/10 text-gray-300">
+              {category}
+            </span>
+          </div>
         </div>
+        {hasImages && (
+          <button
+            onClick={onSelect}
+            className="text-xs px-3 py-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 transition-all flex items-center gap-1"
+          >
+            <Eye className="w-3 h-3" />
+            View
+          </button>
+        )}
       </div>
 
-      <h3 className="text-xl md:text-2xl font-bold mb-2">{name}</h3>
-      <p className="text-sm text-gray-400 mb-4 flex-grow">{description}</p>
+      {/* Description */}
+      <p className="text-sm text-gray-300 mb-4 line-clamp-2 relative z-10">{description}</p>
 
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="text-xs text-blue-400 hover:text-blue-300 mb-4 text-left transition-all"
-      >
-        {expanded ? '▼ Hide Details' : '▶ Show Details'}
-      </button>
-
-      {expanded && (
-        <div className="mb-4 p-3 bg-black/20 rounded-lg text-sm text-gray-300 animate-fadeIn">
-          {details}
-        </div>
-      )}
-
-      <button
-        onClick={onTest}
-        disabled={testing}
-        className={`w-full py-3 px-6 rounded-xl font-semibold bg-gradient-to-r ${color} hover:opacity-90 transition-all disabled:opacity-50 mb-4 flex items-center justify-center gap-2`}
-      >
-        {testing ? (
-          <>
-            <PauseCircle className="w-4 h-4 animate-spin" />
-            Testing...
-          </>
-        ) : (
-          <>
-            <PlayCircle className="w-4 h-4" />
-            Test Algorithm
-          </>
+      {/* Content Area - Different layouts based on algorithm type */}
+      <div className="flex-1 relative z-10 mb-4">
+        {layoutType === 'vertical-compact' && (
+          <CompactQualityLayout result={result} />
         )}
-      </button>
 
-      {result && (
-        <EnhancedResultsPanel result={result} algorithmName={name} />
-      )}
+        {layoutType === 'horizontal-visual' && (
+          <HorizontalArchitectureLayout result={result} />
+        )}
+
+        {layoutType === 'vertical-metrics' && (
+          <VerticalMetricsLayout result={result} />
+        )}
+
+        {layoutType === 'horizontal-stats' && (
+          <HorizontalStatsLayout result={result} />
+        )}
+
+        {layoutType === 'vertical-features' && (
+          <VerticalFeaturesLayout result={result} />
+        )}
+
+        {layoutType === 'horizontal-pipeline' && (
+          <HorizontalPipelineLayout result={result} />
+        )}
+
+        {layoutType === 'vertical-analysis' && (
+          <VerticalAnalysisLayout result={result} />
+        )}
+
+        {/* Placeholder for algorithms without results */}
+        {!result && (
+          <div className="h-32 flex items-center justify-center bg-white/5 rounded-lg">
+            <div className="text-center text-gray-400">
+              <PlayCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <p className="text-xs">Run test to see visualization</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Action Section - Always at bottom */}
+      <div className="relative z-10 space-y-3">
+        <button
+          onClick={() => setShowDetails(!showDetails)}
+          className="w-full text-xs text-blue-400 hover:text-blue-300 transition-all text-left"
+        >
+          {showDetails ? '▼ Hide Technical Details' : '▶ Show Technical Details'}
+        </button>
+
+        {showDetails && (
+          <div className="p-3 bg-black/20 rounded-lg text-xs text-gray-300 animate-fadeIn">
+            {details}
+          </div>
+        )}
+
+        <button
+          onClick={onTest}
+          disabled={testing}
+          className={`w-full py-3 px-4 rounded-xl font-semibold bg-gradient-to-r ${color} hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2`}
+        >
+          {testing ? (
+            <>
+              <PauseCircle className="w-4 h-4 animate-spin" />
+              Testing...
+            </>
+          ) : (
+            <>
+              <PlayCircle className="w-4 h-4" />
+              Test Algorithm
+            </>
+          )}
+        </button>
+      </div>
     </div>
   )
 }
@@ -357,6 +420,282 @@ function EnhancedResultsPanel({ result, algorithmName }) {
           {JSON.stringify(result, null, 2)}
         </pre>
       </details>
+    </div>
+  )
+}
+
+// Algorithm-specific layout components
+function CompactQualityLayout({ result }) {
+  if (!result || !result.components) {
+    return (
+      <div className="bg-black/20 p-3 rounded-lg">
+        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
+          <BarChart3 className="w-3 h-3" />
+          Quality Assessment Components
+        </div>
+        <div className="text-xs text-gray-500">Run test to see component breakdown</div>
+      </div>
+    )
+  }
+
+  const components = Object.entries(result.components).slice(0, 3) // Show top 3 components
+
+  return (
+    <div className="bg-black/20 p-3 rounded-lg">
+      <div className="text-xs text-gray-400 mb-3 flex items-center gap-2">
+        <BarChart3 className="w-3 h-3" />
+        Quality Components
+      </div>
+      <div className="space-y-2">
+        {components.map(([key, value]) => (
+          <div key={key} className="flex items-center justify-between">
+            <span className="text-xs text-gray-300 capitalize">
+              {key.replace(/_/g, ' ')}
+            </span>
+            <div className="flex items-center gap-2">
+              <div className="w-12 h-1 bg-white/20 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-blue-400 rounded-full transition-all"
+                  style={{ width: `${value * 100}%` }}
+                ></div>
+              </div>
+              <span className="text-xs font-semibold text-blue-400">
+                {(value * 100).toFixed(0)}%
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function HorizontalArchitectureLayout({ result }) {
+  if (!result || !result.parameters) {
+    return (
+      <div className="bg-black/20 p-3 rounded-lg">
+        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
+          <Layers className="w-3 h-3" />
+          Model Architecture
+        </div>
+        <div className="text-xs text-gray-500">Run test to see architecture details</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-black/20 p-3 rounded-lg">
+      <div className="text-xs text-gray-400 mb-3 flex items-center gap-2">
+        <Layers className="w-3 h-3" />
+        Model Architecture
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="text-center">
+          <div className="text-lg font-bold text-purple-400">{(result.parameters / 1000000).toFixed(1)}M</div>
+          <div className="text-xs text-gray-400">Parameters</div>
+        </div>
+        <div className="w-px h-8 bg-white/20"></div>
+        <div className="text-center">
+          <div className="text-lg font-bold text-pink-400">
+            {result.input_shape ? result.input_shape.join('×') : 'N/A'}
+          </div>
+          <div className="text-xs text-gray-400">Input Shape</div>
+        </div>
+        <div className="w-px h-8 bg-white/20"></div>
+        <div className="text-center">
+          <div className="text-lg font-bold text-blue-400">
+            {result.output_shape ? result.output_shape.join('×') : 'N/A'}
+          </div>
+          <div className="text-xs text-gray-400">Output Shape</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function VerticalMetricsLayout({ result }) {
+  if (!result || result.loss === undefined) {
+    return (
+      <div className="bg-black/20 p-3 rounded-lg">
+        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
+          <TrendingUp className="w-3 h-3" />
+          Training Metrics
+        </div>
+        <div className="text-xs text-gray-500">Run test to see training progress</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-black/20 p-3 rounded-lg">
+      <div className="text-xs text-gray-400 mb-3 flex items-center gap-2">
+        <TrendingUp className="w-3 h-3" />
+        Training Progress
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="text-center p-2 bg-orange-500/10 rounded">
+          <div className="text-sm font-bold text-orange-400">{result.loss.toFixed(4)}</div>
+          <div className="text-xs text-gray-400">Loss</div>
+        </div>
+        <div className="text-center p-2 bg-red-500/10 rounded">
+          <div className="text-sm font-bold text-red-400">{result.preference_accuracy?.toFixed(1)}%</div>
+          <div className="text-xs text-gray-400">Accuracy</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function HorizontalStatsLayout({ result }) {
+  if (!result || result.instructions_processed === undefined) {
+    return (
+      <div className="bg-black/20 p-3 rounded-lg">
+        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
+          <GitBranch className="w-3 h-3" />
+          Session Statistics
+        </div>
+        <div className="text-xs text-gray-500">Run test to see session stats</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-black/20 p-3 rounded-lg">
+      <div className="text-xs text-gray-400 mb-3 flex items-center gap-2">
+        <GitBranch className="w-3 h-3" />
+        Session Stats
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="text-center">
+          <div className="text-lg font-bold text-green-400">{result.success_rate?.toFixed(0)}%</div>
+          <div className="text-xs text-gray-400">Success Rate</div>
+        </div>
+        <div className="w-px h-8 bg-white/20"></div>
+        <div className="text-center">
+          <div className="text-lg font-bold text-emerald-400">{(result.average_confidence * 100)?.toFixed(0)}%</div>
+          <div className="text-xs text-gray-400">Confidence</div>
+        </div>
+        <div className="w-px h-8 bg-white/20"></div>
+        <div className="text-center">
+          <div className="text-lg font-bold text-blue-400">{result.instructions_processed}</div>
+          <div className="text-xs text-gray-400">Processed</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function VerticalFeaturesLayout({ result }) {
+  if (!result || result.ios_files_generated === undefined) {
+    return (
+      <div className="bg-black/20 p-3 rounded-lg">
+        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
+          <Cpu className="w-3 h-3" />
+          Optimization Features
+        </div>
+        <div className="text-xs text-gray-500">Run test to see optimization details</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-black/20 p-3 rounded-lg">
+      <div className="text-xs text-gray-400 mb-3 flex items-center gap-2">
+        <Cpu className="w-3 h-3" />
+        iOS Optimization
+      </div>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-300">Apple Silicon</span>
+          <span className={`text-xs px-2 py-1 rounded ${
+            result.apple_silicon ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+          }`}>
+            {result.apple_silicon ? 'Optimized' : 'Not Ready'}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-300">Neural Engine</span>
+          <span className={`text-xs px-2 py-1 rounded ${
+            result.neural_engine_support ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'
+          }`}>
+            {result.neural_engine_support ? 'Supported' : 'Not Supported'}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function HorizontalPipelineLayout({ result }) {
+  if (!result || !result.classifier) {
+    return (
+      <div className="bg-black/20 p-3 rounded-lg">
+        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
+          <Settings className="w-3 h-3" />
+          Pipeline Architecture
+        </div>
+        <div className="text-xs text-gray-500">Run test to see pipeline details</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-black/20 p-3 rounded-lg">
+      <div className="text-xs text-gray-400 mb-3 flex items-center gap-2">
+        <Settings className="w-3 h-3" />
+        ML Pipeline
+      </div>
+      <div className="flex items-center justify-center gap-2">
+        <div className="text-center">
+          <div className="w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center text-xs font-bold">
+            1
+          </div>
+          <div className="text-xs text-gray-400 mt-1">TF-IDF</div>
+        </div>
+        <div className="w-4 h-px bg-white/30"></div>
+        <div className="text-center">
+          <div className="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center text-xs font-bold">
+            2
+          </div>
+          <div className="text-xs text-gray-400 mt-1">Logistic</div>
+        </div>
+      </div>
+      <div className="text-center mt-2">
+        <div className="text-sm font-bold text-cyan-400">{result.training_accuracy?.toFixed(1)}% Accuracy</div>
+      </div>
+    </div>
+  )
+}
+
+function VerticalAnalysisLayout({ result }) {
+  if (!result || result.tfidf_features === undefined) {
+    return (
+      <div className="bg-black/20 p-3 rounded-lg">
+        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
+          <Eye className="w-3 h-3" />
+          Feature Analysis
+        </div>
+        <div className="text-xs text-gray-500">Run test to see feature analysis</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-black/20 p-3 rounded-lg">
+      <div className="text-xs text-gray-400 mb-3 flex items-center gap-2">
+        <Eye className="w-3 h-3" />
+        Feature Analysis
+      </div>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-300">TF-IDF Features</span>
+          <span className="text-xs font-semibold text-yellow-400">{result.tfidf_features}D</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-300">Similarity Score</span>
+          <span className="text-xs font-semibold text-orange-400">{(result.similarity_score * 100)?.toFixed(1)}%</span>
+        </div>
+      </div>
     </div>
   )
 }
