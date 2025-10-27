@@ -108,9 +108,9 @@ def score_quality():
         edited_img = Image.open(BytesIO(base64.b64decode(edited_b64)))
         
         # Convert to tensors
-        transform = torch.transforms.Compose([
-            torch.transforms.Resize((256, 256)),
-            torch.transforms.ToTensor(),
+        transform = transforms.Compose([
+            transforms.Resize((256, 256)),
+            transforms.ToTensor(),
         ])
         
         original_tensor = transform(original_img).unsqueeze(0)

@@ -28,6 +28,7 @@ try:
     HAS_CLIP = True
 except ImportError:
     HAS_CLIP = False
+    clip = None  # type: ignore[assignment]
 
 
 class InstructionComplianceScorer(nn.Module):
@@ -316,7 +317,7 @@ class AdvancedQualityScorer(nn.Module):
         original: torch.Tensor,
         edited: torch.Tensor,
         instructions: List[str],
-    ) -> Dict[str, float]:
+    ) -> Dict[str, Any]:
         """
         Compute comprehensive quality score with detailed component breakdown.
 
@@ -416,10 +417,11 @@ class AdvancedQualityScorer(nn.Module):
         instructions = [instruction]
 
         # Compute scores
-        scores = self.forward(original_tensor, edited_tensor, instructions)  # type: ignore
+        score_dict = self.forward(original_tensor, edited_tensor, instructions)  # type: ignore
+        detailed_scores: Dict[str, Any] = dict(score_dict)
 
         # Add evaluation summary
-        overall = scores['overall_score']
+        overall = detailed_scores['overall_score']
         if overall >= 0.9:
             grade = "Exceptional"
             recommendation = "Publish as exemplar"
@@ -438,7 +440,7 @@ class AdvancedQualityScorer(nn.Module):
 
         # Build result dictionary with proper typing
         result: Dict[str, Any] = {
-            **scores,  # Unpack existing float scores
+            **detailed_scores,  # Unpack existing scores
             'grade': grade,
             'recommendation': recommendation,
             'instruction': instruction,

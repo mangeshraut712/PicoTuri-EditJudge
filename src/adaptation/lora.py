@@ -710,7 +710,7 @@ def test_lora_adapter():
     # Test saving and loading
     adapter.save_adapter("/tmp/test_lora_adapter")
 
-    loaded_adapter = LoRAAdapter.load_adapter(
+    LoRAAdapter.load_adapter(
         "/tmp/test_lora_adapter",
         device="cpu"
     )

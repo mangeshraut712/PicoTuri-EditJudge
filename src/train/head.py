@@ -89,9 +89,13 @@ class CalibrationMethod:
         return iso
 
     @staticmethod
-    def temperature_scaling(scores: np.ndarray, labels: np.ndarray,
-                          model: nn.Module, loader: DataLoader,
-                          device: str = "cpu") -> float:
+    def temperature_scaling(
+        scores: np.ndarray,
+        labels: np.ndarray,
+        model: nn.Module,
+        loader: DataLoader,
+        device: str = "cpu",
+    ) -> float:
         """
         Temperature scaling calibration
 
@@ -245,7 +249,7 @@ class TrainingHead:
             train_predictions = []
             train_targets = []
 
-            for batch in tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}"):
+            for batch in tqdm(train_loader, desc=f"Epoch {epoch + 1}/{epochs}"):
                 features = batch['features'].to(self.device)
                 labels = batch['labels'].to(self.device)
 
@@ -307,13 +311,13 @@ class TrainingHead:
                 patience_counter += 1
 
             if patience_counter >= patience:
-                logger.info(f"Early stopping at epoch {epoch+1}")
+                logger.info(f"Early stopping at epoch {epoch + 1}")
                 break
 
             # Logging
             if epoch % 10 == 0:
                 logger.info(
-                    f"Epoch {epoch+1}: Train Loss: {train_loss_avg:.4f}, "
+                    f"Epoch {epoch + 1}: Train Loss: {train_loss_avg:.4f}, "
                     f"Val Loss: {val_loss_avg:.4f}, Train AUC: {train_auc:.4f}, "
                     f"Val AUC: {val_auc:.4f}"
                 )

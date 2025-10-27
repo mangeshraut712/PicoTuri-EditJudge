@@ -7,10 +7,9 @@ for all algorithms in the edit quality assessment pipeline.
 """
 
 import importlib.util
-import json
 import sys
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Callable, List, Tuple
 
 try:
     import matplotlib.pyplot as plt  # type: ignore[import]
@@ -304,7 +303,7 @@ class AlgorithmDashboard:
         ax.set_title('Model Performance Metrics', fontsize=16, fontweight='bold', color=APPLE_COLORS['dark_gray'])
 
         # Add value labels
-        for angle, value, label in zip(angles[:-1], values[:-1], labels):
+        for angle, value, _ in zip(angles[:-1], values[:-1], labels):
             ax.text(
                 angle,
                 value + 0.05,
@@ -357,14 +356,14 @@ class AlgorithmDashboard:
         table.scale(1.5, 1.8)
 
         # Style header
-        for (i, j), cell in table.get_celld().items():
+        for (row_idx, _), cell in table.get_celld().items():
             cell.set_fontsize(14)
             cell.set_text_props(weight='bold')
-            if i == 0:
+            if row_idx == 0:
                 cell.set_facecolor(APPLE_COLORS['blue'])
                 cell.set_text_props(color='white')
             else:
-                cell.set_facecolor('white' if i % 2 == 0 else APPLE_COLORS['light_gray'])
+                cell.set_facecolor('white' if row_idx % 2 == 0 else APPLE_COLORS['light_gray'])
 
         ax.set_title(
             'Dataset Overview',
@@ -411,7 +410,7 @@ class AlgorithmDashboard:
         )
 
         # Add value labels
-        for i, (bar, prob, pred) in enumerate(zip(bars, probabilities, predictions)):
+        for bar, prob, pred in zip(bars, probabilities, predictions):
             ax.text(
                 bar.get_width() + 0.01,
                 bar.get_y() + bar.get_height() / 2,

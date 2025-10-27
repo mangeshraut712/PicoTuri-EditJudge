@@ -21,7 +21,7 @@ Key components:
 - Sequential edit application
 """
 
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 import torch  # type: ignore[import]
 import torch.nn as nn  # type: ignore[import]
 

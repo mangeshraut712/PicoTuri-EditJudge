@@ -22,7 +22,7 @@ Key components:
 """
 
 import math
-from typing import Any, Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import torch  # type: ignore[import]
 import torch.nn as nn  # type: ignore[import]
@@ -258,7 +258,7 @@ class AdvancedDiffusionModel(nn.Module):
         current_channels = model_channels
         ds = 1  # Current downsampling factor
 
-        for level, (in_mult, out_mult) in enumerate(zip(input_ch_mult, output_ch_mult)):
+        for level, (_, out_mult) in enumerate(zip(input_ch_mult, output_ch_mult)):
             for _ in range(num_res_blocks):
                 layers = [UNetBlock(
                     in_channels=current_channels,
@@ -290,7 +290,7 @@ class AdvancedDiffusionModel(nn.Module):
         # Reverse to go from deep to shallow
         reversed_multipliers = list(reversed(channel_multipliers))
 
-        for level, mult in enumerate(reversed_multipliers):
+        for level, _ in enumerate(reversed_multipliers):
             for _ in range(num_res_blocks + 1):
                 # Determine output channels
                 if level == len(reversed_multipliers) - 1:

@@ -21,8 +21,7 @@ Key components:
 - Stable training with KL regularization
 """
 
-import math
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import torch  # type: ignore[import]
 import torch.nn as nn  # type: ignore[import]

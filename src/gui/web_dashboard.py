@@ -4,22 +4,23 @@ Modern Web-Based Dashboard for PicoTuri-EditJudge
 A beautiful, interactive web dashboard using Flask and modern web technologies.
 Features real-time algorithm testing, visualizations, and model performance metrics.
 """
-import json
-import sys
 from pathlib import Path
 from typing import Any, Dict, List
-# Add parent directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 try:
-    from flask import Flask, render_template, jsonify, request
+    from flask import Flask, render_template, jsonify, request  # type: ignore[import]
     HAS_FLASK = True
 except ImportError:
     HAS_FLASK = False
     print("⚠️ Flask not installed. Install with: pip install flask")
-import torch
-from src.algorithms.quality_scorer import AdvancedQualityScorer
+
+import torch  # type: ignore[import]
+
 from src.algorithms.diffusion_model import AdvancedDiffusionModel
+from src.algorithms.quality_scorer import AdvancedQualityScorer
 from src.train.baseline import build_pipeline
+
+
 app = Flask(__name__, template_folder='templates', static_folder='static')
 @app.route('/')
 def index():
