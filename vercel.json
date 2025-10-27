@@ -18,9 +18,9 @@
     },
     {
       "src": "dashboard/package.json",
-      "use": "@vercel/next",
+      "use": "@vercel/static",
       "config": {
-        "maxLambdaSize": "50mb"
+        "distDir": "dist"
       }
     }
   ],
