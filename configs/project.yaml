@@ -1,0 +1,263 @@
+# PicoTuri EditJudge Project Configuration
+# Comprehensive configuration for all project components
+
+project:
+  name: "PicoTuri EditJudge"
+  version: "0.2.0"
+  description: "Privacy-first edit quality assessment system"
+  author: "PicoTuri Team"
+  license: "MIT"
+  
+# Model configurations
+models:
+  text_encoder:
+    model_name: "bert-base-uncased"
+    max_length: 512
+    hidden_size: 768
+    num_attention_heads: 12
+    num_hidden_layers: 12
+    intermediate_size: 3072
+    
+  image_encoder:
+    model_name: "ViT-B-32"
+    image_size: 224
+    patch_size: 32
+    hidden_size: 512
+    num_attention_heads: 8
+    num_hidden_layers: 12
+    
+  fusion_head:
+    input_dim: 1280  # 768 (text) + 512 (image)
+    hidden_dims: [512, 256, 128]
+    output_dim: 1
+    dropout: 0.1
+    activation: "gelu"
+    
+# Training configurations
+training:
+  batch_size: 32
+  learning_rate: 1e-4
+  weight_decay: 0.01
+  warmup_steps: 1000
+  max_steps: 10000
+  gradient_clip_norm: 1.0
+  seed: 42
+  
+  # Data configuration
+  data:
+    train_split: 0.8
+    val_split: 0.1
+    test_split: 0.1
+    shuffle: true
+    num_workers: 4
+    
+  # Optimization
+  optimizer:
+    type: "adamw"
+    betas: [0.9, 0.999]
+    eps: 1e-8
+    
+  scheduler:
+    type: "linear"
+    warmup_ratio: 0.1
+    
+# Runtime configurations
+runtime:
+  # Batch processing
+  batcher:
+    strategy: "adaptive"  # throughput, latency, balanced, adaptive
+    min_batch_size: 1
+    max_batch_size: 32
+    target_latency_ms: 50.0
+    max_wait_time_ms: 10.0
+    memory_limit_mb: 2048.0
+    metrics_window: 100
+    adjustment_factor: 0.1
+    enable_monitoring: true
+    
+  # Session pool
+  session_pool:
+    pool_size: 4
+    warm_up: true
+    max_idle_time: 300.0  # 5 minutes
+    enable_monitoring: true
+    
+  # ONNX Runtime
+  onnx:
+    optimization_level: "all"
+    enable_cpu_mem_arena: true
+    enable_mem_pattern: true
+    execution_mode: "parallel"
+    intra_op_num_threads: 4
+    inter_op_num_threads: 2
+    
+# Deployment configurations
+deployment:
+  # Web deployment
+  web:
+    framework: "vite"
+    bundler: "rollup"
+    typescript: true
+    tailwind: true
+    
+    # Model paths
+    model_paths:
+      text_encoder: "/models/editjudge-text-bert-0.2.onnx"
+      image_encoder: "/models/editjudge-image-clip-0.2.onnx"
+      fusion_head: "/models/editjudge-head-0.2.onnx"
+      
+    # Performance
+    webgpu: true
+    webgl: true
+    wasm: true
+    
+  # Android deployment
+  android:
+    min_sdk: 24
+    target_sdk: 34
+    compile_sdk: 34
+    
+    # Dependencies
+    compose_version: "1.5.4"
+    onnx_runtime_version: "1.16.0"
+    kotlin_version: "1.9.10"
+    
+    # Performance
+    nnapi: true
+    gpu_delegate: false
+    
+# Adaptation configurations
+adaptation:
+  # LoRA configuration
+  lora:
+    rank: 16
+    alpha: 32.0
+    dropout: 0.1
+    target_modules: ["query", "value", "dense", "intermediate"]
+    bias: "none"
+    fan_in_fan_out: false
+    init_lora_weights: true
+    
+  # Calibration configuration
+  calibration:
+    method: "temperature_scaling"  # temperature_scaling, platt_scaling, isotonic_regression
+    temperature_init: 1.0
+    regularization_strength: 1e-4
+    max_iter: 1000
+    lr: 0.01
+    cv_folds: 5
+    
+  # Drift detection
+  drift_detection:
+    method: "ks_test"  # ks_test, psi, kl_divergence, wasserstein, chisquare
+    significance_level: 0.05
+    window_size: 1000
+    update_frequency: 100
+    min_samples: 50
+    
+# Performance targets
+performance:
+  targets:
+    latency_p50_ms: 50
+    latency_p95_ms: 100
+    latency_p99_ms: 150
+    throughput_samples_per_second: 20
+    memory_usage_mb: 1000
+    model_size_mb: 100
+    
+  # Hardware-specific targets
+  hardware:
+    web_gpu:
+      latency_ms: 45
+      memory_mb: 850
+      
+    web_gl:
+      latency_ms: 120
+      memory_mb: 1200
+      
+    android_nnapi:
+      latency_ms: 35
+      memory_mb: 650
+      
+    android_cpu:
+      latency_ms: 95
+      memory_mb: 980
+      
+# Quality and testing
+quality:
+  # Test configuration
+  testing:
+    framework: "pytest"
+    coverage_threshold: 85
+    test_types: ["unit", "integration", "performance"]
+    
+  # Code quality
+  linting:
+    python: ["flake8", "mypy", "black"]
+    typescript: ["eslint", "prettier"]
+    kotlin: ["ktlint"]
+    
+  # Documentation
+  docs:
+    format: "markdown"
+    include_api: true
+    include_examples: true
+    
+# Monitoring and logging
+monitoring:
+  # Metrics collection
+  metrics:
+    enabled: true
+    collection_interval: 10  # seconds
+    retention_days: 30
+    
+  # Logging
+  logging:
+    level: "INFO"
+    format: "json"
+    file: "logs/editjudge.log"
+    max_size: "100MB"
+    backup_count: 5
+    
+  # Performance monitoring
+  performance:
+    track_latency: true
+    track_memory: true
+    track_throughput: true
+    track_errors: true
+    
+# Security and privacy
+security:
+  # Data privacy
+  privacy:
+    local_processing_only: true
+    no_data_exfiltration: true
+    encryption_at_rest: false  # Optional for local storage
+    
+  # Model security
+  model_security:
+    model_signing: false
+    tamper_detection: false
+    
+  # Input validation
+  validation:
+    max_file_size_mb: 50
+    allowed_image_formats: ["jpg", "jpeg", "png", "webp"]
+    max_text_length: 1000
+    
+# Development configuration
+development:
+  # Environment
+  python_version: "3.8+"
+  node_version: "16+"
+  
+  # Build tools
+  build:
+    parallel: true
+    cache: true
+    
+  # Debug configuration
+  debug:
+    verbose_logging: false
+    save_intermediate: false
+    profiling: false

@@ -16,8 +16,7 @@ Modern technologies used:
 - Multi-scale analysis for technical quality assessment
 """
 
-import math
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List
 
 import torch  # type: ignore[import]
 import torch.nn as nn  # type: ignore[import]
@@ -93,19 +92,19 @@ class EditingRealismScorer(nn.Module):
         # Load VGG16 for perceptual features
         vgg = models.vgg16(weights=models.VGG16_Weights.DEFAULT).features
         self.layers = nn.ModuleList([
-            vgg[:4],    # conv1_2
-            vgg[4:9],   # conv2_2
-            vgg[9:16],  # conv3_3
-            vgg[16:23],  # conv4_3
+            nn.Sequential(*list(vgg.children())[:4]),    # conv1_2
+            nn.Sequential(*list(vgg.children())[4:9]),   # conv2_2
+            nn.Sequential(*list(vgg.children())[9:16]),  # conv3_3
+            nn.Sequential(*list(vgg.children())[16:23]),  # conv4_3
         ])
         self.weights = [1.0, 1.0, 1.0, 1.0]  # Equal weighting
         self.register_buffer('mean', torch.tensor([0.485, 0.456, 0.406]).view(1, -1, 1, 1))
         self.register_buffer('std', torch.tensor([0.229, 0.224, 0.225]).view(1, -1, 1, 1))
 
     def _normalize(self, x: torch.Tensor) -> torch.Tensor:
-        mean = self.mean  # type: ignore[has-type]
-        std = self.std  # type: ignore[has-type]
-        return (x - mean) / std
+        mean = self.mean.to(x.device)  # type: ignore
+        std = self.std.to(x.device)  # type: ignore
+        return (x - mean) / std  # type: ignore
 
     def _extract_features(self, x: torch.Tensor) -> List[torch.Tensor]:
         features = []
@@ -345,9 +344,27 @@ class AdvancedQualityScorer(nn.Module):
             + self.weights['technical_quality'] * technical_scores
         )
 
+        # Calculate grade and recommendation
+        overall = overall_scores.mean().item()
+        if overall >= 0.9:
+            grade = "Exceptional"
+            recommendation = "Publish as exemplar"
+        elif overall >= 0.8:
+            grade = "Excellent"
+            recommendation = "Ready for deployment"
+        elif overall >= 0.7:
+            grade = "Good"
+            recommendation = "Minor improvements needed"
+        elif overall >= 0.6:
+            grade = "Fair"
+            recommendation = "Significant improvements needed"
+        else:
+            grade = "Poor"
+            recommendation = "Needs substantial rework"
+        
         # Prepare detailed results
         results = {
-            'overall_score': overall_scores.mean().item(),
+            'overall_score': overall,
             'component_scores': {
                 'instruction_compliance': instruction_scores.mean().item(),
                 'editing_realism': realism_scores.mean().item(),
@@ -355,7 +372,9 @@ class AdvancedQualityScorer(nn.Module):
                 'technical_quality': technical_scores.mean().item()
             },
             'weights': self.weights,
-            'descriptions': self.component_descriptions
+            'descriptions': self.component_descriptions,
+            'grade': grade,
+            'recommendation': recommendation
         }
 
         # Add detailed batch-level scores if batch_size > 1
@@ -384,16 +403,20 @@ class AdvancedQualityScorer(nn.Module):
         edited_img = Image.open(edited_path).convert('RGB')
 
         transform = transforms.Compose([
-            transforms.Resize((512, 512)),
+            transforms.Resize((512, 512)),  # type: ignore[call-arg]
             transforms.ToTensor(),
         ])
 
-        original_tensor = transform(original_img).unsqueeze(0)
-        edited_tensor = transform(edited_img).unsqueeze(0)
+        original_tensor = transform(original_img)  # type: ignore
+        if original_tensor.dim() == 3:  # type: ignore
+            original_tensor = original_tensor.unsqueeze(0)  # type: ignore
+        edited_tensor = transform(edited_img)  # type: ignore
+        if edited_tensor.dim() == 3:  # type: ignore
+            edited_tensor = edited_tensor.unsqueeze(0)  # type: ignore
         instructions = [instruction]
 
         # Compute scores
-        scores = self.forward(original_tensor, edited_tensor, instructions)
+        scores = self.forward(original_tensor, edited_tensor, instructions)  # type: ignore
 
         # Add evaluation summary
         overall = scores['overall_score']

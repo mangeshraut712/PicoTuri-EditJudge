@@ -43,8 +43,8 @@ except ImportError:
     torch = None
 
 if TYPE_CHECKING:
-    import coremltools  # pragma: no cover
-    import torch as torch_module  # pragma: no cover
+    import coremltools  # type: ignore[import] # pragma: no cover
+    import torch as torch_module  # type: ignore[import] # pragma: no cover
 
 
 class CoreMLOptimizer:
@@ -113,11 +113,11 @@ class CoreMLOptimizer:
 
             # Apply quantization for better performance
             if quantization == 'fp16':
-                mlmodel = ct_mod.models.MLModel(mlmodel.get_spec(), weights_dir=mlmodel.weights_dir)
-                config = ct_mod.optimize.coreml.OptimizationConfig(
-                    global_config=ct_mod.optimize.coreml.OpLinearQuantizerConfig(mode='linear_symmetric')
+                mlmodel = ct_mod.models.MLModel(mlmodel.get_spec(), weights_dir=mlmodel.weights_dir)  # type: ignore[attr-defined]
+                config = ct_mod.optimize.coreml.OptimizationConfig(  # type: ignore[attr-defined]
+                    global_config=ct_mod.optimize.coreml.OpLinearQuantizerConfig(mode='linear_symmetric')  # type: ignore[attr-defined]
                 )
-                mlmodel = ct_mod.optimize.coreml.linear_quantize_weights(mlmodel, config)
+                mlmodel = ct_mod.optimize.coreml.linear_quantize_weights(mlmodel, config)  # type: ignore[attr-defined]
                 print("   ✅ FP16 quantization applied for Neural Engine compatibility")
 
             elif quantization == 'int8':
@@ -127,7 +127,7 @@ class CoreMLOptimizer:
 
             # Save the model
             output_path_obj = Path(output_path)
-            mlmodel.save(output_path_obj)
+            mlmodel.save(str(output_path_obj))  # type: ignore[attr-defined]
 
             # Get model metadata
             model_size = sum(f.stat().st_size for f in output_path_obj.parent.glob("*.mlmodel*")) / (1024**2)

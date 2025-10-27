@@ -138,68 +138,110 @@ python tests/test_all_algorithms.py
 
 ### ✨ Key Innovations
 
-- **🔒 Privacy-First Architecture**: All processing happens on-device - no cloud dependencies
-- **⚡ Real-Time Performance**: Sub-millisecond inference using Core ML acceleration
-- **🎯 Multimodal Fusion**: Combines visual similarity (Turi Create/TF) + textual semantics (TF-IDF/transformers)
-- **📱 Native iOS Integration**: Seamless SwiftUI interface with Core ML model deployment
-- **🔬 Research-Grade Tools**: Reproducible pipelines with comprehensive ML observability
-- **🚀 Production Ready**: CI/CD, type safety, comprehensive testing, and deployment automation
+- **🔬 Systematic Research Framework**: 7 comprehensive experiments (R1-R7) for systematic evaluation
+- **🎯 Multimodal Fusion**: BERT + CLIP embeddings with advanced fusion architectures
+- **📊 Domain Adaptation**: LoRA fine-tuning for domain-specific performance
+- **🏆 Preference Learning**: Pairwise and listwise learning to rank for quality assessment
+- **🛡️ Robustness Testing**: Corruption, adversarial, and conformal prediction evaluation
+- **⚡ Real-Time Optimization**: Adaptive batching and INT8 quantization for production
+- **🌍 Cross-Platform Parity**: ONNX and Core ML export with unified inference
 
 ## 📁 Project Structure
 
 ```
 PicoTuri-EditJudge/
-├── 📂 src/                      # Main source code
-│   ├── algorithms/              # Core ML algorithms
-│   │   ├── quality_scorer.py   # 4-component quality scorer
-│   │   ├── diffusion_model.py  # U-Net diffusion model
-│   │   ├── dpo_training.py     # DPO training
-│   │   ├── multi_turn_editor.py # Multi-turn editor
-│   │   └── coreml_optimizer.py # Core ML optimization
-│   ├── train/                   # Training modules
-│   │   └── baseline.py         # Baseline scikit-learn training
-│   ├── export/                  # Model export utilities
-│   ├── features_image/          # Image feature extraction
-│   ├── features_text/           # Text feature extraction
-│   ├── fuse/                    # Feature fusion modules
-│   ├── gui/                     # Dashboard and visualization
-│   └── models/                  # Model definitions
+├── 📂 src/                          # Core source code
+│   ├── algorithms/                  # ML algorithms
+│   │   └── quality_scorer.py       # 4-component quality assessment
+│   ├── features_text/               # Text feature extraction
+│   │   └── bert.py                 # BERT embeddings
+│   ├── features_image/              # Image feature extraction
+│   │   └── clip.py                 # CLIP embeddings
+│   ├── fuse/                        # Feature fusion
+│   │   └── fusion.py               # Multimodal fusion head
+│   ├── train/                       # Training utilities
+│   ├── export/                      # Model export (ONNX, Core ML)
+│   ├── runtime/                     # Runtime optimization
+│   ├── adaptation/                  # Domain adaptation (LoRA)
+│   └── gui/                         # Dashboard interface
 │
-├── 📂 tests/                    # Test suite
-│   ├── test_all_algorithms.py  # Comprehensive algorithm tests
-│   └── test_smoke.py           # Quick smoke tests
+├── 📂 experiments/                  # Research framework (R1-R7)
+│   ├── r1_embeddings/               # R1: Embedding choice vs performance
+│   │   ├── run.py                  # Experiment runner
+│   │   └── configs/                # YAML configurations
+│   ├── r2_fusion/                   # R2: Fusion architecture ablations
+│   │   ├── run.py
+│   │   └── configs/
+│   ├── r3_domain/                   # R3: Domain adaptation (LoRA)
+│   │   ├── run.py
+│   │   └── configs/
+│   ├── r4_preference/               # R4: Preference learning for ranking
+│   │   └── run.py
+│   ├── r5_robustness/               # R5: Robustness & safety
+│   │   └── run.py
+│   ├── r6_batching/                 # R6: Real-time batching & quantization
+│   │   ├── run.py
+│   │   └── configs/
+│   ├── r7_parity/                   # R7: Cross-platform inference parity
+│   │   └── run.py
+│   ├── utils.py                     # Shared utilities
+│   └── README.md                    # Experiment documentation
 │
-├── 📂 docs/                     # Documentation
-│   ├── ALGORITHM_VERIFICATION_REPORT.md
-│   ├── QUICK_START_GUIDE.md
-│   ├── FIXES_SUMMARY.md
-│   └── LINTING_FIXES_REPORT.md
+├── 📂 scripts/                      # Analysis & benchmarking
+│   ├── run_experiment.py            # Main experiment runner
+│   ├── bench_latency.py             # Latency benchmarking
+│   ├── compare_experiments.py       # Cross-experiment comparison
+│   └── analyze_results.py           # Statistical analysis
 │
-├── 📂 assets/                   # Project assets
-│   ├── images/                  # Sample images
-│   └── charts/                  # Performance charts
+├── 📂 tests/                        # Test suite
+├── 📂 dashboard/                    # Web dashboard
+├── 📂 docs/                         # Documentation
+├── 📂 configs/                      # Configuration files
+├── 📂 data/                         # Datasets
+├── 📂 examples/                     # Example code
+├── 📂 notebooks/                    # Jupyter notebooks
+├── 📂 tools/                        # Development tools
 │
-├── 📂 data/                     # Data files
-│   ├── sample_dataset.csv      # Sample dataset
-│   ├── baseline.joblib         # Trained model
-│   └── manifests/              # Dataset manifests
-│
-├── 📂 examples/                 # Example implementations
-│   ├── ios/EditJudgeDemo/      # iOS SwiftUI demo
-│   └── c_demo/                 # C integration examples
-│
-├── 📂 scripts/                  # Utility scripts
-├── 📂 tools/                    # Development tools
-├── 📂 configs/                  # Configuration files
-├── 📂 notebooks/                # Jupyter notebooks
-│
-├── 📄 README.md                 # This file
-├── 📄 PROJECT_STRUCTURE.md      # Detailed structure guide
-├── 📄 requirements-dev.txt      # Python dependencies
-└── 📄 verify_all.sh             # Quick verification script
+├── 📄 README.md                     # This file
+├── 📄 requirements.txt              # Python dependencies
+├── 📄 setup.py                      # Package setup
+└── 📄 verify_all.sh                 # Verification script
 ```
 
-See [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) for detailed directory information.
+See [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) for detailed information.
+
+## 🔬 Research Experiments (R1-R7)
+
+The project includes a comprehensive research framework with 7 systematic experiments:
+
+| Experiment | Focus | Key Metrics |
+|-----------|-------|------------|
+| **R1: Embeddings** | BERT vs e5 vs CLIP variants | AUC, F1, Latency, Throughput |
+| **R2: Fusion** | Architecture ablations (LR, MLP, 3-layer) | Accuracy, Calibration, ECE |
+| **R3: Domain Adaptation** | LoRA fine-tuning for domains | Delta AUC, Generalization Gap |
+| **R4: Preference Learning** | Pairwise vs listwise ranking | NDCG@5/10, Kendall's τ |
+| **R5: Robustness** | Corruption, adversarial, conformal | Error Rate, Coverage, AUC |
+| **R6: Batching & Quantization** | Adaptive batching + INT8 | Throughput, Speedup, Size Reduction |
+| **R7: Cross-Platform Parity** | PyTorch, ONNX, Core ML | Prediction Consistency, Latency |
+
+### Running Experiments
+
+```bash
+# Run single experiment with config
+python scripts/run_experiment.py --config experiments/r1_embeddings/configs/bert_clip_b32.yaml
+
+# Run experiment suite with multiple seeds
+python scripts/run_experiment.py --suite r1_embeddings --seeds 42,43,44
+
+# Benchmark latency across platforms
+python scripts/bench_latency.py --models all --output results.json
+
+# Compare experiments
+python scripts/compare_experiments.py --experiments experiments/r1_embeddings/* experiments/r2_fusion/*
+
+# Analyze results
+python scripts/analyze_results.py --results-dir experiments --metrics auc f1 latency_p95
+```
 
 ## 🏗️ Architecture
 
