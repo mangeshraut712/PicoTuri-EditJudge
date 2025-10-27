@@ -532,6 +532,11 @@ function MultiTurnVisualization({ data }) {
 }
 
 function CoreMLVisualization({ data }) {
+  const optimizationData = [
+    { name: 'Files Generated', value: data.ios_files_generated, fill: '#3b82f6' },
+    { name: 'Size Reduction', value: Math.round((1 - data.model_size_reduction) * 100), fill: '#10b981' }
+  ]
+
   return (
     <div className="space-y-4">
       <div className="bg-black/20 p-4 rounded-lg">
@@ -539,7 +544,7 @@ function CoreMLVisualization({ data }) {
           <Cpu className="w-4 h-4" />
           iOS Deployment Ready
         </h4>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="text-center p-4 bg-indigo-500/20 rounded-lg">
             <div className="text-3xl font-bold text-indigo-400">{data.ios_files_generated}</div>
             <div className="text-xs text-gray-400">Files Generated</div>
@@ -549,26 +554,80 @@ function CoreMLVisualization({ data }) {
             <div className="text-xs text-gray-400">Core ML Version</div>
           </div>
         </div>
+        
+        <ResponsiveContainer width="100%" height={120}>
+          <BarChart data={optimizationData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+            <XAxis dataKey="name" tick={{ fill: '#fff', fontSize: 10 }} />
+            <YAxis tick={{ fill: '#fff', fontSize: 10 }} />
+            <Tooltip 
+              contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #ffffff20', borderRadius: '8px' }}
+              formatter={(value, name) => [
+                name === 'Size Reduction' ? `${value}% smaller` : `${value} files`,
+                name
+              ]}
+            />
+            <Bar dataKey="value" fill="#3b82f6" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
       
       <div className="bg-black/20 p-4 rounded-lg">
         <h4 className="text-sm font-semibold mb-3">Optimization Features</h4>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between p-2 bg-white/5 rounded">
-            <span className="text-sm">Apple Silicon</span>
-            <span className={`px-2 py-1 rounded text-xs ${data.apple_silicon ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-              {data.apple_silicon ? 'Optimized' : 'Not Optimized'}
-            </span>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="p-3 bg-white/5 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm">Apple Silicon</span>
+              <span className={`px-2 py-1 rounded text-xs ${data.apple_silicon ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                {data.apple_silicon ? 'Optimized' : 'Not Optimized'}
+              </span>
+            </div>
+            <div className="w-full bg-white/10 rounded-full h-1">
+              <div 
+                className={`h-1 rounded-full transition-all ${data.apple_silicon ? 'bg-green-400' : 'bg-red-400'}`}
+                style={{ width: data.apple_silicon ? '100%' : '30%' }}
+              ></div>
+            </div>
           </div>
-          <div className="flex items-center justify-between p-2 bg-white/5 rounded">
-            <span className="text-sm">Neural Engine</span>
-            <span className={`px-2 py-1 rounded text-xs ${data.neural_engine_support ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-              {data.neural_engine_support ? 'Supported' : 'Not Supported'}
-            </span>
+          
+          <div className="p-3 bg-white/5 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm">Neural Engine</span>
+              <span className={`px-2 py-1 rounded text-xs ${data.neural_engine_support ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                {data.neural_engine_support ? 'Supported' : 'Not Supported'}
+              </span>
+            </div>
+            <div className="w-full bg-white/10 rounded-full h-1">
+              <div 
+                className={`h-1 rounded-full transition-all ${data.neural_engine_support ? 'bg-blue-400' : 'bg-gray-400'}`}
+                style={{ width: data.neural_engine_support ? '100%' : '20%' }}
+              ></div>
+            </div>
           </div>
-          <div className="flex items-center justify-between p-2 bg-white/5 rounded">
-            <span className="text-sm">Target iOS</span>
-            <span className="text-sm font-semibold">{data.target_ios_version}</span>
+          
+          <div className="p-3 bg-white/5 rounded-lg col-span-2">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm">Target iOS Version</span>
+              <span className="text-sm font-semibold text-purple-400">{data.target_ios_version}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400">Compatibility:</span>
+              <div className="flex gap-1">
+                {['iOS 17', 'iOS 16', 'iOS 15'].map((version, index) => (
+                  <div 
+                    key={version}
+                    className={`px-2 py-1 rounded text-xs ${
+                      data.target_ios_version.includes(version.split(' ')[1]) || 
+                      (data.target_ios_version === '17.0+' && parseInt(version.split(' ')[1]) <= 17)
+                        ? 'bg-green-500/20 text-green-400' 
+                        : 'bg-gray-500/20 text-gray-400'
+                    }`}
+                  >
+                    {version}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -577,51 +636,97 @@ function CoreMLVisualization({ data }) {
 }
 
 function BaselineModelVisualization({ data }) {
-  const pipelineData = [
-    { name: 'TF-IDF', value: 1, fill: '#14b8a6' },
-    { name: 'Classifier', value: 1, fill: '#06b6d4' }
+  const accuracyData = [
+    { name: 'Training', value: data.training_accuracy * 100, fill: '#3b82f6' },
+    { name: 'Validation', value: data.validation_accuracy * 100, fill: '#10b981' }
   ]
+
+  const pipelineSteps = data.pipeline_steps || 2
+  const pipelineData = Array.from({ length: pipelineSteps }, (_, i) => ({
+    name: i === 0 ? 'TF-IDF Vectorizer' : i === pipelineSteps - 1 ? 'Logistic Regression' : `Step ${i + 1}`,
+    value: 1,
+    fill: i === 0 ? '#14b8a6' : i === pipelineSteps - 1 ? '#06b6d4' : '#8b5cf6'
+  }))
 
   return (
     <div className="space-y-4">
       <div className="bg-black/20 p-4 rounded-lg">
         <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-          <BarChart3 className="w-4 h-4" />
-          Pipeline Architecture
+          <TrendingUp className="w-4 h-4" />
+          Model Performance
         </h4>
-        <ResponsiveContainer width="100%" height={150}>
-          <BarChart data={pipelineData} layout="horizontal">
+        <ResponsiveContainer width="100%" height={140}>
+          <BarChart data={accuracyData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-            <XAxis type="number" tick={{ fill: '#fff', fontSize: 10 }} />
-            <YAxis dataKey="name" type="category" tick={{ fill: '#fff', fontSize: 10 }} />
+            <XAxis dataKey="name" tick={{ fill: '#fff', fontSize: 10 }} />
+            <YAxis domain={[0, 100]} tick={{ fill: '#fff', fontSize: 10 }} />
             <Tooltip 
               contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #ffffff20', borderRadius: '8px' }}
+              formatter={(value) => [`${value.toFixed(1)}%`, 'Accuracy']}
             />
-            <Bar dataKey="value" fill="#14b8a6" />
+            <Bar dataKey="value" fill="#3b82f6" />
           </BarChart>
         </ResponsiveContainer>
       </div>
       
       <div className="bg-black/20 p-4 rounded-lg">
+        <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+          <Settings className="w-4 h-4" />
+          Pipeline Architecture
+        </h4>
+        <div className="flex items-center justify-center mb-4">
+          {pipelineData.map((step, index) => (
+            <div key={step.name} className="flex items-center">
+              <div className="text-center">
+                <div 
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-xs mx-2"
+                  style={{ backgroundColor: step.fill }}
+                >
+                  {index + 1}
+                </div>
+                <div className="text-xs text-gray-400 mt-1 max-w-16 truncate">{step.name}</div>
+              </div>
+              {index < pipelineData.length - 1 && (
+                <div className="w-8 h-0.5 bg-white/30"></div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <div className="bg-black/20 p-4 rounded-lg">
         <h4 className="text-sm font-semibold mb-3">Model Configuration</h4>
-        <div className="grid grid-cols-2 gap-2">
-          <div className="text-center p-2 bg-teal-500/20 rounded-lg">
-            <div className="text-xs font-bold text-teal-400">{data.classifier}</div>
-            <div className="text-xs text-gray-400">Classifier</div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="p-3 bg-white/5 rounded-lg">
+            <div className="text-center">
+              <div className="text-lg font-bold text-teal-400 mb-1">{data.classifier}</div>
+              <div className="text-xs text-gray-400">Classifier</div>
+            </div>
           </div>
-          <div className="text-center p-2 bg-cyan-500/20 rounded-lg">
-            <div className="text-xs font-bold text-cyan-400">{data.solver}</div>
-            <div className="text-xs text-gray-400">Solver</div>
+          <div className="p-3 bg-white/5 rounded-lg">
+            <div className="text-center">
+              <div className="text-lg font-bold text-cyan-400 mb-1">{data.solver}</div>
+              <div className="text-xs text-gray-400">Solver</div>
+            </div>
+          </div>
+          <div className="p-3 bg-white/5 rounded-lg">
+            <div className="text-center">
+              <div className="text-lg font-bold text-blue-400 mb-1">{data.max_iter}</div>
+              <div className="text-xs text-gray-400">Max Iterations</div>
+            </div>
+          </div>
+          <div className="p-3 bg-white/5 rounded-lg">
+            <div className="text-center">
+              <div className="text-lg font-bold text-purple-400 mb-1">{data.pipeline_steps}</div>
+              <div className="text-xs text-gray-400">Pipeline Steps</div>
+            </div>
           </div>
         </div>
-        <div className="mt-2 space-y-1">
-          <div className="flex items-center justify-between p-1 bg-white/5 rounded text-xs">
-            <span className="text-gray-400">Max Iterations</span>
-            <span className="font-semibold text-blue-400">{data.max_iter}</span>
-          </div>
-          <div className="flex items-center justify-between p-1 bg-white/5 rounded text-xs">
-            <span className="text-gray-400">Pipeline Steps</span>
-            <span className="font-semibold text-purple-400">{data.pipeline_steps}</span>
+        
+        <div className="mt-3 p-3 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 rounded-lg">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-300">Feature Extraction</span>
+            <span className="text-sm font-semibold text-cyan-400">{data.feature_extraction}</span>
           </div>
         </div>
       </div>
