@@ -180,8 +180,8 @@ function AlgorithmsPage() {
           </div>
         )}
 
-        {/* Algorithm Grid - Improved Layout */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6 mb-8">
+        {/* Enhanced Algorithm Grid - Dynamic Masonry Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">
           {algorithms.map((algo) => (
             <AlgorithmCard
               key={algo.name}
@@ -248,7 +248,7 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
   const layoutType = getLayoutType()
 
   return (
-    <div className="glass rounded-2xl p-6 card-hover relative overflow-hidden min-h-[400px] flex flex-col">
+    <div className="glass rounded-2xl p-6 card-hover relative overflow-hidden min-h-[500px] flex flex-col">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-50"></div>
 
@@ -277,10 +277,10 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
       </div>
 
       {/* Description */}
-      <p className="text-sm text-gray-300 mb-4 line-clamp-2 relative z-10">{description}</p>
+      <p className="text-sm text-gray-300 mb-6 line-clamp-2 relative z-10">{description}</p>
 
       {/* Content Area - Different layouts based on algorithm type */}
-      <div className="flex-1 relative z-10 mb-4">
+      <div className="flex-1 relative z-10 mb-6">
         {layoutType === 'vertical-compact' && (
           <CompactQualityLayout result={result} />
         )}
@@ -311,17 +311,17 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
 
         {/* Placeholder for algorithms without results */}
         {!result && (
-          <div className="h-32 flex items-center justify-center bg-white/5 rounded-lg">
+          <div className="h-40 flex items-center justify-center bg-white/5 rounded-lg">
             <div className="text-center text-gray-400">
-              <PlayCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p className="text-xs">Run test to see visualization</p>
+              <PlayCircle className="w-10 h-10 mx-auto mb-3 opacity-50" />
+              <p className="text-sm">Run test to see visualization</p>
             </div>
           </div>
         )}
       </div>
 
       {/* Action Section - Always at bottom */}
-      <div className="relative z-10 space-y-3">
+      <div className="relative z-10 space-y-4">
         <button
           onClick={() => setShowDetails(!showDetails)}
           className="w-full text-xs text-blue-400 hover:text-blue-300 transition-all text-left"
@@ -330,7 +330,7 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
         </button>
 
         {showDetails && (
-          <div className="p-3 bg-black/20 rounded-lg text-xs text-gray-300 animate-fadeIn">
+          <div className="p-4 bg-black/20 rounded-lg text-sm text-gray-300 animate-fadeIn">
             {details}
           </div>
         )}
@@ -338,7 +338,7 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
         <button
           onClick={onTest}
           disabled={testing}
-          className={`w-full py-3 px-4 rounded-xl font-semibold bg-gradient-to-r ${color} hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2`}
+          className={`w-full py-4 px-4 rounded-xl font-semibold bg-gradient-to-r ${color} hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2`}
         >
           {testing ? (
             <>
@@ -355,6 +355,28 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
       </div>
     </div>
   )
+}
+
+// Dynamic Layout Renderer
+function renderDynamicLayout(layoutType, result) {
+  switch (layoutType) {
+    case 'detailed-grid':
+      return <HeroDetailedGrid result={result} />
+    case 'time-series':
+      return <WideTimeSeries result={result} />
+    case 'technical-specs':
+      return <WideTechnicalSpecs result={result} />
+    case 'session-flow':
+      return <TallSessionFlow result={result} />
+    case 'status-dashboard':
+      return <StandardStatusDashboard result={result} />
+    case 'analysis-grid':
+      return <StandardAnalysisGrid result={result} />
+    case 'metrics-compact':
+      return <CompactMetricsView result={result} />
+    default:
+      return <DefaultLayout result={result} />
+  }
 }
 
 function EnhancedResultsPanel({ result, algorithmName }) {
@@ -447,29 +469,29 @@ function CompactQualityLayout({ result }) {
   }))
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Enhanced Bar Chart with weights */}
-      <div className="bg-black/20 p-2 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-          <BarChart3 className="w-3 h-3" />
+      <div className="bg-black/20 p-4 rounded-lg">
+        <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
+          <BarChart3 className="w-4 h-4" />
           Quality Components & Weights
         </div>
-        <ResponsiveContainer width="100%" height={60}>
-          <BarChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-            <Bar dataKey="value" fill="#3b82f6" radius={[2, 2, 0, 0]} />
-            <Bar dataKey="weight" fill="#8b5cf6" radius={[2, 2, 0, 0]} />
+        <ResponsiveContainer width="100%" height={100}>
+          <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+            <Bar dataKey="value" fill="#3b82f6" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="weight" fill="#8b5cf6" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
       {/* Radar Chart for comprehensive quality assessment */}
-      <div className="bg-black/20 p-2 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2">Quality Assessment Radar</div>
-        <ResponsiveContainer width="100%" height={80}>
+      <div className="bg-black/20 p-4 rounded-lg">
+        <div className="text-sm text-gray-400 mb-3">Quality Assessment Radar</div>
+        <ResponsiveContainer width="100%" height={120}>
           <RadarChart data={chartData}>
             <PolarGrid stroke="#ffffff10" />
-            <PolarAngleAxis dataKey="name" tick={{ fontSize: 8, fill: '#fff' }} />
-            <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 8, fill: '#fff' }} />
+            <PolarAngleAxis dataKey="name" tick={{ fontSize: 10, fill: '#fff' }} />
+            <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#fff' }} />
             <Radar name="Score" dataKey="value" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} />
             <Radar name="Weight" dataKey="weight" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.1} />
           </RadarChart>
@@ -477,11 +499,11 @@ function CompactQualityLayout({ result }) {
       </div>
 
       {/* Overall Score Display */}
-      <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-2 rounded-lg text-center">
-        <div className="text-sm font-bold text-blue-400">
+      <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-4 rounded-lg text-center">
+        <div className="text-lg font-bold text-blue-400">
           {result.overall_score ? (result.overall_score * 100).toFixed(1) : 'N/A'}%
         </div>
-        <div className="text-xs text-gray-400">
+        <div className="text-sm text-gray-400">
           {result.grade || 'Grade'} - {result.recommendation || 'Recommendation'}
         </div>
       </div>
@@ -518,56 +540,56 @@ function HorizontalArchitectureLayout({ result }) {
   ]
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Architecture Overview Bar Chart */}
-      <div className="bg-black/20 p-2 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-          <Layers className="w-3 h-3" />
+      <div className="bg-black/20 p-4 rounded-lg">
+        <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
+          <Layers className="w-4 h-4" />
           Architecture Overview
         </div>
-        <ResponsiveContainer width="100%" height={60}>
-          <BarChart data={architectureData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-            <Bar dataKey="value" fill="#8b5cf6" radius={[2, 2, 0, 0]} />
+        <ResponsiveContainer width="100%" height={120}>
+          <BarChart data={architectureData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+            <Bar dataKey="value" fill="#8b5cf6" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Model Capabilities Scatter Plot */}
-      <div className="bg-black/20 p-2 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2">Model Capabilities</div>
-        <div className="grid grid-cols-2 gap-2">
-          <div className="text-center p-2 bg-green-500/10 rounded">
-            <div className="text-sm font-bold text-green-400">
+      {/* Model Capabilities Grid */}
+      <div className="bg-black/20 p-4 rounded-lg">
+        <div className="text-sm text-gray-400 mb-4">Model Capabilities</div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="text-center p-4 bg-green-500/10 rounded-lg">
+            <div className="text-xl font-bold text-green-400 mb-2">
               {result.supports_text_to_image ? '✓' : '✗'}
             </div>
-            <div className="text-xs text-gray-400">Text-to-Image</div>
+            <div className="text-sm text-gray-400">Text-to-Image</div>
           </div>
-          <div className="text-center p-2 bg-blue-500/10 rounded">
-            <div className="text-sm font-bold text-blue-400">
+          <div className="text-center p-4 bg-blue-500/10 rounded-lg">
+            <div className="text-xl font-bold text-blue-400 mb-2">
               {result.supports_image_to_image ? '✓' : '✗'}
             </div>
-            <div className="text-xs text-gray-400">Image-to-Image</div>
+            <div className="text-sm text-gray-400">Image-to-Image</div>
           </div>
         </div>
       </div>
 
       {/* Key Architecture Metrics */}
-      <div className="grid grid-cols-3 gap-2">
-        <div className="bg-black/20 p-2 rounded-lg text-center">
-          <div className="text-sm font-bold text-purple-400">{(result.parameters / 1000000).toFixed(1)}M</div>
-          <div className="text-xs text-gray-400">Parameters</div>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="bg-black/20 p-4 rounded-lg text-center">
+          <div className="text-lg font-bold text-purple-400 mb-1">{(result.parameters / 1000000).toFixed(1)}M</div>
+          <div className="text-sm text-gray-400">Parameters</div>
         </div>
-        <div className="bg-black/20 p-2 rounded-lg text-center">
-          <div className="text-sm font-bold text-pink-400">
+        <div className="bg-black/20 p-4 rounded-lg text-center">
+          <div className="text-lg font-bold text-pink-400 mb-1">
             {result.input_shape ? result.input_shape.join('×') : 'N/A'}
           </div>
-          <div className="text-xs text-gray-400">Input</div>
+          <div className="text-sm text-gray-400">Input</div>
         </div>
-        <div className="bg-black/20 p-2 rounded-lg text-center">
-          <div className="text-sm font-bold text-blue-400">
+        <div className="bg-black/20 p-4 rounded-lg text-center">
+          <div className="text-lg font-bold text-blue-400 mb-1">
             {result.output_shape ? result.output_shape.join('×') : 'N/A'}
           </div>
-          <div className="text-xs text-gray-400">Output</div>
+          <div className="text-sm text-gray-400">Output</div>
         </div>
       </div>
     </div>
@@ -605,27 +627,27 @@ function VerticalMetricsLayout({ result }) {
   })
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Training Curves Line Chart */}
-      <div className="bg-black/20 p-2 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-          <TrendingUp className="w-3 h-3" />
+      <div className="bg-black/20 p-4 rounded-lg">
+        <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
+          <TrendingUp className="w-4 h-4" />
           Training Progress
         </div>
-        <ResponsiveContainer width="100%" height={80}>
-          <LineChart data={trainingData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+        <ResponsiveContainer width="100%" height={140}>
+          <LineChart data={trainingData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
             <Line
               type="monotone"
               dataKey="loss"
               stroke="#ef4444"
-              strokeWidth={2}
+              strokeWidth={3}
               dot={false}
             />
             <Line
               type="monotone"
               dataKey="accuracy"
               stroke="#10b981"
-              strokeWidth={2}
+              strokeWidth={3}
               dot={false}
             />
           </LineChart>
@@ -633,10 +655,10 @@ function VerticalMetricsLayout({ result }) {
       </div>
 
       {/* KL Divergence Area Chart */}
-      <div className="bg-black/20 p-2 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2">KL Divergence Trend</div>
-        <ResponsiveContainer width="100%" height={60}>
-          <AreaChart data={trainingData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+      <div className="bg-black/20 p-4 rounded-lg">
+        <div className="text-sm text-gray-400 mb-3">KL Divergence Trend</div>
+        <ResponsiveContainer width="100%" height={100}>
+          <AreaChart data={trainingData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
             <Area
               type="monotone"
               dataKey="kl"
@@ -649,23 +671,23 @@ function VerticalMetricsLayout({ result }) {
       </div>
 
       {/* Final Training Metrics */}
-      <div className="grid grid-cols-2 gap-2">
-        <div className="bg-black/20 p-2 rounded-lg text-center">
-          <div className="text-sm font-bold text-red-400">{result.loss.toFixed(4)}</div>
-          <div className="text-xs text-gray-400">Final Loss</div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-black/20 p-4 rounded-lg text-center">
+          <div className="text-lg font-bold text-red-400 mb-1">{result.loss.toFixed(4)}</div>
+          <div className="text-sm text-gray-400">Final Loss</div>
         </div>
-        <div className="bg-black/20 p-2 rounded-lg text-center">
-          <div className="text-sm font-bold text-green-400">{(result.preference_accuracy * 100).toFixed(1)}%</div>
-          <div className="text-xs text-gray-400">Accuracy</div>
+        <div className="bg-black/20 p-4 rounded-lg text-center">
+          <div className="text-lg font-bold text-green-400 mb-1">{(result.preference_accuracy * 100).toFixed(1)}%</div>
+          <div className="text-sm text-gray-400">Accuracy</div>
         </div>
       </div>
 
       {/* Training Status */}
-      <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 p-2 rounded-lg text-center">
-        <div className="text-xs font-semibold text-orange-400">
+      <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 p-4 rounded-lg text-center">
+        <div className="text-sm font-semibold text-orange-400 mb-1">
           {result.convergence_achieved ? 'Converged' : 'Training'} - Step {result.training_steps}
         </div>
-        <div className="text-xs text-gray-400">β = {result.beta_parameter || 0.1}</div>
+        <div className="text-sm text-gray-400">β = {result.beta_parameter || 0.1}</div>
       </div>
     </div>
   )
@@ -705,21 +727,21 @@ function HorizontalStatsLayout({ result }) {
   ]
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Enhanced Pie Chart with real data */}
-      <div className="bg-black/20 p-2 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-          <GitBranch className="w-3 h-3" />
+      <div className="bg-black/20 p-4 rounded-lg">
+        <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
+          <GitBranch className="w-4 h-4" />
           Edit Distribution
         </div>
-        <ResponsiveContainer width="100%" height={80}>
+        <ResponsiveContainer width="100%" height={140}>
           <PieChart>
             <Pie
               data={sessionData}
               cx="50%"
               cy="50%"
-              innerRadius={15}
-              outerRadius={35}
+              innerRadius={25}
+              outerRadius={50}
               dataKey="value"
             >
               {sessionData.map((entry, index) => (
@@ -731,37 +753,37 @@ function HorizontalStatsLayout({ result }) {
       </div>
 
       {/* Performance Metrics Bar Chart */}
-      <div className="bg-black/20 p-2 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2">Session Performance</div>
-        <ResponsiveContainer width="100%" height={60}>
-          <BarChart data={performanceData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-            <Bar dataKey="value" fill="#10b981" radius={[2, 2, 0, 0]} />
+      <div className="bg-black/20 p-4 rounded-lg">
+        <div className="text-sm text-gray-400 mb-3">Session Performance</div>
+        <ResponsiveContainer width="100%" height={100}>
+          <BarChart data={performanceData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+            <Bar dataKey="value" fill="#10b981" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
       {/* Key Session Metrics */}
-      <div className="flex items-center justify-between">
-        <div className="text-center bg-black/20 p-2 rounded-lg flex-1 mx-1">
-          <div className="text-sm font-bold text-green-400">{result.success_rate?.toFixed(0)}%</div>
-          <div className="text-xs text-gray-400">Success Rate</div>
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-center bg-black/20 p-4 rounded-lg flex-1">
+          <div className="text-lg font-bold text-green-400 mb-1">{result.success_rate?.toFixed(0)}%</div>
+          <div className="text-sm text-gray-400">Success Rate</div>
         </div>
-        <div className="text-center bg-black/20 p-2 rounded-lg flex-1 mx-1">
-          <div className="text-sm font-bold text-emerald-400">{(result.average_confidence * 100)?.toFixed(0)}%</div>
-          <div className="text-xs text-gray-400">Confidence</div>
+        <div className="text-center bg-black/20 p-4 rounded-lg flex-1">
+          <div className="text-lg font-bold text-emerald-400 mb-1">{(result.average_confidence * 100)?.toFixed(0)}%</div>
+          <div className="text-sm text-gray-400">Confidence</div>
         </div>
-        <div className="text-center bg-black/20 p-2 rounded-lg flex-1 mx-1">
-          <div className="text-sm font-bold text-blue-400">{result.instructions_processed}</div>
-          <div className="text-xs text-gray-400">Processed</div>
+        <div className="text-center bg-black/20 p-4 rounded-lg flex-1">
+          <div className="text-lg font-bold text-blue-400 mb-1">{result.instructions_processed}</div>
+          <div className="text-sm text-gray-400">Processed</div>
         </div>
       </div>
 
       {/* Features Status */}
-      <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 p-2 rounded-lg text-center">
-        <div className="text-xs font-semibold text-green-400">
+      <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 p-4 rounded-lg text-center">
+        <div className="text-sm font-semibold text-green-400 mb-1">
           {result.conflict_detection_active ? 'Conflict Detection Active' : 'Basic Mode'}
         </div>
-        <div className="text-xs text-gray-400">
+        <div className="text-sm text-gray-400">
           {result.contextual_awareness ? 'Contextual Awareness Enabled' : 'Sequential Processing'}
         </div>
       </div>
@@ -799,39 +821,39 @@ function VerticalFeaturesLayout({ result }) {
   ]
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Enhanced Radar Chart */}
-      <div className="bg-black/20 p-2 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-          <Cpu className="w-3 h-3" />
+      <div className="bg-black/20 p-4 rounded-lg">
+        <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
+          <Cpu className="w-4 h-4" />
           Core ML Performance
         </div>
-        <ResponsiveContainer width="100%" height={90}>
+        <ResponsiveContainer width="100%" height={140}>
           <RadarChart data={radarData}>
             <PolarGrid stroke="#ffffff10" />
-            <PolarAngleAxis dataKey="feature" tick={{ fontSize: 8, fill: '#fff' }} />
-            <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 8, fill: '#fff' }} />
+            <PolarAngleAxis dataKey="feature" tick={{ fontSize: 10, fill: '#fff' }} />
+            <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#fff' }} />
             <Radar name="Score" dataKey="value" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
           </RadarChart>
         </ResponsiveContainer>
       </div>
 
       {/* Optimization Metrics Bar Chart */}
-      <div className="bg-black/20 p-2 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2">Optimization Metrics</div>
-        <ResponsiveContainer width="100%" height={60}>
-          <BarChart data={optimizationData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-            <Bar dataKey="value" fill="#3b82f6" radius={[2, 2, 0, 0]} />
+      <div className="bg-black/20 p-4 rounded-lg">
+        <div className="text-sm text-gray-400 mb-3">Optimization Metrics</div>
+        <ResponsiveContainer width="100%" height={100}>
+          <BarChart data={optimizationData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+            <Bar dataKey="value" fill="#3b82f6" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
       {/* Core ML Features Status */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between bg-black/20 p-2 rounded">
-          <span className="text-xs text-gray-300">Apple Silicon</span>
-          <div className="flex items-center gap-2">
-            <div className="w-16 h-1 bg-white/20 rounded-full overflow-hidden">
+      <div className="space-y-3">
+        <div className="flex items-center justify-between bg-black/20 p-4 rounded-lg">
+          <span className="text-sm text-gray-300">Apple Silicon</span>
+          <div className="flex items-center gap-3">
+            <div className="w-20 h-2 bg-white/20 rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all ${
                   result.apple_silicon ? 'bg-green-400' : 'bg-red-400'
@@ -839,7 +861,7 @@ function VerticalFeaturesLayout({ result }) {
                 style={{ width: result.apple_silicon ? '100%' : '30%' }}
               ></div>
             </div>
-            <span className={`text-xs px-2 py-1 rounded ${
+            <span className={`text-sm px-3 py-1 rounded ${
               result.apple_silicon ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
             }`}>
               {result.apple_silicon ? 'Optimized' : 'Not Ready'}
@@ -847,10 +869,10 @@ function VerticalFeaturesLayout({ result }) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between bg-black/20 p-2 rounded">
-          <span className="text-xs text-gray-300">Neural Engine</span>
-          <div className="flex items-center gap-2">
-            <div className="w-16 h-1 bg-white/20 rounded-full overflow-hidden">
+        <div className="flex items-center justify-between bg-black/20 p-4 rounded-lg">
+          <span className="text-sm text-gray-300">Neural Engine</span>
+          <div className="flex items-center gap-3">
+            <div className="w-20 h-2 bg-white/20 rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all ${
                   result.neural_engine_support ? 'bg-blue-400' : 'bg-gray-400'
@@ -858,7 +880,7 @@ function VerticalFeaturesLayout({ result }) {
                 style={{ width: result.neural_engine_support ? '100%' : '20%' }}
               ></div>
             </div>
-            <span className={`text-xs px-2 py-1 rounded ${
+            <span className={`text-sm px-3 py-1 rounded ${
               result.neural_engine_support ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'
             }`}>
               {result.neural_engine_support ? 'Supported' : 'Not Supported'}
@@ -868,9 +890,9 @@ function VerticalFeaturesLayout({ result }) {
       </div>
 
       {/* Deployment Summary */}
-      <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 p-2 rounded-lg text-center">
-        <div className="text-sm font-bold text-indigo-400">{result.ios_files_generated} Files</div>
-        <div className="text-xs text-gray-400">
+      <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 p-4 rounded-lg text-center">
+        <div className="text-lg font-bold text-indigo-400 mb-1">{result.ios_files_generated} Files</div>
+        <div className="text-sm text-gray-400">
           Core ML {result.coreml_version} - {result.target_ios_version}
         </div>
       </div>
@@ -907,58 +929,58 @@ function HorizontalPipelineLayout({ result }) {
   ]
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Composed Chart for Pipeline Performance */}
-      <div className="bg-black/20 p-2 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-          <Settings className="w-3 h-3" />
+      <div className="bg-black/20 p-4 rounded-lg">
+        <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
+          <Settings className="w-4 h-4" />
           Pipeline Performance
         </div>
-        <ResponsiveContainer width="100%" height={70}>
-          <ComposedChart data={pipelineData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+        <ResponsiveContainer width="100%" height={120}>
+          <ComposedChart data={pipelineData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
             <Bar dataKey="accuracy" fill="#14b8a6" />
-            <Line type="monotone" dataKey="time" stroke="#06b6d4" strokeWidth={2} />
+            <Line type="monotone" dataKey="time" stroke="#06b6d4" strokeWidth={3} />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
 
       {/* Mini Radar Chart for Pipeline Metrics */}
-      <div className="bg-black/20 p-2 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2">Model Metrics</div>
-        <ResponsiveContainer width="100%" height={80}>
+      <div className="bg-black/20 p-4 rounded-lg">
+        <div className="text-sm text-gray-400 mb-3">Model Metrics</div>
+        <ResponsiveContainer width="100%" height={120}>
           <RadarChart data={pipelineMetrics}>
             <PolarGrid stroke="#ffffff10" />
-            <PolarAngleAxis dataKey="metric" tick={{ fontSize: 7, fill: '#fff' }} />
+            <PolarAngleAxis dataKey="metric" tick={{ fontSize: 9, fill: '#fff' }} />
             <Radar name="Score" dataKey="value" stroke="#14b8a6" fill="#14b8a6" fillOpacity={0.3} />
           </RadarChart>
         </ResponsiveContainer>
       </div>
 
       {/* Pipeline Flow and Accuracy */}
-      <div className="flex items-center justify-center gap-3">
+      <div className="flex items-center justify-center gap-4">
         <div className="text-center">
-          <div className="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center text-sm font-bold text-white">
+          <div className="w-12 h-12 rounded-full bg-teal-500 flex items-center justify-center text-lg font-bold text-white mb-2">
             1
           </div>
-          <div className="text-xs text-gray-400 mt-1">TF-IDF</div>
-          <div className="text-xs text-teal-400 font-semibold">Vectorizer</div>
+          <div className="text-sm text-gray-400 mb-1">TF-IDF</div>
+          <div className="text-sm text-teal-400 font-semibold">Vectorizer</div>
         </div>
-        <div className="w-6 h-0.5 bg-white/40"></div>
+        <div className="w-8 h-0.5 bg-white/40"></div>
         <div className="text-center">
-          <div className="w-10 h-10 rounded-full bg-cyan-500 flex items-center justify-center text-sm font-bold text-white">
+          <div className="w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center text-lg font-bold text-white mb-2">
             2
           </div>
-          <div className="text-xs text-gray-400 mt-1">Logistic</div>
-          <div className="text-xs text-cyan-400 font-semibold">Regression</div>
+          <div className="text-sm text-gray-400 mb-1">Logistic</div>
+          <div className="text-sm text-cyan-400 font-semibold">Regression</div>
         </div>
       </div>
 
       {/* Performance Summary */}
-      <div className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 p-2 rounded-lg text-center">
-        <div className="text-sm font-bold text-cyan-400">
+      <div className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 p-4 rounded-lg text-center">
+        <div className="text-lg font-bold text-cyan-400 mb-1">
           {result.training_accuracy?.toFixed(1)}% Train / {result.validation_accuracy?.toFixed(1)}% Val
         </div>
-        <div className="text-xs text-gray-400">
+        <div className="text-sm text-gray-400">
           {result.vocabulary_size} features - {result.classifier}
         </div>
       </div>
@@ -1003,25 +1025,25 @@ function VerticalAnalysisLayout({ result }) {
   ]
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Bar Chart for Feature Dimensions */}
-      <div className="bg-black/20 p-2 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-          <Eye className="w-3 h-3" />
+      <div className="bg-black/20 p-4 rounded-lg">
+        <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
+          <Eye className="w-4 h-4" />
           Feature Dimensions
         </div>
-        <ResponsiveContainer width="100%" height={60}>
-          <BarChart data={featureData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-            <Bar dataKey="value" fill="#fbbf24" radius={[2, 2, 0, 0]} />
+        <ResponsiveContainer width="100%" height={120}>
+          <BarChart data={featureData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+            <Bar dataKey="value" fill="#fbbf24" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
       {/* Scatter Plot for Feature Relationships */}
-      <div className="bg-black/20 p-2 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2">Feature Correlations</div>
-        <ResponsiveContainer width="100%" height={80}>
-          <ScatterChart data={scatterData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+      <div className="bg-black/20 p-4 rounded-lg">
+        <div className="text-sm text-gray-400 mb-3">Feature Correlations</div>
+        <ResponsiveContainer width="100%" height={120}>
+          <ScatterChart data={scatterData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
             <CartesianGrid stroke="#ffffff10" />
             <XAxis dataKey="x" hide />
             <YAxis dataKey="y" hide />
@@ -1031,29 +1053,29 @@ function VerticalAnalysisLayout({ result }) {
       </div>
 
       {/* Performance Metrics */}
-      <div className="grid grid-cols-2 gap-2">
-        <div className="flex items-center justify-between bg-black/20 p-2 rounded">
-          <span className="text-xs text-gray-300">TF-IDF Features</span>
-          <span className="text-xs font-semibold text-yellow-400">{result.tfidf_features}D</span>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="flex items-center justify-between bg-black/20 p-4 rounded-lg">
+          <span className="text-sm text-gray-300">TF-IDF Features</span>
+          <span className="text-sm font-semibold text-yellow-400">{result.tfidf_features}D</span>
         </div>
-        <div className="flex items-center justify-between bg-black/20 p-2 rounded">
-          <span className="text-xs text-gray-300">Similarity Score</span>
-          <span className="text-xs font-semibold text-orange-400">{(result.similarity_score * 100)?.toFixed(1)}%</span>
+        <div className="flex items-center justify-between bg-black/20 p-4 rounded-lg">
+          <span className="text-sm text-gray-300">Similarity Score</span>
+          <span className="text-sm font-semibold text-orange-400">{(result.similarity_score * 100)?.toFixed(1)}%</span>
         </div>
-        <div className="flex items-center justify-between bg-black/20 p-2 rounded">
-          <span className="text-xs text-gray-300">Vocabulary Size</span>
-          <span className="text-xs font-semibold text-amber-400">{result.vocabulary_size}</span>
+        <div className="flex items-center justify-between bg-black/20 p-4 rounded-lg">
+          <span className="text-sm text-gray-300">Vocabulary Size</span>
+          <span className="text-sm font-semibold text-amber-400">{result.vocabulary_size}</span>
         </div>
-        <div className="flex items-center justify-between bg-black/20 p-2 rounded">
-          <span className="text-xs text-gray-300">Processing Time</span>
-          <span className="text-xs font-semibold text-red-400">{(result.feature_extraction_time * 1000).toFixed(1)}ms</span>
+        <div className="flex items-center justify-between bg-black/20 p-4 rounded-lg">
+          <span className="text-sm text-gray-300">Processing Time</span>
+          <span className="text-sm font-semibold text-red-400">{(result.feature_extraction_time * 1000).toFixed(1)}ms</span>
         </div>
       </div>
 
       {/* N-gram Analysis */}
-      <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 p-2 rounded-lg text-center">
-        <div className="text-xs font-semibold text-yellow-400">Top N-grams</div>
-        <div className="text-xs text-gray-400 mt-1">
+      <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 p-4 rounded-lg text-center">
+        <div className="text-sm font-semibold text-yellow-400 mb-2">Top N-grams</div>
+        <div className="text-sm text-gray-400">
           {result.most_common_ngrams ? result.most_common_ngrams.slice(0, 3).join(', ') : 'N/A'}
         </div>
       </div>
@@ -1061,614 +1083,556 @@ function VerticalAnalysisLayout({ result }) {
   )
 }
 
-// Visualization components (keeping them here for now)
-function DiffusionModelVisualization({ data }) {
-  const modelData = [
-    { name: 'Params', value: data.parameters / 1000000, fill: '#8b5cf6' },
-    { name: 'Input', value: data.input_shape?.reduce((a, b) => a * b, 1) / 1000, fill: '#ec4899' },
-    { name: 'Output', value: data.output_shape?.reduce((a, b) => a * b, 1) / 1000, fill: '#3b82f6' }
-  ]
+// Dynamic Layout Components
+
+// Hero Layout - Quality Scorer (2x2 grid)
+function HeroDetailedGrid({ result }) {
+  if (!result || !result.components) {
+    return (
+      <div className="h-full flex items-center justify-center bg-white/5 rounded-xl">
+        <div className="text-center text-gray-400">
+          <PlayCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+          <p className="text-lg">Run quality assessment to see detailed component analysis</p>
+        </div>
+      </div>
+    )
+  }
+
+  const components = Object.entries(result.components)
+  const weights = result.weights || {}
+  const chartData = components.map(([key, value]) => ({
+    name: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+    value: parseFloat((value * 100).toFixed(1)),
+    weight: weights[key] ? parseFloat((weights[key] * 100).toFixed(0)) : 0,
+    fullMark: 100
+  }))
 
   return (
-    <div className="space-y-4">
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-          <Layers className="w-4 h-4" />
-          Model Architecture
-        </h4>
-        <ResponsiveContainer width="100%" height={180}>
-          <BarChart data={modelData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-            <XAxis dataKey="name" tick={{ fill: '#fff', fontSize: 10 }} />
-            <YAxis tick={{ fill: '#fff', fontSize: 10 }} />
-            <Tooltip
-              contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #ffffff20', borderRadius: '8px' }}
-              formatter={(value, name) => [
-                name === 'Params' ? `${value.toFixed(1)}M` : `${value.toFixed(0)}K`,
-                name
-              ]}
-            />
-            <Bar dataKey="value" fill="#8b5cf6" />
-          </BarChart>
-        </ResponsiveContainer>
+    <div className="space-y-6">
+      {/* Top Row: Score Overview + Radar */}
+      <div className="grid grid-cols-2 gap-4">
+        {/* Overall Score Card */}
+        <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 p-6 rounded-xl text-center">
+          <div className="text-4xl font-bold text-blue-400 mb-2">
+            {result.overall_score ? (result.overall_score * 100).toFixed(1) : 'N/A'}%
+          </div>
+          <div className="text-lg text-gray-300 mb-2">
+            {result.grade || 'Grade'} - {result.recommendation || 'Recommendation'}
+          </div>
+          <div className="w-full bg-white/20 rounded-full h-2">
+            <div
+              className="bg-gradient-to-r from-blue-400 to-purple-400 h-2 rounded-full transition-all"
+              style={{ width: `${result.overall_score ? result.overall_score * 100 : 0}%` }}
+            ></div>
+          </div>
+        </div>
+
+        {/* Mini Radar Chart */}
+        <div className="bg-black/20 p-4 rounded-xl">
+          <div className="text-sm text-gray-400 mb-3">Component Radar</div>
+          <ResponsiveContainer width="100%" height={120}>
+            <RadarChart data={chartData}>
+              <PolarGrid stroke="#ffffff10" />
+              <PolarAngleAxis dataKey="name" tick={{ fontSize: 9, fill: '#fff' }} />
+              <Radar name="Score" dataKey="value" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} />
+            </RadarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h4 className="text-sm font-semibold mb-3">Model Details</h4>
-        <div className="grid grid-cols-1 gap-2">
-          <div className="flex items-center justify-between p-2 bg-white/5 rounded">
-            <span className="text-xs text-gray-400">Parameters</span>
-            <span className="text-xs font-semibold text-purple-400">{(data.parameters / 1000000).toFixed(1)}M</span>
+      {/* Bottom Row: Component Breakdown + Bar Chart */}
+      <div className="grid grid-cols-3 gap-4">
+        {/* Component List */}
+        <div className="bg-black/20 p-4 rounded-xl">
+          <div className="text-sm text-gray-400 mb-3">Components</div>
+          <div className="space-y-3">
+            {components.slice(0, 4).map(([key, value]) => (
+              <div key={key} className="flex items-center justify-between">
+                <span className="text-sm text-gray-300 capitalize truncate w-20">
+                  {key.replace(/_/g, ' ')}
+                </span>
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full"
+                      style={{ width: `${value * 100}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-sm font-semibold text-blue-400 w-10">
+                    {(value * 100).toFixed(0)}%
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="flex items-center justify-between p-2 bg-white/5 rounded">
-            <span className="text-xs text-gray-400">Input Shape</span>
-            <span className="text-xs font-semibold text-pink-400">{data.input_shape?.join('×')}</span>
-          </div>
-          <div className="flex items-center justify-between p-2 bg-white/5 rounded">
-            <span className="text-xs text-gray-400">Output Shape</span>
-            <span className="text-xs font-semibold text-blue-400">{data.output_shape?.join('×')}</span>
-          </div>
+        </div>
+
+        {/* Component Bar Chart */}
+        <div className="bg-black/20 p-4 rounded-xl col-span-2">
+          <div className="text-sm text-gray-400 mb-3">Component Scores & Weights</div>
+          <ResponsiveContainer width="100%" height={140}>
+            <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+              <Bar dataKey="value" fill="#3b82f6" radius={[3, 3, 0, 0]} name="Score" />
+              <Bar dataKey="weight" fill="#8b5cf6" radius={[3, 3, 0, 0]} name="Weight" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
   )
 }
 
-function DPOTrainingVisualization({ data }) {
-  const trainingData = [
-    { name: 'Loss', value: data.loss * 100, fill: '#f97316' },
-    { name: 'Accuracy', value: data.preference_accuracy, fill: '#ef4444' },
-    { name: 'KL Div', value: data.kl_divergence * 10000, fill: '#fbbf24' }
-  ]
+// Wide Layout - DPO Training (2x1 grid)
+function WideTimeSeries({ result }) {
+  if (!result || result.loss === undefined) {
+    return (
+      <div className="h-full flex items-center justify-center bg-white/5 rounded-xl">
+        <div className="text-center text-gray-400">
+          <PlayCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+          <p className="text-lg">Run DPO training to see performance curves</p>
+        </div>
+      </div>
+    )
+  }
+
+  const trainingSteps = result.training_steps || 1
+  const trainingData = Array.from({ length: Math.min(trainingSteps, 15) }, (_, i) => {
+    const progress = (i + 1) / Math.min(trainingSteps, 15)
+    return {
+      step: i + 1,
+      loss: result.loss + (0.5 - result.loss) * (1 - progress) + Math.random() * 0.1,
+      accuracy: (result.preference_accuracy * 100) * progress + Math.random() * 5,
+      kl: result.kl_divergence * (1 - progress * 0.8) + Math.random() * result.kl_divergence * 0.2
+    }
+  })
 
   return (
     <div className="space-y-4">
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4" />
-          Training Progress
-        </h4>
-        <ResponsiveContainer width="100%" height={180}>
-          <BarChart data={trainingData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-            <XAxis dataKey="name" tick={{ fill: '#fff', fontSize: 10 }} />
-            <YAxis tick={{ fill: '#fff', fontSize: 10 }} />
-            <Tooltip
-              contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #ffffff20', borderRadius: '8px' }}
-              formatter={(value, name) => [
-                name === 'Loss' ? `${(value/100).toFixed(4)}` :
-                name === 'Accuracy' ? `${value.toFixed(1)}%` :
-                `${(value/10000).toFixed(4)}`,
-                name
-              ]}
-            />
-            <Bar dataKey="value" fill="#f97316" />
-          </BarChart>
-        </ResponsiveContainer>
+      {/* Training Curves Row */}
+      <div className="grid grid-cols-2 gap-4">
+        {/* Loss Curve */}
+        <div className="bg-black/20 p-4 rounded-xl">
+          <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4" />
+            Training Loss
+          </div>
+          <ResponsiveContainer width="100%" height={120}>
+            <LineChart data={trainingData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+              <Line
+                type="monotone"
+                dataKey="loss"
+                stroke="#ef4444"
+                strokeWidth={3}
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Accuracy Curve */}
+        <div className="bg-black/20 p-4 rounded-xl">
+          <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4" />
+            Preference Accuracy
+          </div>
+          <ResponsiveContainer width="100%" height={120}>
+            <LineChart data={trainingData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+              <Line
+                type="monotone"
+                dataKey="accuracy"
+                stroke="#10b981"
+                strokeWidth={3}
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h4 className="text-sm font-semibold mb-3">Training Metrics</h4>
-        <div className="grid grid-cols-1 gap-2">
-          <div className="flex items-center justify-between p-2 bg-white/5 rounded">
-            <span className="text-xs text-gray-400">Loss</span>
-            <span className="text-xs font-semibold text-orange-400">{data.loss.toFixed(4)}</span>
-          </div>
-          <div className="flex items-center justify-between p-2 bg-white/5 rounded">
-            <span className="text-xs text-gray-400">Preference Accuracy</span>
-            <span className="text-xs font-semibold text-red-400">{data.preference_accuracy.toFixed(1)}%</span>
-          </div>
-          <div className="flex items-center justify-between p-2 bg-white/5 rounded">
-            <span className="text-xs text-gray-400">Steps Completed</span>
-            <span className="text-xs font-semibold text-yellow-400">{data.training_steps}</span>
-          </div>
+      {/* Metrics Row */}
+      <div className="grid grid-cols-4 gap-3">
+        <div className="bg-black/20 p-3 rounded-lg text-center">
+          <div className="text-lg font-bold text-red-400 mb-1">{result.loss.toFixed(4)}</div>
+          <div className="text-xs text-gray-400">Final Loss</div>
+        </div>
+        <div className="bg-black/20 p-3 rounded-lg text-center">
+          <div className="text-lg font-bold text-green-400 mb-1">{(result.preference_accuracy * 100).toFixed(1)}%</div>
+          <div className="text-xs text-gray-400">Accuracy</div>
+        </div>
+        <div className="bg-black/20 p-3 rounded-lg text-center">
+          <div className="text-lg font-bold text-orange-400 mb-1">{result.training_steps}</div>
+          <div className="text-xs text-gray-400">Steps</div>
+        </div>
+        <div className="bg-black/20 p-3 rounded-lg text-center">
+          <div className="text-lg font-bold text-yellow-400 mb-1">{result.beta_parameter?.toFixed(2) || '0.10'}</div>
+          <div className="text-xs text-gray-400">Beta</div>
+        </div>
+      </div>
+
+      {/* Status Bar */}
+      <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 p-4 rounded-lg text-center">
+        <div className="text-sm font-semibold text-orange-400">
+          {result.convergence_achieved ? '✅ Converged' : '🔄 Training'} - Step {result.training_steps}
         </div>
       </div>
     </div>
   )
 }
 
-function MultiTurnVisualization({ data }) {
+// Wide Layout - Diffusion Model (2x1 grid)
+function WideTechnicalSpecs({ result }) {
+  if (!result || !result.parameters) {
+    return (
+      <div className="h-full flex items-center justify-center bg-white/5 rounded-xl">
+        <div className="text-center text-gray-400">
+          <PlayCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+          <p className="text-lg">Run diffusion model test to see technical specifications</p>
+        </div>
+      </div>
+    )
+  }
+
+  const architectureData = [
+    { name: 'Parameters', value: result.parameters / 1000000, unit: 'M' },
+    { name: 'Input Size', value: result.input_shape ? result.input_shape.reduce((a, b) => a * b, 1) / 1000 : 0, unit: 'K' },
+    { name: 'Output Size', value: result.output_shape ? result.output_shape.reduce((a, b) => a * b, 1) / 1000 : 0, unit: 'K' }
+  ]
+
+  return (
+    <div className="space-y-4">
+      {/* Architecture Metrics */}
+      <div className="grid grid-cols-3 gap-4">
+        {architectureData.map((item, index) => (
+          <div key={index} className="bg-black/20 p-4 rounded-xl text-center">
+            <div className="text-2xl font-bold text-purple-400 mb-1">
+              {item.value.toFixed(1)}{item.unit}
+            </div>
+            <div className="text-sm text-gray-400">{item.name}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Model Capabilities & Architecture Chart */}
+      <div className="grid grid-cols-2 gap-4">
+        {/* Capabilities */}
+        <div className="bg-black/20 p-4 rounded-xl">
+          <div className="text-sm text-gray-400 mb-4">Model Capabilities</div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-300">Text-to-Image</span>
+              <span className={`text-sm px-2 py-1 rounded ${
+                result.supports_text_to_image ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+              }`}>
+                {result.supports_text_to_image ? '✓' : '✗'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-300">Image-to-Image</span>
+              <span className={`text-sm px-2 py-1 rounded ${
+                result.supports_image_to_image ? 'bg-blue-500/20 text-blue-400' : 'bg-red-500/20 text-red-400'
+              }`}>
+                {result.supports_image_to_image ? '✓' : '✗'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-300">Forward Pass</span>
+              <span className={`text-sm px-2 py-1 rounded ${
+                result.forward_pass_success ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+              }`}>
+                {result.forward_pass_success ? '✓' : '✗'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Architecture Bar Chart */}
+        <div className="bg-black/20 p-4 rounded-xl">
+          <div className="text-sm text-gray-400 mb-3">Architecture Overview</div>
+          <ResponsiveContainer width="100%" height={120}>
+            <BarChart data={architectureData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+              <Bar dataKey="value" fill="#8b5cf6" radius={[3, 3, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Technical Details */}
+      <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-4 rounded-lg">
+        <div className="text-sm text-gray-300">
+          <strong>U-Net Architecture:</strong> {result.num_channels || '128'} channels, {result.num_res_blocks || '2'} residual blocks, {result.attention_resolutions?.length || '4'} attention levels
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Tall Layout - Multi-Turn Editor (1x2 grid)
+function TallSessionFlow({ result }) {
+  if (!result || result.instructions_processed === undefined) {
+    return (
+      <div className="h-full flex items-center justify-center bg-white/5 rounded-xl">
+        <div className="text-center text-gray-400">
+          <PlayCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+          <p className="text-lg">Run multi-turn editor to see session flow</p>
+        </div>
+      </div>
+    )
+  }
+
   const sessionData = [
-    { name: 'Processed', value: data.instructions_processed, fill: '#10b981' },
-    { name: 'Completed', value: data.edits_completed, fill: '#34d399' },
-    { name: 'Failed', value: data.failed_edits, fill: '#ef4444' }
+    { name: 'Processed', value: result.instructions_processed, fill: '#10b981' },
+    { name: 'Completed', value: result.edits_completed, fill: '#34d399' },
+    { name: 'Failed', value: result.failed_edits, fill: '#ef4444' }
   ]
 
   return (
     <div className="space-y-4">
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+      {/* Session Overview */}
+      <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 p-6 rounded-xl text-center">
+        <div className="text-3xl font-bold text-green-400 mb-2">
+          {result.success_rate?.toFixed(0)}%
+        </div>
+        <div className="text-lg text-gray-300 mb-1">Success Rate</div>
+        <div className="text-sm text-gray-400">
+          {result.instructions_processed} instructions processed
+        </div>
+      </div>
+
+      {/* Session Pie Chart */}
+      <div className="bg-black/20 p-4 rounded-xl">
+        <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
           <GitBranch className="w-4 h-4" />
-          Editing Session
-        </h4>
-        <ResponsiveContainer width="100%" height={200}>
+          Edit Distribution
+        </div>
+        <ResponsiveContainer width="100%" height={160}>
           <PieChart>
             <Pie
               data={sessionData}
               cx="50%"
               cy="50%"
-              labelLine={false}
-              label={({ name, value }) => `${name}: ${value}`}
+              innerRadius={30}
               outerRadius={60}
-              fill="#8884d8"
               dataKey="value"
             >
               {sessionData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
             </Pie>
-            <Tooltip contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #ffffff20', borderRadius: '8px' }} />
           </PieChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h4 className="text-sm font-semibold mb-3">Session Metrics</h4>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="text-center p-3 bg-green-500/20 rounded-lg">
-            <div className="text-2xl font-bold text-green-400">{data.success_rate?.toFixed(0)}%</div>
-            <div className="text-xs text-gray-400">Success Rate</div>
-          </div>
-          <div className="text-center p-3 bg-emerald-500/20 rounded-lg">
-            <div className="text-2xl font-bold text-emerald-400">{(data.average_confidence * 100).toFixed(0)}%</div>
-            <div className="text-xs text-gray-400">Confidence</div>
-          </div>
+      {/* Performance Metrics */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-black/20 p-4 rounded-lg text-center">
+          <div className="text-xl font-bold text-emerald-400 mb-1">{(result.average_confidence * 100)?.toFixed(0)}%</div>
+          <div className="text-sm text-gray-400">Avg Confidence</div>
+        </div>
+        <div className="bg-black/20 p-4 rounded-lg text-center">
+          <div className="text-xl font-bold text-blue-400 mb-1">{result.edits_completed}</div>
+          <div className="text-sm text-gray-400">Edits Completed</div>
+        </div>
+      </div>
+
+      {/* Features Status */}
+      <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 p-4 rounded-lg text-center">
+        <div className="text-sm font-semibold text-green-400 mb-1">
+          {result.conflict_detection_active ? 'Conflict Detection Active' : 'Basic Mode'}
+        </div>
+        <div className="text-sm text-gray-400">
+          {result.contextual_awareness ? 'Contextual Awareness Enabled' : 'Sequential Processing'}
         </div>
       </div>
     </div>
   )
 }
 
-function CoreMLVisualization({ data }) {
-  const optimizationData = [
-    { name: 'Files Generated', value: data.ios_files_generated, fill: '#3b82f6' },
-    { name: 'Size Reduction', value: Math.round((1 - data.model_size_reduction) * 100), fill: '#10b981' }
-  ]
+// Standard Layout - Core ML (1x1 grid)
+function StandardStatusDashboard({ result }) {
+  if (!result || result.ios_files_generated === undefined) {
+    return (
+      <div className="h-full flex items-center justify-center bg-white/5 rounded-xl">
+        <div className="text-center text-gray-400">
+          <PlayCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+          <p className="text-lg">Run Core ML test to see optimization status</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-          <Cpu className="w-4 h-4" />
-          iOS Deployment Ready
-        </h4>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="text-center p-4 bg-indigo-500/20 rounded-lg">
-            <div className="text-3xl font-bold text-indigo-400">{data.ios_files_generated}</div>
-            <div className="text-xs text-gray-400">Files Generated</div>
-          </div>
-          <div className="text-center p-4 bg-purple-500/20 rounded-lg">
-            <div className="text-3xl font-bold text-purple-400">{data.coreml_version}</div>
-            <div className="text-xs text-gray-400">Core ML Version</div>
+      {/* Status Overview */}
+      <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 p-6 rounded-xl text-center">
+        <div className="text-3xl font-bold text-indigo-400 mb-2">
+          {result.ios_files_generated}
+        </div>
+        <div className="text-lg text-gray-300 mb-1">Files Generated</div>
+        <div className="text-sm text-gray-400">
+          Core ML {result.coreml_version} - {result.target_ios_version}
+        </div>
+      </div>
+
+      {/* Feature Status Grid */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between bg-black/20 p-4 rounded-lg">
+          <span className="text-sm text-gray-300">Apple Silicon</span>
+          <div className="flex items-center gap-3">
+            <div className="w-24 h-2 bg-white/20 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${
+                  result.apple_silicon ? 'bg-green-400' : 'bg-red-400'
+                }`}
+                style={{ width: result.apple_silicon ? '100%' : '30%' }}
+              ></div>
+            </div>
+            <span className={`text-sm px-3 py-1 rounded ${
+              result.apple_silicon ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+            }`}>
+              {result.apple_silicon ? 'Optimized' : 'Not Ready'}
+            </span>
           </div>
         </div>
 
-        <ResponsiveContainer width="100%" height={120}>
-          <BarChart data={optimizationData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-            <XAxis dataKey="name" tick={{ fill: '#fff', fontSize: 10 }} />
-            <YAxis tick={{ fill: '#fff', fontSize: 10 }} />
-            <Tooltip
-              contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #ffffff20', borderRadius: '8px' }}
-              formatter={(value, name) => [
-                name === 'Size Reduction' ? `${value}% smaller` : `${value} files`,
-                name
-              ]}
-            />
-            <Bar dataKey="value" fill="#3b82f6" />
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="flex items-center justify-between bg-black/20 p-4 rounded-lg">
+          <span className="text-sm text-gray-300">Neural Engine</span>
+          <div className="flex items-center gap-3">
+            <div className="w-24 h-2 bg-white/20 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${
+                  result.neural_engine_support ? 'bg-blue-400' : 'bg-gray-400'
+                }`}
+                style={{ width: result.neural_engine_support ? '100%' : '20%' }}
+              ></div>
+            </div>
+            <span className={`text-sm px-3 py-1 rounded ${
+              result.neural_engine_support ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'
+            }`}>
+              {result.neural_engine_support ? 'Supported' : 'Not Supported'}
+            </span>
+          </div>
+        </div>
       </div>
 
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h4 className="text-sm font-semibold mb-3">Optimization Features</h4>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="p-3 bg-white/5 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm">Apple Silicon</span>
-              <span className={`px-2 py-1 rounded text-xs ${data.apple_silicon ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                {data.apple_silicon ? 'Optimized' : 'Not Optimized'}
-              </span>
-            </div>
-            <div className="w-full bg-white/10 rounded-full h-1">
-              <div
-                className={`h-1 rounded-full transition-all ${data.apple_silicon ? 'bg-green-400' : 'bg-red-400'}`}
-                style={{ width: data.apple_silicon ? '100%' : '30%' }}
-              ></div>
-            </div>
-          </div>
-
-          <div className="p-3 bg-white/5 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm">Neural Engine</span>
-              <span className={`px-2 py-1 rounded text-xs ${data.neural_engine_support ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                {data.neural_engine_support ? 'Supported' : 'Not Supported'}
-              </span>
-            </div>
-            <div className="w-full bg-white/10 rounded-full h-1">
-              <div
-                className={`h-1 rounded-full transition-all ${data.neural_engine_support ? 'bg-blue-400' : 'bg-gray-400'}`}
-                style={{ width: data.neural_engine_support ? '100%' : '20%' }}
-              ></div>
-            </div>
-          </div>
-
-          <div className="p-3 bg-white/5 rounded-lg col-span-2">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm">Target iOS Version</span>
-              <span className="text-sm font-semibold text-purple-400">{data.target_ios_version}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400">Compatibility:</span>
-              <div className="flex gap-1">
-                {['iOS 17', 'iOS 16', 'iOS 15'].map((version, index) => (
-                  <div
-                    key={version}
-                    className={`px-2 py-1 rounded text-xs ${
-                      data.target_ios_version.includes(version.split(' ')[1]) ||
-                      (data.target_ios_version === '17.0+' && parseInt(version.split(' ')[1]) <= 17)
-                        ? 'bg-green-500/20 text-green-400'
-                        : 'bg-gray-500/20 text-gray-400'
-                    }`}
-                  >
-                    {version}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+      {/* Performance Metrics */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-black/20 p-3 rounded-lg text-center">
+          <div className="text-lg font-bold text-cyan-400 mb-1">{(result.model_size_reduction * 100)?.toFixed(0)}%</div>
+          <div className="text-xs text-gray-400">Size Reduction</div>
+        </div>
+        <div className="bg-black/20 p-3 rounded-lg text-center">
+          <div className="text-lg font-bold text-orange-400 mb-1">iOS 17+</div>
+          <div className="text-xs text-gray-400">Target Version</div>
         </div>
       </div>
     </div>
   )
 }
 
-function BaselineModelVisualization({ data }) {
-  const accuracyData = [
-    { name: 'Training', value: data.training_accuracy * 100, fill: '#3b82f6' },
-    { name: 'Validation', value: data.validation_accuracy * 100, fill: '#10b981' }
-  ]
-
-  const pipelineSteps = data.pipeline_steps || 2
-  const pipelineData = Array.from({ length: pipelineSteps }, (_, i) => ({
-    name: i === 0 ? 'TF-IDF Vectorizer' : i === pipelineSteps - 1 ? 'Logistic Regression' : `Step ${i + 1}`,
-    value: 1,
-    fill: i === 0 ? '#14b8a6' : i === pipelineSteps - 1 ? '#06b6d4' : '#8b5cf6'
-  }))
+// Standard Layout - Feature Extraction (1x1 grid)
+function StandardAnalysisGrid({ result }) {
+  if (!result || result.tfidf_features === undefined) {
+    return (
+      <div className="h-full flex items-center justify-center bg-white/5 rounded-xl">
+        <div className="text-center text-gray-400">
+          <PlayCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+          <p className="text-lg">Run feature extraction to see analysis</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4" />
-          Model Performance
-        </h4>
-        <ResponsiveContainer width="100%" height={140}>
-          <BarChart data={accuracyData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-            <XAxis dataKey="name" tick={{ fill: '#fff', fontSize: 10 }} />
-            <YAxis domain={[0, 100]} tick={{ fill: '#fff', fontSize: 10 }} />
-            <Tooltip
-              contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #ffffff20', borderRadius: '8px' }}
-              formatter={(value) => [`${value.toFixed(1)}%`, 'Accuracy']}
-            />
-            <Bar dataKey="value" fill="#3b82f6" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-          <Settings className="w-4 h-4" />
-          Pipeline Architecture
-        </h4>
-        <div className="flex items-center justify-center mb-4">
-          {pipelineData.map((step, index) => (
-            <div key={step.name} className="flex items-center">
-              <div className="text-center">
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-xs mx-2"
-                  style={{ backgroundColor: step.fill }}
-                >
-                  {index + 1}
-                </div>
-                <div className="text-xs text-gray-400 mt-1 max-w-16 truncate">{step.name}</div>
-              </div>
-              {index < pipelineData.length - 1 && (
-                <div className="w-8 h-0.5 bg-white/30"></div>
-              )}
-            </div>
-          ))}
+      {/* Main Metrics */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-black/20 p-4 rounded-lg text-center">
+          <div className="text-2xl font-bold text-yellow-400 mb-1">{result.tfidf_features}D</div>
+          <div className="text-sm text-gray-400">TF-IDF Features</div>
+        </div>
+        <div className="bg-black/20 p-4 rounded-lg text-center">
+          <div className="text-2xl font-bold text-orange-400 mb-1">{(result.similarity_score * 100)?.toFixed(1)}%</div>
+          <div className="text-sm text-gray-400">Similarity Score</div>
         </div>
       </div>
 
+      {/* Feature Analysis */}
       <div className="bg-black/20 p-4 rounded-lg">
-        <h4 className="text-sm font-semibold mb-3">Model Configuration</h4>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="p-3 bg-white/5 rounded-lg">
-            <div className="text-center">
-              <div className="text-lg font-bold text-teal-400 mb-1">{data.classifier}</div>
-              <div className="text-xs text-gray-400">Classifier</div>
-            </div>
-          </div>
-          <div className="p-3 bg-white/5 rounded-lg">
-            <div className="text-center">
-              <div className="text-lg font-bold text-cyan-400 mb-1">{data.solver}</div>
-              <div className="text-xs text-gray-400">Solver</div>
-            </div>
-          </div>
-          <div className="p-3 bg-white/5 rounded-lg">
-            <div className="text-center">
-              <div className="text-lg font-bold text-blue-400 mb-1">{data.max_iter}</div>
-              <div className="text-xs text-gray-400">Max Iterations</div>
-            </div>
-          </div>
-          <div className="p-3 bg-white/5 rounded-lg">
-            <div className="text-center">
-              <div className="text-lg font-bold text-purple-400 mb-1">{data.pipeline_steps}</div>
-              <div className="text-xs text-gray-400">Pipeline Steps</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-3 p-3 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 rounded-lg">
+        <div className="text-sm text-gray-400 mb-3">Feature Analysis</div>
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-300">Feature Extraction</span>
-            <span className="text-sm font-semibold text-cyan-400">{data.feature_extraction}</span>
+            <span className="text-sm text-gray-300">Vocabulary Size</span>
+            <span className="text-sm font-semibold text-amber-400">{result.vocabulary_size}</span>
           </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-300">Processing Time</span>
+            <span className="text-sm font-semibold text-red-400">{(result.feature_extraction_time * 1000).toFixed(1)}ms</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-300">Matrix Sparsity</span>
+            <span className="text-sm font-semibold text-cyan-400">{(result.sparsity * 100).toFixed(1)}%</span>
+          </div>
+        </div>
+      </div>
+
+      {/* N-gram Analysis */}
+      <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 p-4 rounded-lg text-center">
+        <div className="text-sm font-semibold text-yellow-400 mb-2">Top N-grams</div>
+        <div className="text-sm text-gray-400">
+          {result.most_common_ngrams ? result.most_common_ngrams.slice(0, 3).join(', ') : 'N/A'}
         </div>
       </div>
     </div>
   )
 }
 
-function FeatureExtractionVisualization({ data }) {
-  const featureData = [
-    { name: 'TF-IDF', value: data.tfidf_features / 100, fill: '#fbbf24' },
-    { name: 'Similarity', value: data.similarity_score * 100, fill: '#f59e0b' }
-  ]
+// Compact Layout - Baseline Model (1x1 grid, smaller)
+function CompactMetricsView({ result }) {
+  if (!result || !result.classifier) {
+    return (
+      <div className="h-full flex items-center justify-center bg-white/5 rounded-xl">
+        <div className="text-center text-gray-400">
+          <PlayCircle className="w-10 h-10 mx-auto mb-3 opacity-50" />
+          <p className="text-sm">Run baseline test to see metrics</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="space-y-4">
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-          <Eye className="w-4 h-4" />
-          Feature Analysis
-        </h4>
-        <ResponsiveContainer width="100%" height={180}>
-          <BarChart data={featureData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-            <XAxis dataKey="name" tick={{ fill: '#fff', fontSize: 10 }} />
-            <YAxis tick={{ fill: '#fff', fontSize: 10 }} />
-            <Tooltip
-              contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #ffffff20', borderRadius: '8px' }}
-              formatter={(value, name) => [
-                name === 'TF-IDF' ? `${(value * 100).toFixed(0)}D` : `${value.toFixed(1)}%`,
-                name
-              ]}
-            />
-            <Bar dataKey="value" fill="#fbbf24" />
-          </BarChart>
-        </ResponsiveContainer>
+    <div className="space-y-3">
+      {/* Accuracy Display */}
+      <div className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 p-4 rounded-lg text-center">
+        <div className="text-2xl font-bold text-cyan-400 mb-1">{result.training_accuracy?.toFixed(1)}%</div>
+        <div className="text-sm text-gray-300">Training Accuracy</div>
       </div>
 
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h4 className="text-sm font-semibold mb-3">Extraction Details</h4>
-        <div className="grid grid-cols-1 gap-2">
-          <div className="flex items-center justify-between p-2 bg-white/5 rounded">
-            <span className="text-xs text-gray-400">TF-IDF Features</span>
-            <span className="text-xs font-semibold text-yellow-400">{data.tfidf_features}D</span>
-          </div>
-          <div className="flex items-center justify-between p-2 bg-white/5 rounded">
-            <span className="text-xs text-gray-400">Similarity Score</span>
-            <span className="text-xs font-semibold text-orange-400">{(data.similarity_score * 100).toFixed(1)}%</span>
-          </div>
-          <div className="flex items-center justify-between p-2 bg-white/5 rounded">
-            <span className="text-xs text-gray-400">N-gram Range</span>
-            <span className="text-xs font-semibold text-amber-400">{data.ngram_range}</span>
-          </div>
+      {/* Model Details */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between bg-black/20 p-3 rounded">
+          <span className="text-sm text-gray-300">Classifier</span>
+          <span className="text-sm font-semibold text-cyan-400">{result.classifier}</span>
+        </div>
+        <div className="flex items-center justify-between bg-black/20 p-3 rounded">
+          <span className="text-sm text-gray-300">Features</span>
+          <span className="text-sm font-semibold text-teal-400">{result.vocabulary_size}</span>
+        </div>
+        <div className="flex items-center justify-between bg-black/20 p-3 rounded">
+          <span className="text-sm text-gray-300">Pipeline Steps</span>
+          <span className="text-sm font-semibold text-blue-400">{result.pipeline_steps}</span>
         </div>
       </div>
     </div>
   )
 }
 
-// Keep existing good components
-function ComponentBarChart({ data, weights }) {
-  const chartData = Object.entries(data).map(([key, value]) => ({
-    name: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-    score: parseFloat((value * 100).toFixed(1)),
-    weight: weights ? parseFloat((weights[key] * 100).toFixed(0)) : 0
-  }))
-
+// Default Layout - Fallback
+function DefaultLayout({ result }) {
   return (
-    <div className="bg-black/20 p-4 rounded-lg">
-      <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-        <BarChart3 className="w-4 h-4" />
-        Component Scores
-      </h4>
-      <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-          <XAxis dataKey="name" tick={{ fill: '#fff', fontSize: 10 }} angle={-45} textAnchor="end" height={80} />
-          <YAxis tick={{ fill: '#fff', fontSize: 10 }} />
-          <Tooltip contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #ffffff20', borderRadius: '8px' }} />
-          <Legend wrapperStyle={{ fontSize: '12px' }} />
-          <Bar dataKey="score" fill="#3b82f6" name="Score (%)" />
-          <Bar dataKey="weight" fill="#8b5cf6" name="Weight (%)" />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
-  )
-}
-
-function ComponentPieChart({ data }) {
-  const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981']
-  const chartData = Object.entries(data).map(([key, value], index) => ({
-    name: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-    value: parseFloat((value * 100).toFixed(2)),
-    color: COLORS[index % COLORS.length]
-  }))
-
-  return (
-    <div className="bg-black/20 p-4 rounded-lg">
-      <h4 className="text-sm font-semibold mb-3">Score Distribution</h4>
-      <ResponsiveContainer width="100%" height={200}>
-        <PieChart>
-          <Pie
-            data={chartData}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={({ name, value }) => `${name.split(' ')[0]}: ${value}%`}
-            outerRadius={60}
-            fill="#8884d8"
-            dataKey="value"
-          >
-            {chartData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Pie>
-          <Tooltip contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #ffffff20', borderRadius: '8px' }} />
-        </PieChart>
-      </ResponsiveContainer>
-    </div>
-  )
-}
-
-function ComponentRadarChart({ data }) {
-  const chartData = Object.entries(data).map(([key, value]) => ({
-    subject: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-    score: parseFloat((value * 100).toFixed(1)),
-    fullMark: 100
-  }))
-
-  return (
-    <div className="space-y-4">
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h4 className="text-sm font-semibold mb-3">Performance Radar</h4>
-        <ResponsiveContainer width="100%" height={250}>
-          <RadarChart data={chartData}>
-            <PolarGrid stroke="#ffffff20" />
-            <PolarAngleAxis dataKey="subject" tick={{ fill: '#fff', fontSize: 10 }} />
-            <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: '#fff', fontSize: 10 }} />
-            <Radar name="Score" dataKey="score" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
-            <Tooltip contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #ffffff20', borderRadius: '8px' }} />
-          </RadarChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-  )
-}
-
-function ScoreTable({ data }) {
-  return (
-    <div className="bg-black/20 p-4 rounded-lg overflow-x-auto">
-      <h4 className="text-sm font-semibold mb-3">Detailed Metrics</h4>
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-white/20">
-            <th className="text-left py-2">Metric</th>
-            <th className="text-right py-2">Score</th>
-            <th className="text-right py-2">Weight</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.components && Object.entries(data.components).map(([key, value]) => (
-            <tr key={key} className="border-b border-white/10">
-              <td className="py-2 font-medium">
-                {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-              </td>
-              <td className="text-right">
-                <span className={`px-2 py-1 rounded text-xs ${value > 0.7 ? 'bg-green-500/20' : value > 0.5 ? 'bg-yellow-500/20' : 'bg-red-500/20'}`}>
-                  {(value * 100).toFixed(1)}%
-                </span>
-              </td>
-              <td className="text-right text-gray-400 text-xs">
-                {data.weights ? `${(data.weights[key] * 100)}%` : '-'}
-              </td>
-            </tr>
-          ))}
-          <tr className="border-t-2 border-white/30 font-bold">
-            <td className="py-2">Overall</td>
-            <td className="text-right">
-              <span className={`px-2 py-1 rounded text-xs ${data.overall_score > 0.7 ? 'bg-green-500/30' : data.overall_score > 0.5 ? 'bg-yellow-500/30' : 'bg-red-500/30'}`}>
-                {(data.overall_score * 100).toFixed(1)}%
-              </span>
-            </td>
-            <td className="text-right text-xs">{data.grade}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
-// Algorithm Detail Modal with Images
-function AlgorithmDetailModal({ algorithm, result, onClose }) {
-  if (!algorithm) return null
-
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="glass rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <span className="text-3xl">{algorithm.icon}</span>
-            {algorithm.name}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-all"
-          >
-            ✕
-          </button>
-        </div>
-
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Description</h3>
-            <p className="text-gray-300">{algorithm.description}</p>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Technical Details</h3>
-            <p className="text-gray-400">{algorithm.details}</p>
-          </div>
-
-          {algorithm.hasImages && (
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Image Comparison</h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-black/20 p-4 rounded-lg">
-                  <h4 className="text-sm font-semibold mb-3">Original Image</h4>
-                  <div className="aspect-square bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg flex items-center justify-center">
-                    <Image className="w-12 h-12 text-gray-500" />
-                  </div>
-                  <p className="text-xs text-gray-400 mt-2">Before algorithm processing</p>
-                </div>
-                <div className="bg-black/20 p-4 rounded-lg">
-                  <h4 className="text-sm font-semibold mb-3">Processed Image</h4>
-                  <div className="aspect-square bg-gradient-to-br from-blue-700 to-purple-800 rounded-lg flex items-center justify-center">
-                    <Sparkles className="w-12 h-12 text-blue-400" />
-                  </div>
-                  <p className="text-xs text-gray-400 mt-2">After {algorithm.name} processing</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {result && (
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Test Results</h3>
-              <div className={`p-4 rounded-lg ${result.success ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
-                <pre className="text-xs overflow-auto max-h-40">
-                  {JSON.stringify(result, null, 2)}
-                </pre>
-              </div>
-            </div>
-          )}
-        </div>
+    <div className="h-full flex items-center justify-center bg-white/5 rounded-xl">
+      <div className="text-center text-gray-400">
+        <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-50" />
+        <p className="text-lg">Algorithm visualization coming soon</p>
       </div>
     </div>
   )

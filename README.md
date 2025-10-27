@@ -18,91 +18,6 @@
 
   <br/>
 
-  <!-- Demo Preview -->
-  <table>
-    <tr>
-      <td align="center">
-        <pre>
-┌─────────────────────────┐
-│    📱 iOS Demo App      │
-│                         │
-│  Input: "Brighten photo"│
-│                         │
-│  [Original Image] [Edit]│
-│                         │
-│  Quality Score: 85%     │
-│  ✅ ACCEPTED            │
-│                         │
-│  [Edit Image] [Compare] │
-└─────────────────────────┘
-        </pre><br/>
-        <em>iOS SwiftUI Demo App</em>
-      </td>
-      <td align="center">
-        <pre>
-Text Instruction → TF-IDF → Feature Fusion ←← Image Similarity
-                       ↓
-             Logistic Regression Classifer
-                       ↓
-             Quality Score (0.0-1.0)
-                       ↓
-              Core ML Model Export
-        </pre><br/>
-        <em>Multimodal Fusion Pipeline</em>
-      </td>
-      <td align="center">
-        <pre>
-       🔧 Core ML Model
-   ┌─────────────────────┐
-   │ 🎯 PicoTuriEditJudge │
-   │                     │
-   │ Input: Text + Sim   │
-   │ Output: Quality     │
-   │                     │
-   │ Size: ~35MB         │
-   │ Device: Apple Si    │
-   │ Latency: <100ms     │
-   └─────────────────────┘
-        </pre><br/>
-        <em>Core ML Model Export</em>
-      </td>
-    </tr>
-  </table>
-
-  <br/>
-
-  <!-- Quick Demo -->
-  <details open>
-  <summary><strong>🚀 Live Demo (Click to expand)</strong></summary>
-  <br/>
-
-```bash
-# Run comprehensive test suite
-python tests/test_all_algorithms.py
-
-# Or use the verification script
-./verify_all.sh
-```
-
-  <pre>
-  🎯 PICOTURI-EDITJUDGE ALGORITHM VERIFICATION SUITE
-  ==================================================
-  ✅ Quality Scorer - 4-Component Weighted System
-  ✅ Diffusion Model - U-Net with Cross-Attention  
-  ✅ DPO Training - Preference-Based Alignment
-  ✅ Multi-Turn Editor - Conversational Editing
-  ✅ Core ML Optimizer - Apple Silicon Integration
-  ✅ Baseline Training - Scikit-Learn Pipeline
-  ✅ Feature Extraction - TF-IDF & Image Similarity
-
-  Total Tests: 7 | Passed: 7 | Failed: 0
-  Success Rate: 100.0%
-  
-  🎉 ALL ALGORITHMS ARE WORKING PERFECTLY!
-  ✅ Project is production-ready and error-free
-  </pre>
-  </details>
-
 </div>
 
 ## 🌟 **What Makes PicoTuri-EditJudge Special?**
@@ -146,69 +61,21 @@ python tests/test_all_algorithms.py
 - **⚡ Real-Time Optimization**: Adaptive batching and INT8 quantization for production
 - **🌍 Cross-Platform Parity**: ONNX and Core ML export with unified inference
 
-## 📁 Project Structure
+## 📁 Streamlined Project Layout
 
 ```
 PicoTuri-EditJudge/
-├── 📂 src/                          # Core source code
-│   ├── algorithms/                  # ML algorithms
-│   │   └── quality_scorer.py       # 4-component quality assessment
-│   ├── features_text/               # Text feature extraction
-│   │   └── bert.py                 # BERT embeddings
-│   ├── features_image/              # Image feature extraction
-│   │   └── clip.py                 # CLIP embeddings
-│   ├── fuse/                        # Feature fusion
-│   │   └── fusion.py               # Multimodal fusion head
-│   ├── train/                       # Training utilities
-│   ├── export/                      # Model export (ONNX, Core ML)
-│   ├── runtime/                     # Runtime optimization
-│   ├── adaptation/                  # Domain adaptation (LoRA)
-│   └── gui/                         # Dashboard interface
-│
-├── 📂 experiments/                  # Research framework (R1-R7)
-│   ├── r1_embeddings/               # R1: Embedding choice vs performance
-│   │   ├── run.py                  # Experiment runner
-│   │   └── configs/                # YAML configurations
-│   ├── r2_fusion/                   # R2: Fusion architecture ablations
-│   │   ├── run.py
-│   │   └── configs/
-│   ├── r3_domain/                   # R3: Domain adaptation (LoRA)
-│   │   ├── run.py
-│   │   └── configs/
-│   ├── r4_preference/               # R4: Preference learning for ranking
-│   │   └── run.py
-│   ├── r5_robustness/               # R5: Robustness & safety
-│   │   └── run.py
-│   ├── r6_batching/                 # R6: Real-time batching & quantization
-│   │   ├── run.py
-│   │   └── configs/
-│   ├── r7_parity/                   # R7: Cross-platform inference parity
-│   │   └── run.py
-│   ├── utils.py                     # Shared utilities
-│   └── README.md                    # Experiment documentation
-│
-├── 📂 scripts/                      # Analysis & benchmarking
-│   ├── run_experiment.py            # Main experiment runner
-│   ├── bench_latency.py             # Latency benchmarking
-│   ├── compare_experiments.py       # Cross-experiment comparison
-│   └── analyze_results.py           # Statistical analysis
-│
-├── 📂 tests/                        # Test suite
-├── 📂 dashboard/                    # Web dashboard
-├── 📂 docs/                         # Documentation
-├── 📂 configs/                      # Configuration files
-├── 📂 data/                         # Datasets
-├── 📂 examples/                     # Example code
-├── 📂 notebooks/                    # Jupyter notebooks
-├── 📂 tools/                        # Development tools
-│
-├── 📄 README.md                     # This file
-├── 📄 requirements.txt              # Python dependencies
-├── 📄 setup.py                      # Package setup
-└── 📄 verify_all.sh                 # Verification script
+├── api/              # Flask API (algorithm diagnostics)
+├── public/           # Static assets for Vite
+├── src/              # React dashboard UI
+├── src_main/         # ML implementations (quality scorer, diffusion, DPO, etc.)
+├── package.json
+├── requirements.txt
+├── api/requirements.txt
+└── README.md
 ```
 
-See [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) for detailed information.
+> Legacy research folders (`experiments/`, `scripts/`, `tests/`, etc.) have been archived to keep the repo lean. Refer to historical tags if you need them.
 
 ## 🔬 Research Experiments (R1-R7)
 
