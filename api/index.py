@@ -216,5 +216,8 @@ def internal_error(error):
     """Handle 500 errors."""
     return jsonify({'error': 'Internal server error'}), 500
 
+# Export app for Vercel deployment
+app = app
+
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5001)
