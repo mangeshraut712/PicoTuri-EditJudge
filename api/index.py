@@ -216,8 +216,21 @@ def internal_error(error):
     """Handle 500 errors."""
     return jsonify({'error': 'Internal server error'}), 500
 
-# Export app for Vercel deployment
-app = app
+# Vercel serverless function handler
+def handler(event, context):
+    """Handle Vercel serverless function requests."""
+    from werkzeug.middleware.dispatcher import DispatcherMiddleware
+    from werkzeug.serving import make_server
+    
+    # For Vercel, we need to handle the request differently
+    # This is a simplified handler - in production, use vercel-wsgi or similar
+    
+    # Mock response for now
+    return {
+        'statusCode': 200,
+        'headers': {'Content-Type': 'application/json'},
+        'body': '{"message": "API endpoint - work in progress"}'
+    }
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5001)
