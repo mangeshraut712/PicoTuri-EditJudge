@@ -4,8 +4,8 @@ Export BERT, CLIP, and fusion models to ONNX format for cross-platform deploymen
 """
 
 import torch
-import onnx
-import onnxruntime as ort
+import onnx  # type: ignore[import]
+import onnxruntime as ort  # type: ignore[import]
 import numpy as np
 from pathlib import Path
 import logging
@@ -140,7 +140,7 @@ class ONNXExporter:
         # Export to ONNX
         try:
             torch.onnx.export(
-                embedder.model.visual,
+                embedder.model.visual,  # type: ignore[arg-type]
                 (dummy_input,),
                 output_path,
                 input_names=onnx_config['input_names'],

@@ -134,7 +134,7 @@ def train_baseline_model(
     compute_similarity: bool = False,
     image_root: Optional[Path] = None,
     similarity_column: str = "image_similarity",
-) -> Tuple[BaselineArtifacts, Tuple[pd.DataFrame, pd.Series]]:
+) -> Tuple[BaselineArtifacts, Tuple[Any, Any]]:
     """Train the baseline model and return artifacts plus the held-out split."""
     pairs = load_pairs(pairs_path)
     pairs = _ensure_similarity_column(
@@ -174,7 +174,7 @@ def evaluate_model(pipeline: Pipeline, X_test, y_test) -> Dict[str, float]:
     y_pred = pipeline.predict(X_test)
     metrics = {
         "accuracy": accuracy_score(y_test, y_pred),
-        "f1": f1_score(y_test, y_pred, zero_division=0.0),
+        "f1": f1_score(y_test, y_pred, zero_division="warn"),
     }
 
     try:

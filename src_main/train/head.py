@@ -8,8 +8,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
 import numpy as np
-import pandas as pd
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional
 import logging
 from sklearn.metrics import roc_auc_score, accuracy_score, f1_score, precision_recall_curve
 from sklearn.isotonic import IsotonicRegression
@@ -17,7 +16,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 import json
 from pathlib import Path
-import time
 from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
@@ -336,8 +334,8 @@ class TrainingHead:
 
     def calibrate(
         self,
-        features: np.ndarray,
-        labels: np.ndarray,
+        features,
+        labels,
         method: str = "isotonic",
         batch_size: int = 32
     ):
@@ -418,11 +416,11 @@ class TrainingHead:
         # Apply calibration
         if apply_calibration and self.calibrator is not None:
             if self.calibration_method == "platt":
-                predictions = self.calibrator.predict_proba(predictions.reshape(-1, 1))[:, 1]
+                predictions = self.calibrator.predict_proba(predictions.reshape(-1, 1))[:, 1]  # type: ignore[attr-defined]
             elif self.calibration_method == "isotonic":
-                predictions = self.calibrator.transform(predictions)
+                predictions = self.calibrator.transform(predictions)  # type: ignore[attr-defined]
             else:
-                predictions = self.calibrator.transform(predictions)
+                predictions = self.calibrator.transform(predictions)  # type: ignore[attr-defined]
         elif apply_calibration and self.temperature is not None:
             # Apply temperature scaling
             dataset = EditJudgeDataset(features, np.zeros(len(features)))
@@ -442,8 +440,8 @@ class TrainingHead:
 
     def evaluate(
         self,
-        features: np.ndarray,
-        labels: np.ndarray,
+        features,
+        labels,
         batch_size: int = 32,
         apply_calibration: bool = True
     ) -> Dict[str, float]:
@@ -574,7 +572,7 @@ def test_training_head():
     print(f"Training completed. Final val AUC: {history['val_auc'][-1]:.4f}")
 
     # Calibrate model
-    val_features, calib_features, val_labels, calib_labels = train_test_split(
+    _, calib_features, _, calib_labels = train_test_split(
         train_features, train_labels, test_size=0.3, random_state=42
     )
 
