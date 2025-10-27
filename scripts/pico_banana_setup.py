@@ -75,7 +75,7 @@ def setup_environment() -> None:
     print(install_commands)
 
     try:
-        import torch  # type: ignore
+        import torch  # type: ignore[import]
 
         if torch.backends.mps.is_available():
             print("\n✓ Apple Silicon GPU (MPS) detected.")
@@ -263,7 +263,7 @@ from pathlib import Path
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
-from PIL import Image
+from PIL import Image  # type: ignore[import]
 
 
 class PicoBananaDataset(Dataset):

@@ -6,6 +6,8 @@ exclude =
     .pytest_cache,
     .mypy_cache,
     .github,
+    third_party,
+    examples/ios,
     *.pyc,
     *.pyo,
     *.bin,

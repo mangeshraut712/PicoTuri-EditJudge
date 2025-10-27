@@ -11,13 +11,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import List, Sequence
 
-import numpy as np
-from PIL import Image
+import numpy as np  # type: ignore[import]
+from PIL import Image  # type: ignore[import]
 
 
 def _try_turicreate():
     try:
-        import turicreate as tc  # type: ignore
+        import turicreate as tc  # type: ignore[import]
 
         return tc
     except ModuleNotFoundError:

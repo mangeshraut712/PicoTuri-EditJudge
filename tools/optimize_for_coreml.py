@@ -6,8 +6,8 @@ Converts PyTorch SFT model to Core ML format for iOS deployment
 Includes quantization, model export, and Apple Silicon optimization
 """
 
-import torch
-import numpy as np
+import torch  # type: ignore[import]
+import numpy as np  # type: ignore[import]
 import json
 from pathlib import Path
 from typing import Dict, Any
@@ -63,9 +63,6 @@ class CoreMLModelLoader:
 
     def get_sample_input(self) -> Dict[str, torch.Tensor]:
         """Create sample input for tracing"""
-        # Get vocabulary size for input creation
-        vocab_size = self.config['vocab_size']
-
         # Create sample input (same format as training)
         # This should match what dataset generates
         sample_input = torch.tensor([
@@ -125,7 +122,7 @@ class CoreMLOptimizer:
         print("\n🔄 Step 2: Converting to Core ML...")
 
         try:
-            import coremltools as ct
+            import coremltools as ct  # type: ignore[import]
 
             # Load traced model
             traced_model = torch.jit.load(torchscript_path)
@@ -203,7 +200,7 @@ class CoreMLOptimizer:
         print("\n🔄 Step 3: Applying quantization (optional)...")
 
         try:
-            import coremltools as ct
+            import coremltools as ct  # type: ignore[import]
 
             # Note: Quantization APIs vary by coremltools version
             # This is a simplified approach - full quantization would require
@@ -314,7 +311,7 @@ class CoreMLOptimizer:
         print(f"   Manifest: {manifest_path}")
         print()
         print("📱 Ready for iOS deployment!")
-        print(f"   Model size: {final_path.stat().st_size / (1024*1024):.1f} MB")
+        print(f"   Model size: {final_path.stat().st_size / (1024 * 1024):.1f} MB")
         print(f"   Parameters: {self.model_loader.count_parameters():,}")
 
         return {
@@ -362,7 +359,7 @@ def main():
     print("\n🔍 VERIFYING CORE ML MODEL...")
 
     try:
-        import coremltools as ct
+        import coremltools as ct  # type: ignore[import]
 
         coreml_model = ct.models.MLModel(str(exported_files['coreml']))
         print("✅ Core ML model verification passed")

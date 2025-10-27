@@ -18,7 +18,7 @@ import logging
 from pathlib import Path
 from typing import List, Optional, Sequence, cast
 
-import pandas as pd  # type: ignore
+import pandas as pd  # type: ignore[import]
 
 OUTPUT_COLUMNS = [
     "pair_id",
@@ -47,11 +47,14 @@ def read_manifest(path: Path) -> pd.DataFrame:
     return df
 
 
-def normalize_records(df: pd.DataFrame, start_index: int = 0,
-                     instruction_key: str = "instruction",
-                     original_key: str = "original_image",
-                     edited_key: str = "edited_image",
-                     label_key: str = "label") -> pd.DataFrame:
+def normalize_records(
+    df: pd.DataFrame,
+    start_index: int = 0,
+    instruction_key: str = "instruction",
+    original_key: str = "original_image",
+    edited_key: str = "edited_image",
+    label_key: str = "label",
+) -> pd.DataFrame:
     """Map manifest columns into the expected output schema."""
     required = {instruction_key, original_key, edited_key}
     missing = required.difference(df.columns)
@@ -81,21 +84,26 @@ def normalize_records(df: pd.DataFrame, start_index: int = 0,
     return normalized
 
 
-def combine_manifests(paths: Sequence[Path],
-                     instruction_key: str = "instruction",
-                     original_key: str = "original_image",
-                     edited_key: str = "edited_image",
-                     label_key: str = "label") -> pd.DataFrame:
+def combine_manifests(
+    paths: Sequence[Path],
+    instruction_key: str = "instruction",
+    original_key: str = "original_image",
+    edited_key: str = "edited_image",
+    label_key: str = "label",
+) -> pd.DataFrame:
     """Concatenate multiple manifests with stable pair IDs."""
     frames: List[pd.DataFrame] = []
     start = 0
     for path in paths:
         frame = read_manifest(path)
-        normalized = normalize_records(frame, start_index=start,
-                                     instruction_key=instruction_key,
-                                     original_key=original_key,
-                                     edited_key=edited_key,
-                                     label_key=label_key)
+        normalized = normalize_records(
+            frame,
+            start_index=start,
+            instruction_key=instruction_key,
+            original_key=original_key,
+            edited_key=edited_key,
+            label_key=label_key,
+        )
         frames.append(normalized)
         start += len(normalized)
 
@@ -153,11 +161,13 @@ def main(raw_args: Sequence[str] | None = None) -> None:
         raise FileExistsError(f"Refusing to overwrite existing file: {output_path}. Pass --overwrite to continue.")
 
     input_paths = [Path(path).expanduser().resolve() for path in args.input]
-    combined = combine_manifests(input_paths,
-                                instruction_key=args.instruction_key,
-                                original_key=args.original_key,
-                                edited_key=args.edited_key,
-                                label_key=args.label_key)
+    combined = combine_manifests(
+        input_paths,
+        instruction_key=args.instruction_key,
+        original_key=args.original_key,
+        edited_key=args.edited_key,
+        label_key=args.label_key,
+    )
     sampled = sample_pairs(combined, args.sample_size, args.seed)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)

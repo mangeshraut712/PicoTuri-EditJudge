@@ -31,7 +31,7 @@ def export_coreml_manifest(
         raise FileNotFoundError(f"Model path does not exist: {model_path}")
 
     try:
-        from joblib import load  # type: ignore
+        from joblib import load  # type: ignore[import]
     except ModuleNotFoundError as exc:  # pragma: no cover - import environment specific
         raise ImportError(
             "joblib is required to load trained pipelines. Install it with 'pip install joblib'."
@@ -100,7 +100,7 @@ def _ensure_json_extension(path: Path) -> Path:
 
 def _log_coremltools_status() -> None:
     try:
-        import coremltools  # type: ignore
+        import coremltools  # type: ignore[import]
 
         logging.info("coremltools %s detected – you can perform a true conversion in Python 3.12.", coremltools.__version__)
     except Exception:

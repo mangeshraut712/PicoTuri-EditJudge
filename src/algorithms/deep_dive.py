@@ -21,9 +21,9 @@ from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
 # Runtime imports
-import torch  # type: ignore[import-untyped]
-import torch.nn as nn  # type: ignore[import-untyped]
-import torch.nn.functional as F  # type: ignore[import-untyped]
+import torch  # type: ignore[import]
+import torch.nn as nn  # type: ignore[import]
+import torch.nn.functional as F  # type: ignore[import]
 
 
 # -----------------------------------------------------------------------------

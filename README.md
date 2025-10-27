@@ -71,27 +71,29 @@ Text Instruction → TF-IDF → Feature Fusion ←← Image Similarity
   <summary><strong>🚀 Live Demo (Click to expand)</strong></summary>
   <br/>
 
-  ```bash
-  cd /Users/mangeshraut/Downloads/PicoTuri-EditJudge
+```bash
+cd /Users/mangeshraut/Downloads/PicoTuri-EditJudge
 
-  # Run the working baseline demo
-  python demos/working_demo.py
-  ```
+# Run comprehensive test suite
+python test_all_modules.py
+```
 
   <pre>
-  🎯 PicoTuri-EditJudge Demo
-  ================================
-  ✅ Dependencies loaded
-  📊 Sample data: 10 edit pairs
-  📝 Example: Brighten the living room photo...
-  🏃 Training model...
-  🔮 Predictions on sample inputs:
-  💡 "make the image brighter" (sim=0.9) → ACCEPT (0.533)
-  💡 "add a sunset in the background" (sim=0.3) → ACCEPT (0.504)
-  💡 "remove the watermark" (sim=0.9) → NEEDS IMPROVEMENT (0.496)
-  💡 "turn this photo into a painting" (sim=0.1) → NEEDS IMPROVEMENT (0.458)
-  📱 Core ML status:
-  🎉 Demo complete! Project is working.
+  🚀 RUNNING COMPREHENSIVE TEST SUITE
+  ==================================================
+  ✅ PASS Module Imports
+  ✅ PASS Data Loading
+  🎯 Testing Algorithm Performance...
+  Test Accuracy: 1.0000
+  Test F1 Score: 1.0000
+  Test ROC-AUC: 1.0000
+  ✅ Excellent performance achieved!
+  ✅ PASS Algorithm Performance
+  ✅ PASS Core ML Export
+  ✅ PASS Sample Images
+
+  Overall: 5/5 tests passed
+  🎉 ALL TESTS PASSED! Project is fully functional.
   </pre>
   </details>
 
@@ -251,14 +253,17 @@ graph TB
 - ✅ **Complete Demo Suite**: Working baseline + advanced PyTorch pipelines
 - ✅ **iOS SwiftUI App**: Full mobile deployment capability
 
-### 📊 **Live Demo Results**
+### 📊 **Live Test Results**
 
-| Test Case | Image Similarity | Prediction | Confidence |
-|-----------|------------------|------------|------------|
-| "make the image brighter" | 0.9 | ✅ ACCEPT | 53.3% |
-| "add a sunset background" | 0.3 | ✅ ACCEPT | 50.4% |
-| "remove watermark" | 0.9 | ❌ NEEDS IMPROVEMENT | 49.6% |
-| "turn photo into painting" | 0.1 | ❌ NEEDS IMPROVEMENT | 45.8% |
+| **Component** | **Status** | **Details** |
+|---------------|------------|-------------|
+| **Module Imports** | ✅ **PASS** | All 6 core modules import successfully |
+| **Data Loading** | ✅ **PASS** | 1,000 enhanced training examples loaded |
+| **Algorithm Performance** | ✅ **PASS** | 100% test accuracy achieved |
+| **Core ML Export** | ✅ **PASS** | Manifest generation working |
+| **Sample Images** | ✅ **PASS** | 1 original + 1 edited image available |
+
+**Overall: 5/5 test categories PASSED - Project fully functional! 🎉**
 
 ### 🚀 **Model Architecture Stats**
 <table>

@@ -1,7 +1,7 @@
 from pathlib import Path
 
-import pandas as pd
-from PIL import Image
+import pandas as pd  # type: ignore[import]
+from PIL import Image  # type: ignore[import]
 
 from src.features_image import compute_similarity_score
 from src.train.baseline import train_baseline_model

@@ -33,15 +33,15 @@ pd: Any = None
 
 # Optional heavy dependencies with safe checking - type: ignore for mypy compatibility
 try:
-    import torch  # type: ignore[import-untyped]
-    import torch.nn as nn  # type: ignore[import-untyped]
-    import torch.optim as optim  # type: ignore[import-untyped]  # type: ignore[misc]
-    from torch.utils.data import DataLoader, Dataset  # type: ignore[import-untyped]
+    import torch  # type: ignore[import]
+    import torch.nn as nn  # type: ignore[import]
+    import torch.optim as optim  # type: ignore[import]  # type: ignore[misc]
+    from torch.utils.data import DataLoader, Dataset  # type: ignore[import]
 except ModuleNotFoundError:
     torch = nn = optim = DataLoader = Dataset = None  # type: ignore[assignment,misc]
 
 try:
-    from torchvision import models as _torchvision_models, transforms as _torchvision_transforms  # type: ignore[import-untyped]
+    from torchvision import models as _torchvision_models, transforms as _torchvision_transforms  # type: ignore[import]
     models = _torchvision_models
     transforms = _torchvision_transforms
 except ModuleNotFoundError:
@@ -54,13 +54,13 @@ except ModuleNotFoundError:
     ct = None
 
 try:
-    from PIL import Image as _pil_image  # type: ignore[import-untyped]
+    from PIL import Image as _pil_image  # type: ignore[import]
     Image = _pil_image
 except ModuleNotFoundError:
     Image = None
 
 try:
-    import pandas as _pd  # type: ignore[import-untyped]
+    import pandas as _pd  # type: ignore[import]
     pd = _pd
 except ModuleNotFoundError:
     pd = None
@@ -454,9 +454,9 @@ def main() -> None:
 
     # Check dependencies
     try:
-        from sklearn.pipeline import Pipeline  # type: ignore
-        from sklearn.linear_model import LogisticRegression  # type: ignore
-        import joblib  # type: ignore
+        from sklearn.pipeline import Pipeline  # type: ignore[import]
+        from sklearn.linear_model import LogisticRegression  # type: ignore[import]
+        import joblib  # type: ignore[import]
         print("✅ Dependencies loaded")
     except ImportError as e:
         print(f"❌ Missing dependencies: {e}")

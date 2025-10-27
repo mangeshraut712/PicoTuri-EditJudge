@@ -11,12 +11,12 @@ from typing import Dict, Optional, Sequence, Tuple
 from urllib.parse import urlparse
 
 try:
-    import joblib  # type: ignore
+    import joblib  # type: ignore[import]
 except ModuleNotFoundError as exc:  # pragma: no cover - environment specific
     raise ImportError("joblib is required to persist models. Install it with 'pip install joblib'.") from exc
 
 try:
-    import pandas as pd  # type: ignore
+    import pandas as pd  # type: ignore[import]
 except ModuleNotFoundError as exc:  # pragma: no cover - environment specific
     raise ImportError("pandas is required for data processing. Install it with 'pip install pandas'.") from exc
 

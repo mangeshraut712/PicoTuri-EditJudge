@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import pandas as pd
+import pandas as pd  # type: ignore[import]
 
 
 def build_feature_table(pairs: pd.DataFrame, similarity_column: str = "image_similarity") -> pd.DataFrame:
