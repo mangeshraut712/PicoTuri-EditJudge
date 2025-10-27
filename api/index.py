@@ -7,7 +7,6 @@ from flask import Flask, request, jsonify
 import sys
 from pathlib import Path
 import logging
-import torch
 import torchvision.transforms as transforms
 import base64
 from io import BytesIO
@@ -125,8 +124,8 @@ def score_quality():
             transforms.ToTensor(),
         ])
         
-        original_tensor = transform(original_img).unsqueeze(0)
-        edited_tensor = transform(edited_img).unsqueeze(0)
+        original_tensor = transform(original_img).unsqueeze(0)  # type: ignore[attr-defined]
+        edited_tensor = transform(edited_img).unsqueeze(0)  # type: ignore[attr-defined]
         
         # Score quality
         scorer = get_quality_scorer()
