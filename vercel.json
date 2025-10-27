@@ -1,6 +1,15 @@
 {
   "version": 2,
   "name": "picoturi-editjudge",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
   "env": {
     "PYTHON_VERSION": "3.12",
     "NODE_VERSION": "18.x",
