@@ -477,7 +477,7 @@ def main() -> None:
 
     # Train baseline model with improved configuration for higher accuracy
     try:
-        from src.train.baseline import train_baseline_model
+        from src_main.train.baseline import train_baseline_model
 
         print("🏃 Training baseline model with optimized parameters...")
 

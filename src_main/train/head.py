@@ -530,7 +530,7 @@ def test_training_head():
     """Test training head functionality"""
     print("Testing training head...")
 
-    from src.fuse.stack import FeatureFusionStack, FusionMLPHead
+    from src_main.fuse.stack import FeatureFusionStack, FusionMLPHead
 
     # Create dummy data
     n_samples = 1000

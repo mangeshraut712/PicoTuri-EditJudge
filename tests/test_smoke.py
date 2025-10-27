@@ -3,8 +3,8 @@ from pathlib import Path
 import pandas as pd  # type: ignore[import]
 from PIL import Image  # type: ignore[import]
 
-from src.features_image import compute_similarity_score
-from src.train.baseline import train_baseline_model
+from src_main.features_image import compute_similarity_score
+from src_main.train.baseline import train_baseline_model
 
 
 DATA_PATH = Path("data/manifests/sample_pairs.csv")

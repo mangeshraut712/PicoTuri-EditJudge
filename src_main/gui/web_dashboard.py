@@ -16,9 +16,9 @@ except ImportError:
 
 import torch  # type: ignore[import]
 
-from src.algorithms.diffusion_model import AdvancedDiffusionModel
-from src.algorithms.quality_scorer import AdvancedQualityScorer
-from src.train.baseline import build_pipeline
+from src_main.algorithms.diffusion_model import AdvancedDiffusionModel
+from src_main.algorithms.quality_scorer import AdvancedQualityScorer
+from src_main.train.baseline import build_pipeline
 
 
 app = Flask(__name__, template_folder='templates', static_folder='static')

@@ -31,9 +31,9 @@ except ModuleNotFoundError as exc:  # pragma: no cover - environment specific
         "scikit-learn is required for the baseline model. Install it with 'pip install scikit-learn'."
     ) from exc
 
-from src.features_image.similarity import compute_pair_similarity
-from src.features_text.tfidf import build_tfidf_vectorizer
-from src.fuse.feature_joiner import build_feature_table
+from src_main.features_image.similarity import compute_pair_similarity
+from src_main.features_text.tfidf import build_tfidf_vectorizer
+from src_main.fuse.feature_joiner import build_feature_table
 
 
 @dataclass

@@ -14,9 +14,9 @@ from typing import Dict, List, Optional, Tuple
 import time
 
 # Import our modules
-from src.features_text.bert import BERTTextEmbedder
-from src.features_image.clip import CLIPImageEmbedder
-from src.fuse.stack import FeatureFusionStack, FusionMLPHead
+from src_main.features_text.bert import BERTTextEmbedder
+from src_main.features_image.clip import CLIPImageEmbedder
+from src_main.fuse.stack import FeatureFusionStack, FusionMLPHead
 
 logger = logging.getLogger(__name__)
 
