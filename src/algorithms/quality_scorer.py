@@ -361,7 +361,7 @@ class AdvancedQualityScorer(nn.Module):
         else:
             grade = "Poor"
             recommendation = "Needs substantial rework"
-        
+
         # Prepare detailed results
         results = {
             'overall_score': overall,
