@@ -36,7 +36,7 @@ def get_quality_scorer():
     """Get or initialize quality scorer."""
     if 'scorer' not in _models:
         try:
-            from src.algorithms.quality_scorer import AdvancedQualityScorer
+            from src_main.algorithms.quality_scorer import AdvancedQualityScorer
             _models['scorer'] = AdvancedQualityScorer()
             logger.info("✅ Quality Scorer loaded")
         except Exception as e:
@@ -48,7 +48,7 @@ def get_text_embedder():
     """Get or initialize text embedder."""
     if 'text_embedder' not in _models:
         try:
-            from src.features_text.bert import BERTTextEmbedder
+            from src_main.features_text.bert import BERTTextEmbedder
             _models['text_embedder'] = BERTTextEmbedder("bert-base-uncased", device="cpu")
             logger.info("✅ Text Embedder loaded")
         except Exception as e:
@@ -60,7 +60,7 @@ def get_image_embedder():
     """Get or initialize image embedder."""
     if 'image_embedder' not in _models:
         try:
-            from src.features_image.clip import CLIPImageEmbedder
+            from src_main.features_image.clip import CLIPImageEmbedder
             _models['image_embedder'] = CLIPImageEmbedder("ViT-B-32", pretrained="openai", device="cpu")
             logger.info("✅ Image Embedder loaded")
         except Exception as e:
