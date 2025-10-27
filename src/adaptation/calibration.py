@@ -872,7 +872,7 @@ def test_domain_adaptation():
 
     # Test save/load
     adapter.save("/tmp/test_domain_adapter")
-    loaded_adapter = DomainAdapter.load("/tmp/test_domain_adapter")
+    _loaded_adapter = DomainAdapter.load("/tmp/test_domain_adapter")  # noqa: F841
 
     print("Domain adaptation test completed!")
 

@@ -329,7 +329,7 @@ class AdaptiveMicroBatcher:
 
         # Calculate average latency and throughput
         avg_latency = np.mean([m.processing_time for m in recent_metrics])
-        __avg_throughput = np.mean([m.throughput for m in recent_metrics])
+        _avg_throughput = np.mean([m.throughput for m in recent_metrics])  # noqa: F841
 
         # Determine adjustment direction
         new_batch_size = self.current_batch_size
@@ -430,7 +430,7 @@ class AdaptiveMicroBatcher:
             return
 
         recent = list(self.metrics_history)[-10:]
-        __avg_throughput = np.mean([m.throughput for m in recent])
+        _avg_throughput = np.mean([m.throughput for m in recent])  # noqa: F841
         avg_latency = np.mean([m.processing_time for m in recent])
         p95_latency = np.mean([m.latency_p95 for m in recent])
 
