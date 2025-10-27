@@ -362,3 +362,11 @@ def test_features():
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5001)
+
+# Vercel WSGI handler
+try:
+    from vercel_wsgi import handle_wsgi
+    handler = handle_wsgi(app)
+except ImportError:
+    # Fallback if vercel_wsgi is not available
+    handler = None

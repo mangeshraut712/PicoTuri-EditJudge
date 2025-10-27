@@ -11,3 +11,4 @@ open-clip-torch==2.23.0
 requests==2.31.0
 tqdm==4.66.1
 packaging==23.2
+vercel-wsgi==0.1.3
