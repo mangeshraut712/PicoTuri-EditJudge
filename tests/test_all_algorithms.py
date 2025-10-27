@@ -32,7 +32,7 @@ def test_quality_scorer() -> tuple[bool, dict]:
     print_section("1️⃣  QUALITY SCORER - 4-Component Weighted System")
 
     try:
-        from src.algorithms.quality_scorer import AdvancedQualityScorer
+        from src_main.algorithms.quality_scorer import AdvancedQualityScorer
         import torch
 
         scorer = AdvancedQualityScorer()
@@ -67,7 +67,7 @@ def test_diffusion_model() -> tuple[bool, dict]:
     print_section("2️⃣  DIFFUSION MODEL - U-Net with Cross-Attention")
 
     try:
-        from src.algorithms.diffusion_model import AdvancedDiffusionModel, DiffusionSampler
+        from src_main.algorithms.diffusion_model import AdvancedDiffusionModel, DiffusionSampler
         import torch
 
         # Create model with moderate size
@@ -115,8 +115,8 @@ def test_dpo_training() -> tuple[bool, dict]:
     print_section("3️⃣  DPO TRAINING - Preference-Based Alignment")
 
     try:
-        from src.algorithms.dpo_training import DPOTrainer
-        from src.algorithms.diffusion_model import AdvancedDiffusionModel
+        from src_main.algorithms.dpo_training import DPOTrainer
+        from src_main.algorithms.diffusion_model import AdvancedDiffusionModel
         import torch
 
         # Create policy and reference models

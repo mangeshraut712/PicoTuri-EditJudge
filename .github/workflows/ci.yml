@@ -26,7 +26,7 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Lint (flake8)
-        run: flake8 src tests
+        run: flake8 src_main tests
 
       # Temporarily skip mypy to avoid complex optional import typing issues
       # The functional code works correctly and flake8 covers linting
