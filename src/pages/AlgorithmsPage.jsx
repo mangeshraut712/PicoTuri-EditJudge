@@ -1,7 +1,79 @@
-import { useState, useEffect } from 'react'
-import { Activity, CheckCircle, Zap, AlertCircle, TrendingUp, Brain, BookOpen, Image as ImageIcon, Eye, Settings, PlayCircle, PauseCircle, CheckCircle as CheckCircleIcon, AlertCircle as AlertCircleIcon, Layers, BarChart3, GitBranch, Cpu, Sparkles } from 'lucide-react'
-import axios from 'axios'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, LineChart, Line, AreaChart, Area, ScatterChart, Scatter, Treemap, ComposedChart } from 'recharts'
+// Missing Component Stubs
+function AlgorithmDetailModal({ algorithm, result, onClose }) {
+  return null; // Placeholder
+}
+
+function ComponentBarChart({ data, weights }) {
+  return <div className="text-gray-400">Component Bar Chart</div>;
+}
+
+function ComponentPieChart({ data }) {
+  return <div className="text-gray-400">Component Pie Chart</div>;
+}
+
+function ComponentRadarChart({ data }) {
+  return <div className="text-gray-400">Component Radar Chart</div>;
+}
+
+function ScoreTable({ data }) {
+  return <div className="text-gray-400">Score Table</div>;
+}
+
+function DiffusionModelVisualization({ data }) {
+  return <div className="text-gray-400">Diffusion Model Visualization</div>;
+}
+
+function DPOTrainingVisualization({ data }) {
+  return <div className="text-gray-400">DPO Training Visualization</div>;
+}
+
+function MultiTurnVisualization({ data }) {
+  return <div className="text-gray-400">Multi-Turn Visualization</div>;
+}
+
+function CoreMLVisualization({ data }) {
+  return <div className="text-gray-400">Core ML Visualization</div>;
+}
+
+function BaselineModelVisualization({ data }) {
+  return <div className="text-gray-400">Baseline Model Visualization</div>;
+}
+
+function FeatureExtractionVisualization({ data }) {
+  return <div className="text-gray-400">Feature Extraction Visualization</div>;
+}
+
+function HeroDetailedGrid({ result }) {
+  return <div className="text-gray-400">Hero Detailed Grid</div>;
+}
+
+function WideTimeSeries({ result }) {
+  return <div className="text-gray-400">Wide Time Series</div>;
+}
+
+function WideTechnicalSpecs({ result }) {
+  return <div className="text-gray-400">Wide Technical Specs</div>;
+}
+
+function TallSessionFlow({ result }) {
+  return <div className="text-gray-400">Tall Session Flow</div>;
+}
+
+function StandardStatusDashboard({ result }) {
+  return <div className="text-gray-400">Standard Status Dashboard</div>;
+}
+
+function StandardAnalysisGrid({ result }) {
+  return <div className="text-gray-400">Standard Analysis Grid</div>;
+}
+
+function CompactMetricsView({ result }) {
+  return <div className="text-gray-400">Compact Metrics View</div>;
+}
+
+function DefaultLayout({ result }) {
+  return <div className="text-gray-400">Default Layout</div>;
+}
 
 function AlgorithmsPage() {
   const [stats, setStats] = useState(null)
