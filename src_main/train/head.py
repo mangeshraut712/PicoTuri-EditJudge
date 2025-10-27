@@ -383,7 +383,7 @@ class TrainingHead:
 
     def predict(
         self,
-        features: np.ndarray,
+        features,
         batch_size: int = 32,
         apply_calibration: bool = True
     ) -> np.ndarray:
@@ -536,7 +536,7 @@ def test_training_head():
     """Test training head functionality"""
     print("Testing training head...")
 
-    from src_main.fuse.stack import FeatureFusionStack, FusionMLPHead
+    from src_main.fuse.stack import FusionMLPHead
 
     # Create dummy data
     n_samples = 1000
