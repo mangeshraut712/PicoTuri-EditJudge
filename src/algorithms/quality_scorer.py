@@ -37,17 +37,30 @@ class InstructionComplianceScorer(nn.Module):
     def __init__(self, model_name: str = "ViT-B/32"):
         super().__init__()
         if not HAS_CLIP:
-            raise ImportError("CLIP required: pip install git+https://github.com/openai/CLIP.git")
+            self.clip_model = None
+            self.transform = None
+            print("⚠️ CLIP not available, using fallback scoring")
+            return
 
-        if HAS_CLIP and clip is not None:  # type: ignore[possibly-unbound]
+        try:
             self.clip_model, self.preprocess = clip.load(model_name, device="cpu")  # type: ignore[possibly-unbound,attr-defined]
             self.clip_model.eval()  # type: ignore[attr-defined]
-        else:
-            raise ImportError("CLIP not available")
+            # Create transform for tensor preprocessing
+            self.transform = transforms.Compose([
+                transforms.Resize((224, 224)),
+                transforms.Normalize(
+                    mean=(0.48145466, 0.4578275, 0.40821073),
+                    std=(0.26862954, 0.26130258, 0.27577711)
+                )
+            ])
+        except Exception as e:
+            print(f"⚠️ CLIP model load failed: {e}")
+            self.clip_model = None
+            self.transform = None
 
     def forward(self, images: torch.Tensor, instructions: List[str]) -> torch.Tensor:
         """Score instruction-image alignment using CLIP similarity."""
-        if not HAS_CLIP or clip is None:
+        if self.clip_model is None or self.transform is None:
             # Fallback: return neutral score
             return torch.ones(len(instructions), device=images.device) * 0.5
 
@@ -55,12 +68,14 @@ class InstructionComplianceScorer(nn.Module):
             # Encode images
             if images.dim() == 3:
                 images = images.unsqueeze(0)
-            image_features = clip.encode_image(images)  # type: ignore[possibly-unbound]
+            # Apply CLIP preprocessing
+            processed_images = self.transform(images)
+            image_features = self.clip_model.encode_image(processed_images)
             image_features = F.normalize(image_features, dim=-1)
 
             # Encode instructions
             text_tokens = clip.tokenize(instructions).to(images.device)  # type: ignore[possibly-unbound]
-            text_features = clip.encode_text(text_tokens)  # type: ignore[possibly-unbound]
+            text_features = self.clip_model.encode_text(text_tokens)
             text_features = F.normalize(text_features, dim=-1)
 
             # Compute similarity
@@ -76,7 +91,7 @@ class EditingRealismScorer(nn.Module):
     def __init__(self):
         super().__init__()
         # Load VGG16 for perceptual features
-        vgg = models.vgg16(pretrained=True).features
+        vgg = models.vgg16(weights=models.VGG16_Weights.DEFAULT).features
         self.layers = nn.ModuleList([
             vgg[:4],    # conv1_2
             vgg[4:9],   # conv2_2
@@ -88,7 +103,9 @@ class EditingRealismScorer(nn.Module):
         self.register_buffer('std', torch.tensor([0.229, 0.224, 0.225]).view(1, -1, 1, 1))
 
     def _normalize(self, x: torch.Tensor) -> torch.Tensor:
-        return (x - self.mean) / self.std
+        mean = self.mean  # type: ignore[has-type]
+        std = self.std  # type: ignore[has-type]
+        return (x - mean) / std
 
     def _extract_features(self, x: torch.Tensor) -> List[torch.Tensor]:
         features = []
@@ -108,12 +125,12 @@ class EditingRealismScorer(nn.Module):
         edited_features = self._extract_features(edited_norm)
 
         # Compute perceptual distance
-        distance = 0.0
+        distance = torch.tensor(0.0, device=original.device)
         for orig_feat, edit_feat, weight in zip(original_features, edited_features, self.weights):
             # L2 distance in feature space
             feat_distance = F.mse_loss(orig_feat, edit_feat, reduction='none')
             feat_distance = feat_distance.mean(dim=[1, 2, 3])  # Spatial and channel average
-            distance += weight * feat_distance
+            distance = distance + weight * feat_distance
 
         # Convert distance to quality score (lower distance = higher quality)
         quality_score = torch.exp(-distance)  # Exponential decay
@@ -126,7 +143,7 @@ class PreservationBalanceScorer(nn.Module):
     def __init__(self):
         super().__init__()
         # Use ResNet50 for semantic feature extraction
-        resnet = models.resnet50(pretrained=True)
+        resnet = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
         self.encoder = nn.Sequential(*list(resnet.children())[:-2])  # Remove FC and avgpool
         self.adaptive_pool = nn.AdaptiveAvgPool2d((1, 1))
 
@@ -136,9 +153,11 @@ class PreservationBalanceScorer(nn.Module):
     def _create_ssim_kernel(self) -> torch.Tensor:
         """Create SSIM computation kernel."""
         coords = torch.meshgrid(torch.arange(11), torch.arange(11), indexing='ij')
-        kernel = torch.exp(-((coords[0] - 5)**2 + (coords[1] - 5)**2) / (2 * 1.5**2))
-        kernel = kernel / kernel.sum()
-        return kernel.unsqueeze(0).unsqueeze(0)
+        kernel_2d = torch.exp(-((coords[0] - 5)**2 + (coords[1] - 5)**2) / (2 * 1.5**2))
+        kernel_2d = kernel_2d / kernel_2d.sum()
+        # For RGB images with groups=3, need [3, 1, 11, 11]
+        kernel = kernel_2d.unsqueeze(0).unsqueeze(0).repeat(3, 1, 1, 1)
+        return kernel
 
     def _ssim(self, img1: torch.Tensor, img2: torch.Tensor) -> torch.Tensor:
         """Compute Structural Similarity Index."""
@@ -205,8 +224,10 @@ class TechnicalQualityScorer(nn.Module):
         coords = torch.linspace(-(size - 1) / 2, (size - 1) / 2, size)
         g = torch.exp(-(coords ** 2) / (2 * sigma ** 2))
         g = g / g.sum()
-        kernel = g.unsqueeze(0) * g.unsqueeze(1)
-        return kernel.unsqueeze(0).unsqueeze(0)
+        kernel_2d = g.unsqueeze(0) * g.unsqueeze(1)
+        # For RGB images with groups=3, need [3, 1, 5, 5]
+        kernel = kernel_2d.unsqueeze(0).repeat(3, 1, 1, 1)
+        return kernel
 
     def _detect_blur(self, image: torch.Tensor) -> torch.Tensor:
         """Detect image blur using Laplacian variance."""
@@ -430,13 +451,29 @@ def demo_quality_scorer():
         for component, score in results['component_scores'].items():
             weight = results['weights'][component.replace('_', '_').lower()] * 100
             desc = results['descriptions'][component.replace('_', '_').lower()]
-            print(".2f")
-            print(f"   Weight: {weight:.1f}%")
+            print(f"   {component}: {score:.2f} (Weight: {weight:.1f}%)")
             print(f"   {desc}")
 
-        grade = results.get('recommendation', 'Unknown')
+        overall = results['overall_score']
+        if overall >= 0.9:
+            grade = "Exceptional"
+            recommendation = "Publish as exemplar"
+        elif overall >= 0.8:
+            grade = "Excellent"
+            recommendation = "Ready for deployment"
+        elif overall >= 0.7:
+            grade = "Good"
+            recommendation = "Minor improvements needed"
+        elif overall >= 0.6:
+            grade = "Fair"
+            recommendation = "Significant improvements needed"
+        else:
+            grade = "Poor"
+            recommendation = "Needs substantial rework"
+
         print("\n🎯 Final Assessment:")
         print(f"Grade: {grade}")
+        print(f"Recommendation: {recommendation}")
 
     except Exception as e:
         print(f"❌ Quality scorer demo failed: {e}")

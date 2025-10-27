@@ -223,7 +223,7 @@ class MultiTurnEditor:
         self.history_manager.original_image_tensor = initial_image
         self.history_manager.current_image_tensor = initial_image.clone()
 
-        results = {
+        results: Dict[str, Any] = {
             'session_id': torch.randint(1000, 9999, (1,)).item(),
             'total_instructions': len(instruction_sequence),
             'completed_edits': [],
@@ -301,7 +301,7 @@ class MultiTurnEditor:
         success_rate = len(results['completed_edits']) / max(1, len(instruction_sequence))
         results['session_summary']['overall_success_rate'] = success_rate
 
-        print(f"\n🎯 Session complete! Success rate: {success_rate:.1f}")
+        print(f"\n🎯 Session complete! Success rate: {success_rate:.1%}")
         return results
 
     def _apply_single_edit(self, instruction: str, current_image: torch.Tensor) -> Dict[str, Any]:
@@ -444,7 +444,7 @@ def demo_multi_turn_editor():
             summary = results['session_summary']
             print(f"   Average confidence: {summary.get('average_confidence', 0):.2f}")
             print(f"   Total change intensity: {summary.get('total_change_intensity', 0):.4f}")
-            print(f"   Overall success rate: {summary.get('overall_success_rate', 0):.1f}")
+            print(f"   Overall success rate: {summary.get('overall_success_rate', 0):.1%}")
 
         print("\n🎯 Multi-Turn Editor Status: IMPLEMENTED ✅")
         print("🚀 Ready for conversational image editing workflows!")

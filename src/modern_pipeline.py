@@ -65,9 +65,10 @@ try:
 except ModuleNotFoundError:
     pd = None
 
-Tensor = Any
 if torch is not None:  # pragma: no cover
-    Tensor = torch.Tensor  # type: ignore[attr-defined]
+    Tensor = torch.Tensor  # type: ignore[attr-defined,misc]
+else:
+    Tensor = Any  # type: ignore[misc]
 
 # Simplified base classes to avoid mypy redefinition conflicts
 class BaseDataset:  # type: ignore[misc]

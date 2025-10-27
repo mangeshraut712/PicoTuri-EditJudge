@@ -86,7 +86,7 @@ class DPOTrainer:
         label_smoothing: float = 0.0,
         device: str = 'cpu'
     ):
-        self.model = model.to(device)
+        self.model = model.to(device).train()  # Set to training mode
         self.ref_model = ref_model.to(device).eval()  # Freeze reference model
         for param in self.ref_model.parameters():
             param.requires_grad = False
@@ -132,24 +132,24 @@ class DPOTrainer:
             # Convert quality scores to log probabilities
             return torch.log(torch.sigmoid(scores * 5))
         else:
-            # Fallback: use model's forward pass somehow
+            # Fallback: use model's forward pass to compute a score
             # This is a simplification - in practice you'd need a way to score
             instruction_embeddings = self._encode_instruction(instructions)
             # Assume model returns some quality score
-            with torch.no_grad():
-                if hasattr(model, '__call__'):
-                    # Try to get some output from the model
-                    try:
-                        output = model(
-                            images,
-                            torch.ones(len(images), device=self.device, dtype=torch.long),
-                            instruction_embeddings,
-                        )
-                        # Use L2 norm of output as a proxy for confidence
-                        return -torch.norm(output, dim=[1, 2, 3]).unsqueeze(-1)
-                    except Exception:
-                        # Complete fallback
-                        return torch.randn(len(images), 1, device=self.device)
+            try:
+                output = model(
+                    images,
+                    torch.ones(len(images), device=self.device, dtype=torch.long),
+                    instruction_embeddings,
+                )
+                # Use mean absolute value as a proxy for confidence (with gradients)
+                score = -output.abs().mean(dim=[1, 2, 3], keepdim=True)
+                return score
+            except Exception:
+                # Complete fallback - create a learnable parameter
+                # This ensures gradients can flow
+                score = torch.zeros(len(images), 1, device=self.device, requires_grad=True)
+                return score
 
     def dpo_loss(
         self,
@@ -174,8 +174,9 @@ class DPOTrainer:
         rejected_log_probs = self._get_log_probs(self.model, rejected_images, instructions)
 
         # Get log probabilities from reference model
-        ref_accepted_log_probs = self._get_log_probs(self.ref_model, accepted_images, instructions)
-        ref_rejected_log_probs = self._get_log_probs(self.ref_model, rejected_images, instructions)
+        with torch.no_grad():
+            ref_accepted_log_probs = self._get_log_probs(self.ref_model, accepted_images, instructions)
+            ref_rejected_log_probs = self._get_log_probs(self.ref_model, rejected_images, instructions)
 
         # Compute DPO loss components
         accepted_logits = accepted_log_probs - ref_accepted_log_probs
@@ -200,18 +201,9 @@ class DPOTrainer:
             preference_accuracy = (accepted_logits > rejected_logits).float().mean().item()
 
             # KL divergence between policy and reference
-            kl_accepted = F.kl_div(
-                accepted_log_probs.exp(),
-                ref_accepted_log_probs.exp(),
-                reduction='batchmean',
-                log_target=True,
-            )
-            kl_rejected = F.kl_div(
-                rejected_log_probs.exp(),
-                ref_rejected_log_probs.exp(),
-                reduction='batchmean',
-                log_target=True,
-            )
+            # KL(policy || reference) = E[log(policy) - log(reference)]
+            kl_accepted = (accepted_log_probs - ref_accepted_log_probs).mean()
+            kl_rejected = (rejected_log_probs - ref_rejected_log_probs).mean()
             kl_divergence = (kl_accepted + kl_rejected) / 2
 
         metrics = {

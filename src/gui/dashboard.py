@@ -31,10 +31,11 @@ try:
     from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore[import]
     HAS_TK = True
 except ImportError:
-    tk: Optional[Any] = None
-    ttk: Optional[Any] = None
-    FigureCanvasTkAgg: Optional[Any] = None
     HAS_TK = False
+    # Type stubs for when tkinter is not available
+    tk = None  # type: ignore[assignment]
+    ttk = None  # type: ignore[assignment]
+    FigureCanvasTkAgg = None  # type: ignore[assignment]
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
