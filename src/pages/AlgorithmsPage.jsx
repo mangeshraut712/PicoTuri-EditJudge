@@ -389,19 +389,19 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
   const layoutType = getLayoutType()
 
   return (
-    <div className="glass rounded-2xl p-6 card-hover relative overflow-hidden min-h-[500px] flex flex-col">
+    <div className="glass rounded-2xl p-4 sm:p-5 card-hover relative overflow-hidden min-h-[480px] flex flex-col">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-50"></div>
 
       {/* Header Section - Always at top */}
-      <div className="relative z-10 flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className={`text-3xl p-2 rounded-xl bg-gradient-to-r ${color} shadow-lg`}>
+      <div className="relative z-10 flex items-start justify-between mb-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className={`text-2xl sm:text-3xl p-2 rounded-xl bg-gradient-to-r ${color} shadow-lg`}>
             {icon}
           </div>
-          <div>
-            <h3 className="text-lg font-bold text-white">{name}</h3>
-            <span className="text-xs px-2 py-1 rounded-full bg-white/10 text-gray-300">
+          <div className="min-w-0">
+            <h3 className="text-base sm:text-lg font-bold text-white truncate max-w-[180px] sm:max-w-none">{name}</h3>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-gray-300 inline-block mt-0.5">
               {category}
             </span>
           </div>
@@ -418,10 +418,10 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
       </div>
 
       {/* Description */}
-      <p className="text-sm text-gray-300 mb-6 line-clamp-2 relative z-10">{description}</p>
+      <p className="text-xs sm:text-sm text-gray-300 mb-4 line-clamp-2 relative z-10 leading-snug">{description}</p>
 
       {/* Content Area - Different layouts based on algorithm type */}
-      <div className="flex-1 relative z-10 mb-6">
+      <div className="flex-1 relative z-10 mb-4 overflow-hidden">
         {layoutType === 'vertical-compact' && (
           <CompactQualityLayout result={result} />
         )}
@@ -462,10 +462,10 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
       </div>
 
       {/* Action Section - Always at bottom */}
-      <div className="relative z-10 space-y-4">
+      <div className="relative z-10 space-y-3 mt-auto">
         <button
           onClick={() => setShowDetails(!showDetails)}
-          className="w-full text-xs text-blue-400 hover:text-blue-300 transition-all text-left"
+          className="w-full text-xs text-blue-400 hover:text-blue-300 transition-all text-left whitespace-nowrap overflow-hidden text-ellipsis"
         >
           {showDetails ? '▼ Hide Technical Details' : '▶ Show Technical Details'}
         </button>
@@ -479,17 +479,17 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
         <button
           onClick={onTest}
           disabled={testing}
-          className={`w-full py-4 px-4 rounded-xl font-semibold bg-gradient-to-r ${color} hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2`}
+          className={`w-full py-3 sm:py-3.5 px-3 rounded-xl font-semibold bg-gradient-to-r ${color} hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm`}
         >
           {testing ? (
             <>
-              <PauseCircle className="w-4 h-4 animate-spin" />
-              Testing...
+              <PauseCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin flex-shrink-0" />
+              <span className="truncate">Testing...</span>
             </>
           ) : (
             <>
-              <PlayCircle className="w-4 h-4" />
-              Test Algorithm
+              <PlayCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="truncate">Test Algorithm</span>
             </>
           )}
         </button>
@@ -681,56 +681,61 @@ function HorizontalArchitectureLayout({ result }) {
   ]
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Architecture Overview Bar Chart */}
-      <div className="bg-black/20 p-4 rounded-lg">
-        <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
-          <Layers className="w-4 h-4" />
-          Architecture Overview
+      <div className="bg-black/20 p-3 rounded-lg">
+        <div className="text-xs sm:text-sm text-gray-400 mb-2 flex items-center gap-2">
+          <Layers className="w-3.5 h-3.5 flex-shrink-0" />
+          <span className="truncate">Architecture Overview</span>
         </div>
-        <ResponsiveContainer width="100%" height={120}>
-          <BarChart data={architectureData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-            <Bar dataKey="value" fill="#8b5cf6" radius={[3, 3, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="h-24">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={architectureData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+              <Bar dataKey="value" fill="#8b5cf6" radius={[2, 2, 0, 0]} />
+              <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Model Capabilities Grid */}
-      <div className="bg-black/20 p-4 rounded-lg">
-        <div className="text-sm text-gray-400 mb-4">Model Capabilities</div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="text-center p-4 bg-green-500/10 rounded-lg">
-            <div className="text-xl font-bold text-green-400 mb-2">
+      <div className="bg-black/20 p-3 rounded-lg">
+        <div className="text-xs sm:text-sm text-gray-400 mb-2">Capabilities</div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="text-center p-2 bg-green-500/10 rounded-lg">
+            <div className="text-lg font-bold text-green-400 mb-1">
               {result.supports_text_to_image ? '✓' : '✗'}
             </div>
-            <div className="text-sm text-gray-400">Text-to-Image</div>
+            <div className="text-xs text-gray-400 truncate">Text-to-Image</div>
           </div>
-          <div className="text-center p-4 bg-blue-500/10 rounded-lg">
-            <div className="text-xl font-bold text-blue-400 mb-2">
+          <div className="text-center p-2 bg-blue-500/10 rounded-lg">
+            <div className="text-lg font-bold text-blue-400 mb-1">
               {result.supports_image_to_image ? '✓' : '✗'}
             </div>
-            <div className="text-sm text-gray-400">Image-to-Image</div>
+            <div className="text-xs text-gray-400 truncate">Image-to-Image</div>
           </div>
         </div>
       </div>
 
       {/* Key Architecture Metrics */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-black/20 p-4 rounded-lg text-center">
-          <div className="text-lg font-bold text-purple-400 mb-1">{(result.parameters / 1000000).toFixed(1)}M</div>
-          <div className="text-sm text-gray-400">Parameters</div>
+      <div className="grid grid-cols-3 gap-2">
+        <div className="bg-black/20 p-2 sm:p-3 rounded-lg text-center">
+          <div className="text-sm sm:text-base font-bold text-purple-400 mb-0.5 truncate" title={`${(result.parameters / 1000000).toFixed(1)}M`}>
+            {(result.parameters / 1000000).toFixed(1)}M
+          </div>
+          <div className="text-xs text-gray-400 truncate">Params</div>
         </div>
-        <div className="bg-black/20 p-4 rounded-lg text-center">
-          <div className="text-lg font-bold text-pink-400 mb-1">
+        <div className="bg-black/20 p-2 sm:p-3 rounded-lg text-center">
+          <div className="text-sm sm:text-base font-bold text-pink-400 mb-0.5 truncate" title={result.input_shape ? result.input_shape.join('×') : 'N/A'}>
             {result.input_shape ? result.input_shape.join('×') : 'N/A'}
           </div>
-          <div className="text-sm text-gray-400">Input</div>
+          <div className="text-xs text-gray-400 truncate">Input</div>
         </div>
-        <div className="bg-black/20 p-4 rounded-lg text-center">
-          <div className="text-lg font-bold text-blue-400 mb-1">
+        <div className="bg-black/20 p-2 sm:p-3 rounded-lg text-center">
+          <div className="text-sm sm:text-base font-bold text-blue-400 mb-0.5 truncate" title={result.output_shape ? result.output_shape.join('×') : 'N/A'}>
             {result.output_shape ? result.output_shape.join('×') : 'N/A'}
           </div>
-          <div className="text-sm text-gray-400">Output</div>
+          <div className="text-xs text-gray-400 truncate">Output</div>
         </div>
       </div>
     </div>
@@ -962,39 +967,48 @@ function VerticalFeaturesLayout({ result }) {
   ]
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Enhanced Radar Chart */}
-      <div className="bg-black/20 p-4 rounded-lg">
-        <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
-          <Cpu className="w-4 h-4" />
-          Core ML Performance
+      <div className="bg-black/20 p-3 rounded-lg">
+        <div className="text-xs sm:text-sm text-gray-400 mb-2 flex items-center gap-2">
+          <Cpu className="w-3.5 h-3.5 flex-shrink-0" />
+          <span className="truncate">Core ML Performance</span>
         </div>
-        <ResponsiveContainer width="100%" height={140}>
-          <RadarChart data={radarData}>
-            <PolarGrid stroke="#ffffff10" />
-            <PolarAngleAxis dataKey="feature" tick={{ fontSize: 10, fill: '#fff' }} />
-            <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#fff' }} />
-            <Radar name="Score" dataKey="value" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
-          </RadarChart>
-        </ResponsiveContainer>
+        <div className="h-36">
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart data={radarData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+              <PolarGrid stroke="#ffffff10" />
+              <PolarAngleAxis dataKey="feature" tick={{ fontSize: 9, fill: '#fff' }} />
+              <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 8, fill: '#fff' }} />
+              <Radar name="Score" dataKey="value" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+            </RadarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Optimization Metrics Bar Chart */}
-      <div className="bg-black/20 p-4 rounded-lg">
-        <div className="text-sm text-gray-400 mb-3">Optimization Metrics</div>
-        <ResponsiveContainer width="100%" height={100}>
-          <BarChart data={optimizationData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-            <Bar dataKey="value" fill="#3b82f6" radius={[3, 3, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+      <div className="bg-black/20 p-3 rounded-lg">
+        <div className="text-xs sm:text-sm text-gray-400 mb-2">Optimization Metrics</div>
+        <div className="h-20">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={optimizationData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+              <Bar dataKey="value" fill="#3b82f6" radius={[2, 2, 0, 0]}>
+                {optimizationData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Bar>
+              <XAxis dataKey="metric" tick={{ fontSize: 9 }} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Core ML Features Status */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between bg-black/20 p-4 rounded-lg">
-          <span className="text-sm text-gray-300">Apple Silicon</span>
-          <div className="flex items-center gap-3">
-            <div className="w-20 h-2 bg-white/20 rounded-full overflow-hidden">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between bg-black/20 p-2 sm:p-3 rounded-lg">
+          <span className="text-xs sm:text-sm text-gray-300 truncate pr-2">Apple Silicon</span>
+          <div className="flex items-center gap-2">
+            <div className="w-12 sm:w-16 h-1.5 bg-white/20 rounded-full overflow-hidden flex-shrink-0">
               <div
                 className={`h-full rounded-full transition-all ${
                   result.apple_silicon ? 'bg-green-400' : 'bg-red-400'
@@ -1002,7 +1016,7 @@ function VerticalFeaturesLayout({ result }) {
                 style={{ width: result.apple_silicon ? '100%' : '30%' }}
               ></div>
             </div>
-            <span className={`text-sm px-3 py-1 rounded ${
+            <span className={`text-xs px-2 py-0.5 rounded whitespace-nowrap ${
               result.apple_silicon ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
             }`}>
               {result.apple_silicon ? 'Optimized' : 'Not Ready'}
@@ -1010,10 +1024,10 @@ function VerticalFeaturesLayout({ result }) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between bg-black/20 p-4 rounded-lg">
-          <span className="text-sm text-gray-300">Neural Engine</span>
-          <div className="flex items-center gap-3">
-            <div className="w-20 h-2 bg-white/20 rounded-full overflow-hidden">
+        <div className="flex items-center justify-between bg-black/20 p-2 sm:p-3 rounded-lg">
+          <span className="text-xs sm:text-sm text-gray-300 truncate pr-2">Neural Engine</span>
+          <div className="flex items-center gap-2">
+            <div className="w-12 sm:w-16 h-1.5 bg-white/20 rounded-full overflow-hidden flex-shrink-0">
               <div
                 className={`h-full rounded-full transition-all ${
                   result.neural_engine_support ? 'bg-blue-400' : 'bg-gray-400'
@@ -1021,19 +1035,21 @@ function VerticalFeaturesLayout({ result }) {
                 style={{ width: result.neural_engine_support ? '100%' : '20%' }}
               ></div>
             </div>
-            <span className={`text-sm px-3 py-1 rounded ${
+            <span className={`text-xs px-2 py-0.5 rounded whitespace-nowrap ${
               result.neural_engine_support ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'
             }`}>
-              {result.neural_engine_support ? 'Supported' : 'Not Supported'}
+              {result.neural_engine_support ? 'Supported' : 'N/A'}
             </span>
           </div>
         </div>
       </div>
 
       {/* Deployment Summary */}
-      <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 p-4 rounded-lg text-center">
-        <div className="text-lg font-bold text-indigo-400 mb-1">{result.ios_files_generated} Files</div>
-        <div className="text-sm text-gray-400">
+      <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 p-3 rounded-lg text-center">
+        <div className="text-base font-bold text-indigo-400 mb-0.5 truncate">
+          {result.ios_files_generated} Files
+        </div>
+        <div className="text-xs text-gray-400 truncate">
           Core ML {result.coreml_version} - {result.target_ios_version}
         </div>
       </div>
