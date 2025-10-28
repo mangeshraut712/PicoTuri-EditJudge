@@ -1,10 +1,14 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
 
-
-# Ignore Cursor AI rules
-.cursor/rules/codacy.mdc
-
-# Ignore VSCode AI rules
-.github/instructions/codacy.instructions.md
+# Production builds
+dist/
+dist-ssr/
+build/
+*.local
 
 # Python
 __pycache__/
@@ -21,12 +25,9 @@ artifacts/
 
 # macOS
 .DS_Store
+.AppleDouble.pictureFork
+.AppleDouble/resourceFork
 .AppleDouble
-
-# Swift / Xcode
-DerivedData/
-*.xcworkspace/
-xcuserdata/
 
 # Output directories
 outputs/
