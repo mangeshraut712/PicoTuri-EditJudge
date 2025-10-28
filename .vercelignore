@@ -21,14 +21,12 @@ verify_all.sh
 
 # Source code not needed for deployment
 src_main/
-src/
 setup.py
 LICENSE
 README.md
 
 # Large dependencies
 node_modules/
-package-lock.json
 
 # Build artifacts
 dist/
