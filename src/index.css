@@ -2,35 +2,209 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+PicoTuri EditJudge - Clean Frontend Scaffold
+Custom styles and utilities
+*/
+
+/* Base HTML Reset and Typography */
 @layer base {
+  html {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+
   body {
-    @apply bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900;
-    @apply min-h-screen;
-    @apply text-white;
+    @apply antialiased;
+    margin: 0;
+    min-height: 100vh;
+    background: #0f0f0f;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+
+  h1 { @apply text-4xl sm:text-5xl lg:text-6xl; }
+  h2 { @apply text-3xl sm:text-4xl; }
+  h3 { @apply text-2xl sm:text-3xl; }
+  h4 { @apply text-xl sm:text-2xl; }
+  h5 { @apply text-lg sm:text-xl; }
+  h6 { @apply text-base sm:text-lg; }
+
+  p { @apply text-gray-300 leading-relaxed; }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-black;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-700 rounded-lg;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-600;
   }
 }
 
+/* Custom Components */
 @layer components {
   .glass {
-    @apply bg-white/10 backdrop-blur-lg border border-white/20;
+    @apply bg-white/5 backdrop-blur-lg border border-white/10;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
   }
-  
+
+  .glass-hover {
+    @apply glass transition-all duration-300;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  }
+
   .card-hover {
-    @apply transition-all duration-300 hover:scale-105 hover:shadow-2xl;
+    @apply transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-purple-500/10;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent;
+  }
+
+  .status-indicator {
+    @apply w-2 h-2 rounded-full animate-pulse;
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+/* Animations */
+@layer utilities {
+  .animate-fadeIn {
+    animation: fadeIn 0.6s ease-out forwards;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .animate-slideUp {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  .animate-bounceIn {
+    animation: bounceIn 0.5s ease-out;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes bounceIn {
+    from {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
+    }
+    to {
+      box-shadow: 0 0 30px rgba(147, 51, 234, 0.6);
+    }
+  }
+
+  /* Custom gradient backgrounds for components */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .bg-gradient-secondary {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  .bg-gradient-accent {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+
+  /* Responsive utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
   }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.5s ease-out;
+/* Additional custom utilities */
+.glass-card {
+  @apply glass rounded-xl p-6 hover:shadow-lg transition-all duration-300;
+}
+
+.btn-primary {
+  @apply px-6 py-3 bg-gradient-primary text-white rounded-lg font-semibold
+         hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl;
+}
+
+.btn-secondary {
+  @apply px-6 py-3 glass text-white rounded-lg font-semibold
+         hover:border-white/20 transition-all duration-200;
+}
+
+/* Media queries for mobile-first design */
+@media (max-width: 640px) {
+  .container {
+    @apply px-4;
+  }
+
+  .glass-card {
+    @apply p-4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-fadeIn,
+  .animate-slideUp,
+  .animate-bounceIn,
+  .animate-glow {
+    animation: none;
+  }
 }
