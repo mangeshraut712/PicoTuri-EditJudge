@@ -21,8 +21,7 @@ Key components:
 - Stable training with KL regularization
 """
 
-from typing import Any, Dict, List, Optional, Tuple
-
+from typing import Any, Dict, List, Optional, Tuple, Sequence
 import torch  # type: ignore[import]
 import torch.nn as nn  # type: ignore[import]
 import torch.nn.functional as F  # type: ignore[import]
@@ -34,7 +33,7 @@ class PreferenceDataset(Dataset):
 
     def __init__(
         self,
-        image_pairs: List[Tuple[str, str]],  # [(accepted_path, rejected_path), ...]
+        image_pairs: Sequence[Tuple[torch.Tensor, torch.Tensor]],  # [(accepted_path, rejected_path), ...]
         instructions: List[str],
         transform=None
     ):
@@ -62,7 +61,7 @@ class PreferenceDataset(Dataset):
             'instruction': instruction
         }
 
-    def _load_image(self, path: str) -> Any:
+    def _load_image(self, path: torch.Tensor) -> Any:
         """Load image from path."""
         from PIL import Image  # type: ignore[import]
         return Image.open(path).convert('RGB')
@@ -83,7 +82,7 @@ class DPOTrainer:
         instruction_encoder: Optional[nn.Module] = None,
         beta: float = 0.1,  # Temperature parameter
         label_smoothing: float = 0.0,
-        device: str = 'cpu'
+        device: torch.device = torch.device('cpu')
     ):
         self.model = model.to(device).train()  # Set to training mode
         self.ref_model = ref_model.to(device).eval()  # Freeze reference model
@@ -454,6 +453,12 @@ class DPOTrainer:
                 'convergence_achieved': final_metrics['convergence_achieved'],
                 'best_performance': max(history['train_accuracy']) if history['train_accuracy'] else 0
             }
+        }
+
+    def get_training_stats(self):
+        return {
+            'loss': self.training_stats['total_loss'],
+            'accuracy': self.training_stats['preference_accuracy']
         }
 
 
