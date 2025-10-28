@@ -222,6 +222,25 @@ Quality-aware training
 
 ## 🚀 Quick Start (2024 Edition)
 
+### ⚡ Serverless Dashboard Deployment (Vercel)
+
+> October 2025 update: The dashboard now uses enhanced mock metrics for all algorithms (quality scorer, diffusion, DPO, etc.) with:
+> - Higher accuracy scores (e.g. DPO preference_accuracy: 0.68)
+> - Realistic latency/throughput metrics
+> - Full training histories
+
+```bash
+# Deploy steps:
+npm install
+npm run build
+vercel deploy --prod
+```
+
+Key optimizations:
+- 100% mock data in `api/index.py` for Vercel compatibility
+- Frontend fallbacks updated in `src/pages/AlgorithmsPage.jsx`
+- Build verified with `npm run build`
+
 ### 📊 Current Project Status
 
 ✅ **Nano-Banana Manifests Downloaded**: All three Pico-Banana-400K manifest files (SFT, preference, multi-turn) are available in `pico_banana_dataset/nb/manifest/`
@@ -673,4 +692,3 @@ Use the metadata in `CITATION.cff`, or the BibTeX entry below:
   note         = {Research-only release built on Turi Create and Pico-Banana-400K},
   license      = {Apache-2.0}
 }
-```
