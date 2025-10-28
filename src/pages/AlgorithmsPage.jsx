@@ -26,11 +26,11 @@ function AlgorithmsPage() {
     setTesting(prev => ({ ...prev, [name]: true }))
     try {
       const response = await axios.post(endpoint)
-      setTestResults(prev => ({ ...prev, [name]: response.data }))
+      setTestResults(prev => ({ ...prev, [name]: { ...response.data, isRealData: true } }))
     } catch (error) {
-      // Mock responses when API is unavailable
+      // Mock responses when API is unavailable - mark as mock data
       const mockData = getMockResponse(name)
-      setTestResults(prev => ({ ...prev, [name]: mockData }))
+      setTestResults(prev => ({ ...prev, [name]: { ...mockData, isRealData: false, isMockData: true } }))
     } finally {
       setTesting(prev => ({ ...prev, [name]: false }))
     }
@@ -387,9 +387,19 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
   }
 
   const layoutType = getLayoutType()
+  
+  // Calculate dimensions based on layout type
+  const getCardDimensions = () => {
+    const baseClasses = 'w-full max-w-4xl mx-auto' // Wider max width for better content distribution
+    
+    if (['horizontal-visual', 'horizontal-stats', 'horizontal-pipeline'].includes(layoutType)) {
+      return `${baseClasses} min-h-[600px]` // More vertical space for horizontal layouts
+    }
+    return `${baseClasses} min-h-[500px]` // Default height for other layouts
+  }
 
   return (
-    <div className="glass rounded-2xl p-4 sm:p-5 card-hover relative overflow-hidden min-h-[480px] flex flex-col">
+    <div className={`glass rounded-2xl p-4 sm:p-5 card-hover relative overflow-visible flex flex-col ${getCardDimensions()}`}>
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-50"></div>
 
@@ -421,7 +431,7 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
       <p className="text-xs sm:text-sm text-gray-300 mb-4 line-clamp-2 relative z-10 leading-snug">{description}</p>
 
       {/* Content Area - Different layouts based on algorithm type */}
-      <div className="flex-1 relative z-10 mb-4 overflow-hidden">
+      <div className="flex-1 relative z-10 mb-4 overflow-visible">
         {layoutType === 'vertical-compact' && (
           <CompactQualityLayout result={result} />
         )}
@@ -431,7 +441,7 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
         )}
 
         {layoutType === 'vertical-metrics' && (
-          <VerticalMetricsLayout result={result} />
+          <VerticalMetricsLayout result={result} algorithmType={name} />
         )}
 
         {layoutType === 'horizontal-stats' && (
@@ -462,7 +472,7 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
       </div>
 
       {/* Action Section - Always at bottom */}
-      <div className="relative z-10 space-y-3 mt-auto">
+      <div className="relative z-10 space-y-3 mt-4 pt-3 border-t border-white/10">
         <button
           onClick={() => setShowDetails(!showDetails)}
           className="w-full text-xs text-blue-400 hover:text-blue-300 transition-all text-left whitespace-nowrap overflow-hidden text-ellipsis"
@@ -486,6 +496,18 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
               <PauseCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin flex-shrink-0" />
               <span className="truncate">Testing...</span>
             </>
+          ) : result ? (
+            <>
+              <PlayCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="truncate">
+                {result.isRealData ? 'Re-test Algorithm' : 'Test Algorithm'}
+              </span>
+              {result.isMockData && (
+                <span className="ml-1 px-1.5 py-0.5 bg-orange-500/20 text-orange-300 text-xs rounded-full border border-orange-500/30">
+                  Preview
+                </span>
+              )}
+            </>
           ) : (
             <>
               <PlayCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
@@ -499,21 +521,23 @@ function AlgorithmCard({ name, icon, description, details, color, category, hasI
 }
 
 // Dynamic Layout Renderer
-function renderDynamicLayout(layoutType, result) {
+function renderDynamicLayout(layoutType, result, algorithmName) {
   switch (layoutType) {
-    case 'detailed-grid':
-      return <HeroDetailedGrid result={result} />
-    case 'time-series':
-      return <WideTimeSeries result={result} />
-    case 'technical-specs':
+    case 'compact-quality':
+      return <CompactQualityLayout result={result} />
+    case 'horizontal-architecture':
+      return <HorizontalArchitectureLayout result={result} />
+    case 'vertical-metrics':
+      return <VerticalMetricsLayout result={result} algorithmType={algorithmName} />
+    case 'wide-technical':
       return <WideTechnicalSpecs result={result} />
-    case 'session-flow':
+    case 'tall-session':
       return <TallSessionFlow result={result} />
-    case 'status-dashboard':
+    case 'standard-status':
       return <StandardStatusDashboard result={result} />
-    case 'analysis-grid':
+    case 'standard-analysis':
       return <StandardAnalysisGrid result={result} />
-    case 'metrics-compact':
+    case 'compact-metrics':
       return <CompactMetricsView result={result} />
     default:
       return <DefaultLayout result={result} />
@@ -600,6 +624,44 @@ function CompactQualityLayout({ result }) {
     )
   }
 
+  // Check if this is mock data
+  const isMockData = result.isMockData || !result.isRealData
+
+  if (isMockData) {
+    return (
+      <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 p-4 rounded-lg border border-orange-500/20">
+        <div className="text-xs text-orange-300 mb-2 flex items-center gap-2">
+          <BarChart3 className="w-3 h-3" />
+          Quality Assessment Preview
+        </div>
+        <div className="text-xs text-gray-400 mb-3">Sample component scores</div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-300">Instruction Compliance</span>
+            <div className="flex items-center gap-2">
+              <div className="w-16 bg-gray-700/50 rounded-full h-1.5">
+                <div className="bg-blue-400 h-full rounded-full w-3/4"></div>
+              </div>
+              <span className="text-xs font-medium text-blue-400">92%</span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-300">Editing Realism</span>
+            <div className="flex items-center gap-2">
+              <div className="w-16 bg-gray-700/50 rounded-full h-1.5">
+                <div className="bg-green-400 h-full rounded-full w-4/5"></div>
+              </div>
+              <span className="text-xs font-medium text-green-400">89%</span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-3 text-center">
+          <p className="text-xs text-orange-300 font-medium">Run algorithm for detailed quality analysis</p>
+        </div>
+      </div>
+    )
+  }
+
   const components = Object.entries(result.components)
   const weights = result.weights || {}
   const chartData = components.map(([key, value]) => ({
@@ -655,12 +717,46 @@ function CompactQualityLayout({ result }) {
 function HorizontalArchitectureLayout({ result }) {
   if (!result || !result.parameters) {
     return (
-      <div className="bg-black/20 p-3 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-          <Layers className="w-3 h-3" />
-          Model Architecture
+      <div className="h-full flex items-center justify-center bg-black/10 rounded-lg p-6">
+        <div className="text-center">
+          <Layers className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+          <p className="text-sm text-gray-400">Run test to see architecture details</p>
         </div>
-        <div className="text-xs text-gray-500">Run test to see architecture details</div>
+      </div>
+    )
+  }
+
+  // Check if this is mock data
+  const isMockData = result.isMockData || !result.isRealData
+
+  if (isMockData) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-lg p-6 border border-orange-500/20">
+        <div className="text-center mb-4">
+          <Layers className="w-8 h-8 mx-auto mb-2 text-orange-400" />
+          <h3 className="text-sm font-medium text-orange-300 mb-1">Architecture Preview</h3>
+          <p className="text-xs text-gray-400">Sample model specifications</p>
+        </div>
+        <div className="bg-black/20 p-4 rounded-lg w-full max-w-sm">
+          <div className="text-xs text-gray-400 mb-2">Model Specs</div>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Parameters</span>
+              <span className="text-xs font-medium text-purple-400">10.9M</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Architecture</span>
+              <span className="text-xs font-medium text-blue-400">U-Net</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Features</span>
+              <span className="text-xs font-medium text-green-400">Diffusion</span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-xs text-orange-300 font-medium">Run the model for detailed architecture analysis</p>
+        </div>
       </div>
     )
   }
@@ -681,755 +777,662 @@ function HorizontalArchitectureLayout({ result }) {
   ]
 
   return (
-    <div className="space-y-3">
+    <div className="h-full w-full flex flex-col space-y-4">
       {/* Architecture Overview Bar Chart */}
-      <div className="bg-black/20 p-3 rounded-lg">
-        <div className="text-xs sm:text-sm text-gray-400 mb-2 flex items-center gap-2">
-          <Layers className="w-3.5 h-3.5 flex-shrink-0" />
-          <span className="truncate">Architecture Overview</span>
+      <div className="bg-black/10 p-4 rounded-lg flex-1 flex flex-col min-h-[250px] w-full">
+        <div className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+          <Layers className="w-4 h-4 text-purple-400" />
+          Architecture Overview
         </div>
-        <div className="h-24">
+        <div className="flex-1">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={architectureData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-              <Bar dataKey="value" fill="#8b5cf6" radius={[2, 2, 0, 0]} />
-              <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+            <BarChart 
+              data={architectureData} 
+              margin={{ top: 10, right: 10, left: 0, bottom: 5 }}
+              barSize={40}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+              <XAxis 
+                dataKey="name" 
+                tick={{ fill: '#9ca3af', fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis 
+                tick={{ fill: '#9ca3af', fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+                width={30}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '0.5rem',
+                  fontSize: '12px'
+                }}
+              />
+              <Bar 
+                dataKey="value" 
+                fill="#8b5cf6" 
+                radius={[4, 4, 0, 0]}
+                animationDuration={1500}
+              >
+                {architectureData.map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={['#8b5cf6', '#ec4899', '#3b82f6'][index % 3]}
+                  />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       {/* Model Capabilities Grid */}
-      <div className="bg-black/20 p-3 rounded-lg">
-        <div className="text-xs sm:text-sm text-gray-400 mb-2">Capabilities</div>
-        <div className="grid grid-cols-2 gap-2">
-          <div className="text-center p-2 bg-green-500/10 rounded-lg">
-            <div className="text-lg font-bold text-green-400 mb-1">
-              {result.supports_text_to_image ? '✓' : '✗'}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+        <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 p-4 rounded-lg border border-green-500/20">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 mb-2">
+              <span className="text-xl font-bold text-green-400">
+                {result.supports_text_to_image ? '✓' : '✗'}
+              </span>
             </div>
-            <div className="text-xs text-gray-400 truncate">Text-to-Image</div>
+            <h4 className="text-sm font-medium text-gray-200">Text-to-Image</h4>
+            <p className="text-xs text-gray-400 mt-1">
+              {result.supports_text_to_image ? 'Supported' : 'Not Available'}
+            </p>
           </div>
-          <div className="text-center p-2 bg-blue-500/10 rounded-lg">
-            <div className="text-lg font-bold text-blue-400 mb-1">
-              {result.supports_image_to_image ? '✓' : '✗'}
+        </div>
+        <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 p-4 rounded-lg border border-blue-500/20">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-500/20 mb-2">
+              <span className="text-xl font-bold text-blue-400">
+                {result.supports_image_to_image ? '✓' : '✗'}
+              </span>
             </div>
-            <div className="text-xs text-gray-400 truncate">Image-to-Image</div>
+            <h4 className="text-sm font-medium text-gray-200">Image-to-Image</h4>
+            <p className="text-xs text-gray-400 mt-1">
+              {result.supports_image_to_image ? 'Supported' : 'Not Available'}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Key Architecture Metrics */}
-      <div className="grid grid-cols-3 gap-2">
-        <div className="bg-black/20 p-2 sm:p-3 rounded-lg text-center">
-          <div className="text-sm sm:text-base font-bold text-purple-400 mb-0.5 truncate" title={`${(result.parameters / 1000000).toFixed(1)}M`}>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+        <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 p-3 rounded-lg border border-purple-500/20">
+          <div className="text-xs text-purple-300 mb-1">Parameters</div>
+          <div className="text-lg font-bold text-purple-400 truncate" title={`${(result.parameters / 1000000).toFixed(1)}M`}>
             {(result.parameters / 1000000).toFixed(1)}M
           </div>
-          <div className="text-xs text-gray-400 truncate">Params</div>
         </div>
-        <div className="bg-black/20 p-2 sm:p-3 rounded-lg text-center">
-          <div className="text-sm sm:text-base font-bold text-pink-400 mb-0.5 truncate" title={result.input_shape ? result.input_shape.join('×') : 'N/A'}>
+        <div className="bg-gradient-to-br from-pink-500/10 to-pink-600/10 p-3 rounded-lg border border-pink-500/20">
+          <div className="text-xs text-pink-300 mb-1">Input Shape</div>
+          <div className="text-lg font-bold text-pink-400 truncate" title={result.input_shape ? result.input_shape.join('×') : 'N/A'}>
             {result.input_shape ? result.input_shape.join('×') : 'N/A'}
           </div>
-          <div className="text-xs text-gray-400 truncate">Input</div>
         </div>
-        <div className="bg-black/20 p-2 sm:p-3 rounded-lg text-center">
-          <div className="text-sm sm:text-base font-bold text-blue-400 mb-0.5 truncate" title={result.output_shape ? result.output_shape.join('×') : 'N/A'}>
+        <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 p-3 rounded-lg border border-blue-500/20">
+          <div className="text-xs text-blue-300 mb-1">Output Shape</div>
+          <div className="text-lg font-bold text-blue-400 truncate" title={result.output_shape ? result.output_shape.join('×') : 'N/A'}>
             {result.output_shape ? result.output_shape.join('×') : 'N/A'}
           </div>
-          <div className="text-xs text-gray-400 truncate">Output</div>
         </div>
       </div>
     </div>
   )
 }
 
-function VerticalMetricsLayout({ result }) {
-  if (!result || result.loss === undefined) {
+function VerticalMetricsLayout({ result, algorithmType = 'default' }) {
+  if (!result) {
     return (
-      <div className="bg-black/20 p-3 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-          <TrendingUp className="w-3 h-3" />
-          Training Metrics
+      <div className="h-full flex items-center justify-center bg-black/10 rounded-lg p-6">
+        <div className="text-center">
+          <TrendingUp className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+          <p className="text-sm text-gray-400">Run test to see {algorithmType} metrics</p>
         </div>
-        <div className="text-xs text-gray-500">Run test to see training progress</div>
       </div>
     )
   }
 
-  // Create realistic training curve data based on final metrics
-  const trainingSteps = result.training_steps || 1
-  const finalLoss = result.loss
-  const finalAccuracy = result.preference_accuracy * 100
-  const finalKL = result.kl_divergence
+  // Check if this is mock data
+  const isMockData = result.isMockData || !result.isRealData
 
-  // Generate training curve (simplified version)
-  const trainingData = Array.from({ length: Math.min(trainingSteps, 10) }, (_, i) => {
-    const progress = (i + 1) / Math.min(trainingSteps, 10)
-    return {
-      step: i + 1,
-      loss: finalLoss + (0.5 - finalLoss) * (1 - progress) + Math.random() * 0.1,
-      accuracy: finalAccuracy * progress + Math.random() * 5,
-      kl: finalKL * (1 - progress * 0.8) + Math.random() * finalKL * 0.2
+  if (isMockData) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-lg p-6 border border-orange-500/20">
+        <div className="text-center mb-4">
+          <TrendingUp className="w-8 h-8 mx-auto mb-2 text-orange-400" />
+          <h3 className="text-sm font-medium text-orange-300 mb-1">Sample Data Preview</h3>
+          <p className="text-xs text-gray-400">This shows example {algorithmType} metrics</p>
+        </div>
+        <div className="bg-black/20 p-4 rounded-lg w-full max-w-sm">
+          <div className="text-xs text-gray-400 mb-2">Key Metrics</div>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Success Rate</span>
+              <span className="text-xs font-medium text-green-400">95%</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Performance</span>
+              <span className="text-xs font-medium text-blue-400">Good</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Accuracy</span>
+              <span className="text-xs font-medium text-purple-400">High</span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-xs text-orange-300 font-medium">Run the real algorithm for detailed analysis</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Algorithm-specific data preparation
+  const getChartData = () => {
+    switch(algorithmType) {
+      case 'Quality Scorer':
+        return Object.entries(result.components || {}).map(([key, value]) => ({
+          name: key.split('_').map(w => w[0].toUpperCase() + w.slice(1)).join(' '),
+          value: value,
+          weight: (result.weights || {})[key] || 0.25,
+          color: {
+            'Instruction Compliance': '#3b82f6',
+            'Editing Realism': '#10b981',
+            'Preservation Balance': '#f59e0b',
+            'Technical Quality': '#ec4899'
+          }[key.split('_').map(w => w[0].toUpperCase() + w.slice(1)).join(' ')] || '#6b7280'
+        }));
+        
+      case 'DPO Training':
+        return [
+          { name: 'Loss', value: result.loss || 0, color: '#ef4444' },
+          { name: 'Preference Accuracy', value: result.preference_accuracy || 0, color: '#10b981' },
+          { name: 'KL Divergence', value: result.kl_divergence || 0, color: '#f59e0b' },
+          { name: 'Learning Rate', value: result.learning_rate * 1000 || 0, color: '#8b5cf6' }
+        ];
+        
+      case 'Feature Extraction':
+        return [
+          { name: 'Similarity Score', value: result.similarity_score || 0, color: '#3b82f6' },
+          { name: 'Semantic Accuracy', value: result.semantic_accuracy || 0, color: '#10b981' },
+          { name: 'Within Group Similarity', value: Math.max(
+            result.within_group_similarity_brighten || 0, 
+            result.within_group_similarity_darken || 0
+          ), color: '#8b5cf6' },
+          { name: 'Vocabulary Size', value: Math.min(1, (result.vocabulary_size || 0) / 2000), color: '#f59e0b' }
+        ];
+        
+      default:
+        return [
+          { name: 'Success', value: result.success ? 1 : 0, color: result.success ? '#10b981' : '#ef4444' },
+          { name: 'Score', value: result.overall_score || result.quality_score || 0.8, color: '#3b82f6' },
+          { name: 'Confidence', value: result.confidence || 0.9, color: '#8b5cf6' },
+          { name: 'Speed (req/s)', value: result.throughput_images_per_sec ? Math.min(1, result.throughput_images_per_sec / 100) : 0.5, color: '#f59e0b' }
+        ];
     }
-  })
+  };
+  
+  const chartData = getChartData().filter(item => item.value !== undefined && item.value !== null);
 
-  return (
-    <div className="space-y-4">
-      {/* Training Curves Line Chart */}
-      <div className="bg-black/20 p-4 rounded-lg">
-        <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4" />
-          Training Progress
-        </div>
-        <ResponsiveContainer width="100%" height={140}>
-          <LineChart data={trainingData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-            <Line
-              type="monotone"
-              dataKey="loss"
-              stroke="#ef4444"
-              strokeWidth={3}
-              dot={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="accuracy"
-              stroke="#10b981"
-              strokeWidth={3}
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+  // Generate algorithm-specific training data
+  const getTrainingData = () => {
+    const steps = Math.min(result.training_steps || 10, 20);
+    
+    if (result.training_history) {
+      return Array.from({ length: steps }, (_, i) => ({
+        step: i + 1,
+        loss: result.training_history.loss[i % result.training_history.loss.length],
+        accuracy: result.training_history.accuracy[i % result.training_history.accuracy.length] / 100,
+        kl: result.training_history.kl_divergence ? 
+          result.training_history.kl_divergence[i % result.training_history.kl_divergence.length] : 0
+      }));
+    }
+    
+    // Fallback for algorithms without training history
+    return Array.from({ length: steps }, (_, i) => {
+      const progress = (i + 1) / steps;
+      return {
+        step: i + 1,
+        loss: (result.loss || 0.9) * (1 - progress * 0.8) + Math.random() * 0.1,
+        accuracy: (result.accuracy || 0.7) * (progress * 0.9 + 0.1) + Math.random() * 0.1,
+        kl: (result.kl_divergence || 0.05) * (1 - progress * 0.9) + Math.random() * 0.01
+      };
+    });
+  };
+  
+  const trainingData = getTrainingData();
 
-      {/* KL Divergence Area Chart */}
-      <div className="bg-black/20 p-4 rounded-lg">
-        <div className="text-sm text-gray-400 mb-3">KL Divergence Trend</div>
-        <ResponsiveContainer width="100%" height={100}>
-          <AreaChart data={trainingData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-            <Area
-              type="monotone"
-              dataKey="kl"
-              stroke="#f59e0b"
-              fill="#f59e0b"
-              fillOpacity={0.6}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Final Training Metrics */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-black/20 p-4 rounded-lg text-center">
-          <div className="text-lg font-bold text-red-400 mb-1">{result.loss.toFixed(4)}</div>
-          <div className="text-sm text-gray-400">Final Loss</div>
-        </div>
-        <div className="bg-black/20 p-4 rounded-lg text-center">
-          <div className="text-lg font-bold text-green-400 mb-1">{(result.preference_accuracy * 100).toFixed(1)}%</div>
-          <div className="text-sm text-gray-400">Accuracy</div>
-        </div>
-      </div>
-
-      {/* Training Status */}
-      <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 p-4 rounded-lg text-center">
-        <div className="text-sm font-semibold text-orange-400 mb-1">
-          {result.convergence_achieved ? 'Converged' : 'Training'} - Step {result.training_steps}
-        </div>
-        <div className="text-sm text-gray-400">β = {result.beta_parameter || 0.1}</div>
-      </div>
-    </div>
-  )
-}
-
-function HorizontalStatsLayout({ result }) {
-  if (!result || result.instructions_processed === undefined) {
-    return (
-      <div className="bg-black/20 p-3 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-          <GitBranch className="w-3 h-3" />
-          Session Statistics
-        </div>
-        <div className="text-xs text-gray-500">Run test to see session stats</div>
-      </div>
-    )
-  }
-
-  // Session statistics with real data
-  const sessionData = [
-    { name: 'Processed', value: result.instructions_processed, fill: '#10b981' },
-    { name: 'Completed', value: result.edits_completed, fill: '#34d399' },
-    { name: 'Failed', value: result.failed_edits, fill: '#ef4444' }
-  ]
-
-  // Treemap data for hierarchical view
-  const treemapData = {
-    name: 'Session',
-    children: sessionData
-  }
-
-  // Performance indicators
-  const performanceData = [
-    { metric: 'Success Rate', value: result.success_rate, color: '#10b981', suffix: '%' },
-    { metric: 'Confidence', value: result.average_confidence * 100, color: '#3b82f6', suffix: '%' },
-    { metric: 'Instructions', value: result.instructions_processed, color: '#8b5cf6', suffix: '' }
-  ]
-
-  return (
-    <div className="space-y-4">
-      {/* Enhanced Pie Chart with real data */}
-      <div className="bg-black/20 p-4 rounded-lg">
-        <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
-          <GitBranch className="w-4 h-4" />
-          Edit Distribution
-        </div>
-        <ResponsiveContainer width="100%" height={140}>
-          <PieChart>
-            <Pie
-              data={sessionData}
-              cx="50%"
-              cy="50%"
-              innerRadius={25}
-              outerRadius={50}
-              dataKey="value"
-            >
-              {sessionData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Performance Metrics Bar Chart */}
-      <div className="bg-black/20 p-4 rounded-lg">
-        <div className="text-sm text-gray-400 mb-3">Session Performance</div>
-        <ResponsiveContainer width="100%" height={100}>
-          <BarChart data={performanceData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-            <Bar dataKey="value" fill="#10b981" radius={[3, 3, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Key Session Metrics */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="text-center bg-black/20 p-4 rounded-lg flex-1">
-          <div className="text-lg font-bold text-green-400 mb-1">{result.success_rate?.toFixed(0)}%</div>
-          <div className="text-sm text-gray-400">Success Rate</div>
-        </div>
-        <div className="text-center bg-black/20 p-4 rounded-lg flex-1">
-          <div className="text-lg font-bold text-emerald-400 mb-1">{(result.average_confidence * 100)?.toFixed(0)}%</div>
-          <div className="text-sm text-gray-400">Confidence</div>
-        </div>
-        <div className="text-center bg-black/20 p-4 rounded-lg flex-1">
-          <div className="text-lg font-bold text-blue-400 mb-1">{result.instructions_processed}</div>
-          <div className="text-sm text-gray-400">Processed</div>
-        </div>
-      </div>
-
-      {/* Features Status */}
-      <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 p-4 rounded-lg text-center">
-        <div className="text-sm font-semibold text-green-400 mb-1">
-          {result.conflict_detection_active ? 'Conflict Detection Active' : 'Basic Mode'}
-        </div>
-        <div className="text-sm text-gray-400">
-          {result.contextual_awareness ? 'Contextual Awareness Enabled' : 'Sequential Processing'}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function VerticalFeaturesLayout({ result }) {
-  if (!result || result.ios_files_generated === undefined) {
-    return (
-      <div className="bg-black/20 p-3 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-          <Cpu className="w-3 h-3" />
-          Optimization Features
-        </div>
-        <div className="text-xs text-gray-500">Run test to see optimization details</div>
-      </div>
-    )
-  }
-
-  // Enhanced radar chart data for Core ML optimization
-  const radarData = [
-    { feature: 'Performance', value: result.apple_silicon ? 95 : 60, fullMark: 100 },
-    { feature: 'Compatibility', value: result.neural_engine_support ? 90 : 70, fullMark: 100 },
-    { feature: 'Size', value: 85, fullMark: 100 },
-    { feature: 'Speed', value: result.apple_silicon ? 98 : 75, fullMark: 100 },
-    { feature: 'Accuracy', value: 92, fullMark: 100 }
-  ]
-
-  // Optimization metrics for bar chart
-  const optimizationData = [
-    { metric: 'Files Generated', value: result.ios_files_generated, color: '#3b82f6' },
-    { metric: 'Size Reduction', value: result.model_size_reduction * 100, color: '#10b981' },
-    { metric: 'iOS Version', value: parseFloat(result.target_ios_version.replace('+', '')), color: '#8b5cf6' }
-  ]
-
-  return (
-    <div className="space-y-3">
-      {/* Enhanced Radar Chart */}
-      <div className="bg-black/20 p-3 rounded-lg">
-        <div className="text-xs sm:text-sm text-gray-400 mb-2 flex items-center gap-2">
-          <Cpu className="w-3.5 h-3.5 flex-shrink-0" />
-          <span className="truncate">Core ML Performance</span>
-        </div>
-        <div className="h-36">
-          <ResponsiveContainer width="100%" height="100%">
-            <RadarChart data={radarData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-              <PolarGrid stroke="#ffffff10" />
-              <PolarAngleAxis dataKey="feature" tick={{ fontSize: 9, fill: '#fff' }} />
-              <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 8, fill: '#fff' }} />
-              <Radar name="Score" dataKey="value" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
-            </RadarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Optimization Metrics Bar Chart */}
-      <div className="bg-black/20 p-3 rounded-lg">
-        <div className="text-xs sm:text-sm text-gray-400 mb-2">Optimization Metrics</div>
-        <div className="h-20">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={optimizationData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-              <Bar dataKey="value" fill="#3b82f6" radius={[2, 2, 0, 0]}>
-                {optimizationData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Bar>
-              <XAxis dataKey="metric" tick={{ fontSize: 9 }} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Core ML Features Status */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between bg-black/20 p-2 sm:p-3 rounded-lg">
-          <span className="text-xs sm:text-sm text-gray-300 truncate pr-2">Apple Silicon</span>
-          <div className="flex items-center gap-2">
-            <div className="w-12 sm:w-16 h-1.5 bg-white/20 rounded-full overflow-hidden flex-shrink-0">
-              <div
-                className={`h-full rounded-full transition-all ${
-                  result.apple_silicon ? 'bg-green-400' : 'bg-red-400'
-                }`}
-                style={{ width: result.apple_silicon ? '100%' : '30%' }}
-              ></div>
-            </div>
-            <span className={`text-xs px-2 py-0.5 rounded whitespace-nowrap ${
-              result.apple_silicon ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-            }`}>
-              {result.apple_silicon ? 'Optimized' : 'Not Ready'}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between bg-black/20 p-2 sm:p-3 rounded-lg">
-          <span className="text-xs sm:text-sm text-gray-300 truncate pr-2">Neural Engine</span>
-          <div className="flex items-center gap-2">
-            <div className="w-12 sm:w-16 h-1.5 bg-white/20 rounded-full overflow-hidden flex-shrink-0">
-              <div
-                className={`h-full rounded-full transition-all ${
-                  result.neural_engine_support ? 'bg-blue-400' : 'bg-gray-400'
-                }`}
-                style={{ width: result.neural_engine_support ? '100%' : '20%' }}
-              ></div>
-            </div>
-            <span className={`text-xs px-2 py-0.5 rounded whitespace-nowrap ${
-              result.neural_engine_support ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'
-            }`}>
-              {result.neural_engine_support ? 'Supported' : 'N/A'}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Deployment Summary */}
-      <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 p-3 rounded-lg text-center">
-        <div className="text-base font-bold text-indigo-400 mb-0.5 truncate">
-          {result.ios_files_generated} Files
-        </div>
-        <div className="text-xs text-gray-400 truncate">
-          Core ML {result.coreml_version} - {result.target_ios_version}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function HorizontalPipelineLayout({ result }) {
-  if (!result || !result.classifier) {
-    return (
-      <div className="bg-black/20 p-3 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-          <Settings className="w-3 h-3" />
-          Pipeline Architecture
-        </div>
-        <div className="text-xs text-gray-500">Run test to see pipeline details</div>
-      </div>
-    )
-  }
-
-  // Enhanced pipeline performance data
-  const pipelineData = [
-    { step: 'TF-IDF', accuracy: result.training_accuracy * 100, time: 0.8, efficiency: 95 },
-    { step: 'Logistic', accuracy: result.training_accuracy * 100, time: 0.2, efficiency: 98 }
-  ]
-
-  // Pipeline metrics for radar chart
-  const pipelineMetrics = [
-    { metric: 'Training Acc', value: result.training_accuracy * 100, fullMark: 100 },
-    { metric: 'Validation Acc', value: result.validation_accuracy * 100, fullMark: 100 },
-    { metric: 'Pipeline Steps', value: result.pipeline_steps * 25, fullMark: 100 }, // Scale to 0-100
-    { metric: 'Vocabulary', value: Math.min(result.vocabulary_size / 10, 100), fullMark: 100 },
-    { metric: 'Prediction', value: result.test_prediction ? Math.max(...result.test_prediction) * 100 : 50, fullMark: 100 }
-  ]
-
-  return (
-    <div className="space-y-4">
-      {/* Composed Chart for Pipeline Performance */}
-      <div className="bg-black/20 p-4 rounded-lg">
-        <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
-          <Settings className="w-4 h-4" />
-          Pipeline Performance
-        </div>
-        <ResponsiveContainer width="100%" height={120}>
-          <ComposedChart data={pipelineData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-            <Bar dataKey="accuracy" fill="#14b8a6" />
-            <Line type="monotone" dataKey="time" stroke="#06b6d4" strokeWidth={3} />
-          </ComposedChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Mini Radar Chart for Pipeline Metrics */}
-      <div className="bg-black/20 p-4 rounded-lg">
-        <div className="text-sm text-gray-400 mb-3">Model Metrics</div>
-        <ResponsiveContainer width="100%" height={120}>
-          <RadarChart data={pipelineMetrics}>
-            <PolarGrid stroke="#ffffff10" />
-            <PolarAngleAxis dataKey="metric" tick={{ fontSize: 9, fill: '#fff' }} />
-            <Radar name="Score" dataKey="value" stroke="#14b8a6" fill="#14b8a6" fillOpacity={0.3} />
-          </RadarChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Pipeline Flow and Accuracy */}
-      <div className="flex items-center justify-center gap-4">
-        <div className="text-center">
-          <div className="w-12 h-12 rounded-full bg-teal-500 flex items-center justify-center text-lg font-bold text-white mb-2">
-            1
-          </div>
-          <div className="text-sm text-gray-400 mb-1">TF-IDF</div>
-          <div className="text-sm text-teal-400 font-semibold">Vectorizer</div>
-        </div>
-        <div className="w-8 h-0.5 bg-white/40"></div>
-        <div className="text-center">
-          <div className="w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center text-lg font-bold text-white mb-2">
-            2
-          </div>
-          <div className="text-sm text-gray-400 mb-1">Logistic</div>
-          <div className="text-sm text-cyan-400 font-semibold">Regression</div>
-        </div>
-      </div>
-
-      {/* Performance Summary */}
-      <div className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 p-4 rounded-lg text-center">
-        <div className="text-lg font-bold text-cyan-400 mb-1">
-          {result.training_accuracy?.toFixed(1)}% Train / {result.validation_accuracy?.toFixed(1)}% Val
-        </div>
-        <div className="text-sm text-gray-400">
-          {result.vocabulary_size} features - {result.classifier}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function VerticalAnalysisLayout({ result }) {
-  if (!result || result.tfidf_features === undefined) {
-    return (
-      <div className="bg-black/20 p-3 rounded-lg">
-        <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-          <Eye className="w-3 h-3" />
-          Feature Analysis
-        </div>
-        <div className="text-xs text-gray-500">Run test to see feature analysis</div>
-      </div>
-    )
-  }
-
-  // Enhanced feature analysis data
-  const featureData = [
-    { name: 'TF-IDF', value: result.tfidf_features, score: result.tfidf_features / 10 },
-    { name: 'Similarity', value: (result.similarity_score * 100), score: result.similarity_score },
-    { name: 'Vocabulary', value: result.vocabulary_size / 100, score: Math.min(result.vocabulary_size / 2000, 1) },
-    { name: 'Sparsity', value: result.sparsity * 1000, score: 1 - result.sparsity } // Convert to 0-100 scale
-  ]
-
-  // Enhanced scatter plot for feature relationships
-  const scatterData = [
-    { x: result.tfidf_features / 100, y: result.similarity_score * 100, size: 80, name: 'TF-IDF vs Similarity' },
-    { x: result.vocabulary_size / 1000, y: result.sparsity * 100, size: 60, name: 'Vocab vs Sparsity' },
-    { x: result.tfidf_features / 200, y: (1 - result.sparsity) * 100, size: 40, name: 'Features vs Density' }
-  ]
-
-  // Performance metrics
-  const performanceData = [
-    { metric: 'TF-IDF Time', value: result.feature_extraction_time * 1000, unit: 'ms' },
-    { metric: 'Similarity Time', value: result.similarity_computation_time * 1000, unit: 'ms' },
-    { metric: 'Texts Processed', value: result.texts_processed, unit: '' },
-    { metric: 'Sparsity', value: (result.sparsity * 100).toFixed(1), unit: '%' }
-  ]
-
-  return (
-    <div className="space-y-4">
-      {/* Bar Chart for Feature Dimensions */}
-      <div className="bg-black/20 p-4 rounded-lg">
-        <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
-          <Eye className="w-4 h-4" />
-          Feature Dimensions
-        </div>
-        <ResponsiveContainer width="100%" height={120}>
-          <BarChart data={featureData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-            <Bar dataKey="value" fill="#fbbf24" radius={[3, 3, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Scatter Plot for Feature Relationships */}
-      <div className="bg-black/20 p-4 rounded-lg">
-        <div className="text-sm text-gray-400 mb-3">Feature Correlations</div>
-        <ResponsiveContainer width="100%" height={120}>
-          <ScatterChart data={scatterData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-            <CartesianGrid stroke="#ffffff10" />
-            <XAxis dataKey="x" hide />
-            <YAxis dataKey="y" hide />
-            <Scatter dataKey="y" fill="#f59e0b" />
-          </ScatterChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Performance Metrics */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="flex items-center justify-between bg-black/20 p-4 rounded-lg">
-          <span className="text-sm text-gray-300">TF-IDF Features</span>
-          <span className="text-sm font-semibold text-yellow-400">{result.tfidf_features}D</span>
-        </div>
-        <div className="flex items-center justify-between bg-black/20 p-4 rounded-lg">
-          <span className="text-sm text-gray-300">Similarity Score</span>
-          <span className="text-sm font-semibold text-orange-400">{(result.similarity_score * 100)?.toFixed(1)}%</span>
-        </div>
-        <div className="flex items-center justify-between bg-black/20 p-4 rounded-lg">
-          <span className="text-sm text-gray-300">Vocabulary Size</span>
-          <span className="text-sm font-semibold text-amber-400">{result.vocabulary_size}</span>
-        </div>
-        <div className="flex items-center justify-between bg-black/20 p-4 rounded-lg">
-          <span className="text-sm text-gray-300">Processing Time</span>
-          <span className="text-sm font-semibold text-red-400">{(result.feature_extraction_time * 1000).toFixed(1)}ms</span>
-        </div>
-      </div>
-
-      {/* N-gram Analysis */}
-      <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 p-4 rounded-lg text-center">
-        <div className="text-sm font-semibold text-yellow-400 mb-2">Top N-grams</div>
-        <div className="text-sm text-gray-400">
-          {result.most_common_ngrams ? result.most_common_ngrams.slice(0, 3).join(', ') : 'N/A'}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Dynamic Layout Components
-
-// Hero Layout - Quality Scorer (2x2 grid)
-function HeroDetailedGrid({ result }) {
-  if (!result || !result.components) {
-    return (
-      <div className="h-full flex items-center justify-center bg-white/5 rounded-xl">
-        <div className="text-center text-gray-400">
-          <PlayCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p className="text-lg">Run quality assessment to see detailed component analysis</p>
-        </div>
-      </div>
-    )
-  }
-
-  const components = Object.entries(result.components)
-  const weights = result.weights || {}
-  const chartData = components.map(([key, value]) => ({
-    name: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-    value: parseFloat((value * 100).toFixed(1)),
-    weight: weights[key] ? parseFloat((weights[key] * 100).toFixed(0)) : 0,
-    fullMark: 100
-  }))
-
-  return (
-    <div className="space-y-6">
-      {/* Top Row: Score Overview + Radar */}
-      <div className="grid grid-cols-2 gap-4">
-        {/* Overall Score Card */}
-        <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 p-6 rounded-xl text-center">
-          <div className="text-4xl font-bold text-blue-400 mb-2">
-            {result.overall_score ? (result.overall_score * 100).toFixed(1) : 'N/A'}%
-          </div>
-          <div className="text-lg text-gray-300 mb-2">
-            {result.grade || 'Grade'} - {result.recommendation || 'Recommendation'}
-          </div>
-          <div className="w-full bg-white/20 rounded-full h-2">
-            <div
-              className="bg-gradient-to-r from-blue-400 to-purple-400 h-2 rounded-full transition-all"
-              style={{ width: `${result.overall_score ? result.overall_score * 100 : 0}%` }}
-            ></div>
-          </div>
-        </div>
-
-        {/* Mini Radar Chart */}
-        <div className="bg-black/20 p-4 rounded-xl">
-          <div className="text-sm text-gray-400 mb-3">Component Radar</div>
-          <ResponsiveContainer width="100%" height={120}>
-            <RadarChart data={chartData}>
-              <PolarGrid stroke="#ffffff10" />
-              <PolarAngleAxis dataKey="name" tick={{ fontSize: 9, fill: '#fff' }} />
-              <Radar name="Score" dataKey="value" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} />
-            </RadarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Bottom Row: Component Breakdown + Bar Chart */}
-      <div className="grid grid-cols-3 gap-4">
-        {/* Component List */}
-        <div className="bg-black/20 p-4 rounded-xl">
-          <div className="text-sm text-gray-400 mb-3">Components</div>
-          <div className="space-y-3">
-            {components.slice(0, 4).map(([key, value]) => (
-              <div key={key} className="flex items-center justify-between">
-                <span className="text-sm text-gray-300 capitalize truncate w-20">
-                  {key.replace(/_/g, ' ')}
+  // Render algorithm-specific header
+  const renderHeader = () => {
+    switch(algorithmType) {
+      case 'Quality Scorer':
+        return (
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-white mb-1">Quality Assessment</h3>
+            <p className="text-sm text-gray-400">
+              Overall Score: <span className="font-medium text-white">
+                {result.overall_score ? (result.overall_score * 100).toFixed(1) : 'N/A'}%
+              </span>
+              {result.grade && (
+                <span className="ml-2 px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded-full">
+                  Grade: {result.grade}
                 </span>
-                <div className="flex items-center gap-2">
-                  <div className="w-12 h-1.5 bg-white/20 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full"
-                      style={{ width: `${value * 100}%` }}
-                    ></div>
+              )}
+            </p>
+          </div>
+        );
+        
+      case 'DPO Training':
+        return (
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-white mb-1">DPO Training Metrics</h3>
+            <p className="text-sm text-gray-400">
+              Preference Accuracy: <span className="font-medium text-white">
+                {result.preference_accuracy ? (result.preference_accuracy * 100).toFixed(1) : 'N/A'}%
+              </span>
+              <span className="mx-2 text-gray-600">•</span>
+              Loss: <span className="font-medium text-white">
+                {result.loss ? result.loss.toFixed(4) : 'N/A'}
+              </span>
+            </p>
+          </div>
+        );
+        
+      default:
+        return (
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-white">
+              {algorithmType} Metrics
+            </h3>
+          </div>
+        );
+    }
+  };
+
+  // Render algorithm-specific metrics
+  const renderMetrics = () => {
+    if (algorithmType === 'Quality Scorer') {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="bg-black/20 p-4 rounded-lg">
+            <h4 className="text-sm font-medium text-gray-300 mb-3">Component Weights</h4>
+            <div className="space-y-2">
+              {chartData.map((item, index) => (
+                <div key={index} className="flex items-center">
+                  <div className="w-32 text-sm text-gray-400">{item.name}</div>
+                  <div className="flex-1 bg-gray-700/50 rounded-full h-2.5">
+                    <div 
+                      className="h-full rounded-full" 
+                      style={{
+                        width: `${item.weight * 100}%`,
+                        backgroundColor: item.color
+                      }}
+                    />
                   </div>
-                  <span className="text-sm font-semibold text-blue-400 w-10">
-                    {(value * 100).toFixed(0)}%
+                  <div className="w-16 text-right text-sm font-medium text-white">
+                    {(item.weight * 100).toFixed(0)}%
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="bg-black/20 p-4 rounded-lg">
+            <h4 className="text-sm font-medium text-gray-300 mb-3">Scores</h4>
+            <div className="space-y-2">
+              {chartData.map((item, index) => (
+                <div key={index} className="flex items-center">
+                  <div className="w-32 text-sm text-gray-400">{item.name}</div>
+                  <div className="flex-1 bg-gray-700/50 rounded-full h-2.5">
+                    <div 
+                      className="h-full rounded-full" 
+                      style={{
+                        width: `${item.value * 100}%`,
+                        backgroundColor: item.color
+                      }}
+                    />
+                  </div>
+                  <div className="w-16 text-right text-sm font-medium text-white">
+                    {(item.value * 100).toFixed(1)}%
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="bg-black/10 p-4 rounded-lg mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {chartData.map((item, index) => (
+            <div 
+              key={index}
+              className="p-3 rounded-lg border border-white/5 bg-gradient-to-br from-white/5 to-white/[0.03]"
+            >
+              <div className="text-xs text-gray-400 mb-1">{item.name}</div>
+              <div 
+                className="text-lg font-bold"
+                style={{ color: item.color }}
+              >
+                {item.name.includes('Score') || item.name === 'Similarity Score' || item.name === 'Semantic Accuracy' ? 
+                  (item.value * 100).toFixed(1) + '%' :
+                  item.name === 'Learning Rate' ?
+                  item.value.toExponential(2) :
+                  item.value.toFixed(4)
+                }
+              </div>
+              {item.name === 'Vocabulary Size' && result.vocabulary_size && (
+                <div className="text-xs text-gray-500 mt-1">{result.vocabulary_size} terms</div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="h-full w-full flex flex-col space-y-4">
+      {renderHeader()}
+      {renderMetrics()}
+      
+      {/* Main Chart Area */}
+      <div className="bg-black/10 p-4 rounded-lg flex-1 flex flex-col min-h-[300px] w-full">
+        <div className="flex justify-between items-center mb-3">
+          <div className="text-sm font-medium text-gray-300 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-purple-400" />
+            {algorithmType === 'DPO Training' ? 'Training Progress' : 'Performance Metrics'}
+          </div>
+          {result.recommendation && (
+            <div className="text-xs text-gray-400 bg-blue-900/30 px-2 py-1 rounded">
+              {result.recommendation}
+            </div>
+          )}
+        </div>
+
+        <div className="flex-1 min-h-[250px]">
+          <ResponsiveContainer width="100%" height="100%">
+            {algorithmType === 'Quality Scorer' ? (
+              <RadarChart 
+                cx="50%" 
+                cy="50%" 
+                outerRadius="80%" 
+                data={chartData}
+                margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
+              >
+                <PolarGrid stroke="#ffffff20" />
+                <PolarAngleAxis 
+                  dataKey="name" 
+                  tick={{ fill: '#9ca3af', fontSize: 11 }}
+                />
+                <PolarRadiusAxis 
+                  angle={30} 
+                  domain={[0, 1]} 
+                  tick={{ fill: '#9ca3af', fontSize: 10 }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    fontSize: '12px'
+                  }}
+                  formatter={(value) => [value.toFixed(2), 'Score']}
+                />
+                <Radar
+                  name="Score"
+                  dataKey="value"
+                  stroke="#8884d8"
+                  fill="#8884d8"
+                  fillOpacity={0.6}
+                />
+              </RadarChart>
+            ) : (
+              <ComposedChart data={trainingData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+                <XAxis 
+                  dataKey="step"
+                  tick={{ fill: '#9ca3af', fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                  label={{ 
+                    value: 'Training Steps', 
+                    position: 'insideBottom', 
+                    offset: -5,
+                    fill: '#9ca3af',
+                    fontSize: 11
+                  }}
+                />
+                <YAxis 
+                  yAxisId="left"
+                  orientation="left"
+                  stroke="#ef4444"
+                  tick={{ fill: '#9ca3af', fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={40}
+                  label={{ 
+                    value: 'Loss', 
+                    angle: -90, 
+                    position: 'insideLeft',
+                    fill: '#ef4444',
+                    fontSize: 11
+                  }}
+                />
+                <YAxis 
+                  yAxisId="right"
+                  orientation="right"
+                  stroke="#10b981"
+                  tick={{ 
+                    fill: '#9ca3af', 
+                    fontSize: 10,
+                    formatter: (value) => (value * 100).toFixed(0) + '%'
+                  }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={50}
+                  domain={[0, 1]}
+                  label={{ 
+                    value: 'Accuracy', 
+                    angle: 90, 
+                    position: 'insideRight',
+                    fill: '#10b981',
+                    fontSize: 11
+                  }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    fontSize: '12px'
+                  }}
+                  formatter={(value, name) => {
+                    if (name === 'Accuracy') return [(value * 100).toFixed(1) + '%', name];
+                    return [value.toFixed(4), name];
+                  }}
+                />
+                <Legend />
+                <Line
+                  yAxisId="left"
+                  type="monotone"
+                  dataKey="loss"
+                  stroke="#ef4444"
+                  strokeWidth={2}
+                  dot={false}
+                  name="Loss"
+                  activeDot={{ r: 6, fill: '#ef4444', stroke: '#fff', strokeWidth: 2 }}
+                />
+                <Line
+                  yAxisId="right"
+                  type="monotone"
+                  dataKey="accuracy"
+                  stroke="#10b981"
+                  strokeWidth={2}
+                  dot={false}
+                  name="Accuracy"
+                  activeDot={{ r: 6, fill: '#10b981', stroke: '#fff', strokeWidth: 2 }}
+                />
+                {algorithmType === 'DPO Training' && (
+                  <Area
+                    yAxisId="left"
+                    type="monotone"
+                    dataKey="kl"
+                    stroke="#f59e0b"
+                    fill="#f59e0b"
+                    fillOpacity={0.1}
+                    strokeWidth={1.5}
+                    name="KL Divergence"
+                    activeDot={{ r: 4, fill: '#f59e0b', stroke: '#fff', strokeWidth: 1.5 }}
+                  />
+                )}
+              </ComposedChart>
+            )}
+          </ResponsiveContainer>
+        </div>
+
+      </div>
+      
+      {/* Additional Info */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Performance Metrics */}
+        <div className="bg-black/10 p-4 rounded-lg">
+          <h4 className="text-sm font-medium text-gray-300 mb-3">Performance</h4>
+          <div className="space-y-3">
+            {result.inference_time_ms && (
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-400">Inference Time</span>
+                <span className="text-sm font-medium text-white">
+                  {result.inference_time_ms}ms
+                </span>
+              </div>
+            )}
+            {result.throughput_images_per_sec && (
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-400">Throughput</span>
+                <span className="text-sm font-medium text-white">
+                  {result.throughput_images_per_sec.toFixed(1)} img/s
+                </span>
+              </div>
+            )}
+            {result.latency_p99_ms && (
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-400">P99 Latency</span>
+                <span className="text-sm font-medium text-white">
+                  {result.latency_p99_ms}ms
+                </span>
+              </div>
+            )}
+            {result.tested_batch_size && (
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-400">Batch Size</span>
+                <span className="text-sm font-medium text-white">
+                  {result.tested_batch_size}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Model Info */}
+        <div className="bg-black/10 p-4 rounded-lg">
+          <h4 className="text-sm font-medium text-gray-300 mb-3">Model Info</h4>
+          <div className="space-y-3">
+            {result.parameters && (
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-400">Parameters</span>
+                <span className="text-sm font-medium text-white">
+                  {(result.parameters / 1000000).toFixed(1)}M
+                </span>
+              </div>
+            )}
+            {result.architecture && (
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-400">Architecture</span>
+                <span className="text-sm font-medium text-white text-right">
+                  {result.architecture}
+                </span>
+              </div>
+            )}
+            {result.input_shape && (
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-400">Input Shape</span>
+                <span className="text-sm font-medium text-white">
+                  {result.input_shape.join('×')}
+                </span>
+              </div>
+            )}
+            {result.output_shape && (
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-400">Output Shape</span>
+                <span className="text-sm font-medium text-white">
+                  {result.output_shape.join('×')}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Status & Actions */}
+        <div className="bg-black/10 p-4 rounded-lg flex flex-col">
+          <h4 className="text-sm font-medium text-gray-300 mb-3">Status</h4>
+          <div className="flex-1 flex flex-col justify-between">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-400">Status</span>
+                <div className="flex items-center gap-1">
+                  <div className={`w-2 h-2 rounded-full ${
+                    result.success === false ? 'bg-red-500' : 
+                    result.convergence_achieved ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'
+                  }`}></div>
+                  <span className="text-xs font-medium text-white">
+                    {result.success === false ? 'Failed' : 
+                     result.convergence_achieved ? 'Ready' : 'Training'}
                   </span>
                 </div>
               </div>
-            ))}
+              
+              {result.training_steps !== undefined && (
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-400">Steps</span>
+                  <span className="text-sm font-medium text-white">
+                    {result.training_steps}
+                  </span>
+                </div>
+              )}
+              
+              {result.learning_rate !== undefined && (
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-400">Learning Rate</span>
+                  <span className="text-sm font-medium text-white">
+                    {result.learning_rate.toExponential(2)}
+                  </span>
+                </div>
+              )}
+              
+              {result.beta_parameter !== undefined && (
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-400">Beta (β)</span>
+                  <span className="text-sm font-medium text-white">
+                    {result.beta_parameter.toFixed(2)}
+                  </span>
+                </div>
+              )}
+            </div>
+            
+            <div className="mt-4 pt-3 border-t border-white/5">
+              <button className="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors">
+                View Detailed Report
+              </button>
+            </div>
           </div>
-        </div>
-
-        {/* Component Bar Chart */}
-        <div className="bg-black/20 p-4 rounded-xl col-span-2">
-          <div className="text-sm text-gray-400 mb-3">Component Scores & Weights</div>
-          <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-              <Bar dataKey="value" fill="#3b82f6" radius={[3, 3, 0, 0]} name="Score" />
-              <Bar dataKey="weight" fill="#8b5cf6" radius={[3, 3, 0, 0]} name="Weight" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Wide Layout - DPO Training (2x1 grid)
-function WideTimeSeries({ result }) {
-  if (!result || result.loss === undefined) {
-    return (
-      <div className="h-full flex items-center justify-center bg-white/5 rounded-xl">
-        <div className="text-center text-gray-400">
-          <PlayCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p className="text-lg">Run DPO training to see performance curves</p>
-        </div>
-      </div>
-    )
-  }
-
-  const trainingSteps = result.training_steps || 1
-  const trainingData = Array.from({ length: Math.min(trainingSteps, 15) }, (_, i) => {
-    const progress = (i + 1) / Math.min(trainingSteps, 15)
-    return {
-      step: i + 1,
-      loss: result.loss + (0.5 - result.loss) * (1 - progress) + Math.random() * 0.1,
-      accuracy: (result.preference_accuracy * 100) * progress + Math.random() * 5,
-      kl: result.kl_divergence * (1 - progress * 0.8) + Math.random() * result.kl_divergence * 0.2
-    }
-  })
-
-  return (
-    <div className="space-y-4">
-      {/* Training Curves Row */}
-      <div className="grid grid-cols-2 gap-4">
-        {/* Loss Curve */}
-        <div className="bg-black/20 p-4 rounded-xl">
-          <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4" />
-            Training Loss
-          </div>
-          <ResponsiveContainer width="100%" height={120}>
-            <LineChart data={trainingData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-              <Line
-                type="monotone"
-                dataKey="loss"
-                stroke="#ef4444"
-                strokeWidth={3}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Accuracy Curve */}
-        <div className="bg-black/20 p-4 rounded-xl">
-          <div className="text-sm text-gray-400 mb-3 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4" />
-            Preference Accuracy
-          </div>
-          <ResponsiveContainer width="100%" height={120}>
-            <LineChart data={trainingData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-              <Line
-                type="monotone"
-                dataKey="accuracy"
-                stroke="#10b981"
-                strokeWidth={3}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Metrics Row */}
-      <div className="grid grid-cols-4 gap-3">
-        <div className="bg-black/20 p-3 rounded-lg text-center">
-          <div className="text-lg font-bold text-red-400 mb-1">{result.loss.toFixed(4)}</div>
-          <div className="text-xs text-gray-400">Final Loss</div>
-        </div>
-        <div className="bg-black/20 p-3 rounded-lg text-center">
-          <div className="text-lg font-bold text-green-400 mb-1">{(result.preference_accuracy * 100).toFixed(1)}%</div>
-          <div className="text-xs text-gray-400">Accuracy</div>
-        </div>
-        <div className="bg-black/20 p-3 rounded-lg text-center">
-          <div className="text-lg font-bold text-orange-400 mb-1">{result.training_steps}</div>
-          <div className="text-xs text-gray-400">Steps</div>
-        </div>
-        <div className="bg-black/20 p-3 rounded-lg text-center">
-          <div className="text-lg font-bold text-yellow-400 mb-1">{result.beta_parameter?.toFixed(2) || '0.10'}</div>
-          <div className="text-xs text-gray-400">Beta</div>
-        </div>
-      </div>
-
-      {/* Status Bar */}
-      <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 p-4 rounded-lg text-center">
-        <div className="text-sm font-semibold text-orange-400">
-          {result.convergence_achieved ? '✅ Converged' : '🔄 Training'} - Step {result.training_steps}
         </div>
       </div>
     </div>
@@ -1444,6 +1447,41 @@ function WideTechnicalSpecs({ result }) {
         <div className="text-center text-gray-400">
           <PlayCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
           <p className="text-lg">Run diffusion model test to see technical specifications</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Check if this is mock data
+  const isMockData = result.isMockData || !result.isRealData
+
+  if (isMockData) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-lg p-6 border border-orange-500/20">
+        <div className="text-center mb-4">
+          <Layers className="w-8 h-8 mx-auto mb-2 text-orange-400" />
+          <h3 className="text-sm font-medium text-orange-300 mb-1">Diffusion Model Preview</h3>
+          <p className="text-xs text-gray-400">Sample technical specifications</p>
+        </div>
+        <div className="bg-black/20 p-4 rounded-lg w-full max-w-sm">
+          <div className="text-xs text-gray-400 mb-2">Model Specs</div>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Parameters</span>
+              <span className="text-xs font-medium text-purple-400">10.9M</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Architecture</span>
+              <span className="text-xs font-medium text-blue-400">U-Net</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Throughput</span>
+              <span className="text-xs font-medium text-green-400">11.9 img/s</span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-xs text-orange-300 font-medium">Run the diffusion model for detailed specs</p>
         </div>
       </div>
     )
@@ -1536,6 +1574,41 @@ function TallSessionFlow({ result }) {
     )
   }
 
+  // Check if this is mock data
+  const isMockData = result.isMockData || !result.isRealData
+
+  if (isMockData) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-lg p-6 border border-orange-500/20">
+        <div className="text-center mb-4">
+          <GitBranch className="w-8 h-8 mx-auto mb-2 text-orange-400" />
+          <h3 className="text-sm font-medium text-orange-300 mb-1">Multi-Turn Editor Preview</h3>
+          <p className="text-xs text-gray-400">Sample session statistics</p>
+        </div>
+        <div className="bg-black/20 p-4 rounded-lg w-full max-w-sm">
+          <div className="text-xs text-gray-400 mb-2">Session Metrics</div>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Success Rate</span>
+              <span className="text-xs font-medium text-green-400">93.4%</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Instructions</span>
+              <span className="text-xs font-medium text-blue-400">3</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Avg Confidence</span>
+              <span className="text-xs font-medium text-purple-400">88%</span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-xs text-orange-300 font-medium">Run the editor for detailed session analysis</p>
+        </div>
+      </div>
+    )
+  }
+
   const sessionData = [
     { name: 'Processed', value: result.instructions_processed, fill: '#10b981' },
     { name: 'Completed', value: result.edits_completed, fill: '#34d399' },
@@ -1612,6 +1685,41 @@ function StandardStatusDashboard({ result }) {
         <div className="text-center text-gray-400">
           <PlayCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
           <p className="text-lg">Run Core ML test to see optimization status</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Check if this is mock data
+  const isMockData = result.isMockData || !result.isRealData
+
+  if (isMockData) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-lg p-6 border border-orange-500/20">
+        <div className="text-center mb-4">
+          <Cpu className="w-8 h-8 mx-auto mb-2 text-orange-400" />
+          <h3 className="text-sm font-medium text-orange-300 mb-1">Core ML Optimizer Preview</h3>
+          <p className="text-xs text-gray-400">Sample optimization status</p>
+        </div>
+        <div className="bg-black/20 p-4 rounded-lg w-full max-w-sm">
+          <div className="text-xs text-gray-400 mb-2">Optimization Metrics</div>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Files Generated</span>
+              <span className="text-xs font-medium text-blue-400">3</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Size Reduction</span>
+              <span className="text-xs font-medium text-green-400">72%</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Target</span>
+              <span className="text-xs font-medium text-purple-400">iOS 17+</span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-xs text-orange-300 font-medium">Run Core ML optimization for detailed status</p>
         </div>
       </div>
     )
@@ -1699,6 +1807,41 @@ function StandardAnalysisGrid({ result }) {
     )
   }
 
+  // Check if this is mock data
+  const isMockData = result.isMockData || !result.isRealData
+
+  if (isMockData) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-lg p-6 border border-orange-500/20">
+        <div className="text-center mb-4">
+          <Sparkles className="w-8 h-8 mx-auto mb-2 text-orange-400" />
+          <h3 className="text-sm font-medium text-orange-300 mb-1">Feature Extraction Preview</h3>
+          <p className="text-xs text-gray-400">Sample analysis metrics</p>
+        </div>
+        <div className="bg-black/20 p-4 rounded-lg w-full max-w-sm">
+          <div className="text-xs text-gray-400 mb-2">Analysis Results</div>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">TF-IDF Features</span>
+              <span className="text-xs font-medium text-yellow-400">1024D</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Similarity Score</span>
+              <span className="text-xs font-medium text-orange-400">87%</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Vocabulary Size</span>
+              <span className="text-xs font-medium text-cyan-400">1850</span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-xs text-orange-300 font-medium">Run feature extraction for detailed analysis</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       {/* Main Metrics */}
@@ -1751,6 +1894,41 @@ function CompactMetricsView({ result }) {
         <div className="text-center text-gray-400">
           <PlayCircle className="w-10 h-10 mx-auto mb-3 opacity-50" />
           <p className="text-sm">Run baseline test to see metrics</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Check if this is mock data
+  const isMockData = result.isMockData || !result.isRealData
+
+  if (isMockData) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-lg p-6 border border-orange-500/20">
+        <div className="text-center mb-4">
+          <BarChart3 className="w-8 h-8 mx-auto mb-2 text-orange-400" />
+          <h3 className="text-sm font-medium text-orange-300 mb-1">Baseline Model Preview</h3>
+          <p className="text-xs text-gray-400">Sample performance metrics</p>
+        </div>
+        <div className="bg-black/20 p-4 rounded-lg w-full max-w-sm">
+          <div className="text-xs text-gray-400 mb-2">Model Performance</div>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Training Accuracy</span>
+              <span className="text-xs font-medium text-cyan-400">98.2%</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Classifier</span>
+              <span className="text-xs font-medium text-teal-400">LogisticRegression</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-300">Features</span>
+              <span className="text-xs font-medium text-blue-400">1850</span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-xs text-orange-300 font-medium">Run baseline model for detailed metrics</p>
         </div>
       </div>
     )
