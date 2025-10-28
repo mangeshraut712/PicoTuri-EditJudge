@@ -336,14 +336,14 @@ class DPOTrainer:
         patience_counter = 0
         best_model_state = None
 
-        print(f"🚀 Starting DPO Training Pipeline")
-        print(f"   Epochs: {num_epochs}")
-        print(f"   Learning Rate: {lr}")
-        print(f"   Patience: {patience}")
+        print("Starting DPO Training Pipeline")
+        print("   Epochs: ", num_epochs)
+        print("   Learning Rate: ", lr)
+        print("   Patience: ", patience)
         print("=" * 50)
 
         for epoch in range(num_epochs):
-            print(f"\n📊 Epoch {epoch + 1}/{num_epochs}")
+            print("\nEpoch ", epoch + 1, "/", num_epochs)
 
             # Training phase
             self.model.train()
@@ -375,7 +375,7 @@ class DPOTrainer:
             history['learning_rates'].append(optimizer.param_groups[0]['lr'])
             history['epochs'].append(epoch + 1)
 
-            print(f"   Train - Loss: {avg_train_loss:.4f}, Accuracy: {avg_train_accuracy:.3f}, KL: {avg_train_kl:.4f}")
+            print("   Train - Loss: ", avg_train_loss, ", Accuracy: ", avg_train_accuracy, ", KL: ", avg_train_kl)
 
             # Validation phase
             if val_dataloader is not None:
@@ -388,7 +388,7 @@ class DPOTrainer:
                 history['val_accuracy'].append(val_accuracy)
                 history['val_kl'].append(val_kl)
 
-                print(f"   Val   - Loss: {val_loss:.4f}, Accuracy: {val_accuracy:.3f}, KL: {val_kl:.4f}")
+                print("   Val   - Loss: ", val_loss, ", Accuracy: ", val_accuracy, ", KL: ", val_kl)
 
                 # Early stopping check
                 if val_loss < best_val_loss:
@@ -397,11 +397,11 @@ class DPOTrainer:
                     if save_path:
                         best_model_state = self.model.state_dict().copy()
                         torch.save(best_model_state, save_path)
-                        print(f"   💾 Saved best model (val_loss: {best_val_loss:.4f})")
+                        print("   Saved best model (val_loss: ", best_val_loss, ")")
                 else:
                     patience_counter += 1
                     if patience_counter >= patience:
-                        print(f"   ⏹️ Early stopping triggered (patience: {patience})")
+                        print("   Early stopping triggered (patience: ", patience, ")")
                         break
             else:
                 # If no validation, use training loss for early stopping
@@ -411,7 +411,7 @@ class DPOTrainer:
                 else:
                     patience_counter += 1
                     if patience_counter >= patience:
-                        print(f"   ⏹️ Early stopping triggered (patience: {patience})")
+                        print("   Early stopping triggered (patience: ", patience, ")")
                         break
 
             # Update learning rate
@@ -420,7 +420,7 @@ class DPOTrainer:
         # Load best model if available
         if best_model_state and save_path:
             self.model.load_state_dict(best_model_state)
-            print(f"✅ Loaded best model from {save_path}")
+            print("Loaded best model from ", save_path)
 
         # Final evaluation
         final_metrics = {
@@ -439,11 +439,11 @@ class DPOTrainer:
                 'final_val_kl': history['val_kl'][-1]
             })
 
-        print("\n🎯 Training Complete!")
-        print(f"   Final Train Accuracy: {final_metrics['final_train_accuracy']:.3f}")
-        print(f"   Best Validation Loss: {best_val_loss:.4f}")
-        print(f"   Epochs Completed: {final_metrics['epochs_completed']}")
-        print(f"   Convergence Achieved: {final_metrics['convergence_achieved']}")
+        print("\nTraining Complete!")
+        print("   Final Train Accuracy: ", final_metrics['final_train_accuracy'])
+        print("   Best Validation Loss: ", best_val_loss)
+        print("   Epochs Completed: ", final_metrics['epochs_completed'])
+        print("   Convergence Achieved: ", final_metrics['convergence_achieved'])
 
         return {
             'history': history,
@@ -512,17 +512,17 @@ class RejectionSampler:
 # Demo utility
 def demo_dpo_training():
     """Demonstrate DPO training capabilities with full pipeline."""
-    print("🎯 Direct Preference Optimization (DPO) Training Demo - Full Pipeline")
+    print("Direct Preference Optimization (DPO) Training Demo - Full Pipeline")
     print("=" * 70)
 
     device = torch.device('cpu')
-    print(f"📊 Using device: {device}")
+    print("Using device: ", device)
 
     try:
         from .diffusion_model import AdvancedDiffusionModel
         from torch.utils.data import DataLoader
 
-        print("🏗️ Initializing models and datasets...")
+        print("Initializing models and datasets...")
 
         # Create policy model (trainable)
         model = AdvancedDiffusionModel(
@@ -540,10 +540,10 @@ def demo_dpo_training():
         # Copy weights to create reference
         ref_model.load_state_dict(model.state_dict())
 
-        print(f"📏 Model parameters: Policy = {sum(p.numel() for p in model.parameters()):,}")
+        print("Model parameters: Policy = ", sum(p.numel() for p in model.parameters()), "| Reference = ", sum(p.numel() for p in ref_model.parameters()))
 
         # Create synthetic preference dataset
-        print("📝 Creating synthetic preference datasets...")
+        print("Creating synthetic preference datasets...")
 
         # Training data
         train_image_pairs = [
@@ -569,11 +569,11 @@ def demo_dpo_training():
         val_dataset = PreferenceDataset(val_image_pairs, val_instructions)
         val_dataloader = DataLoader(val_dataset, batch_size=4, shuffle=False)
 
-        print(f"   Training pairs: {len(train_dataset)}")
-        print(f"   Validation pairs: {len(val_dataset)}")
+        print("   Training pairs: ", len(train_dataset))
+        print("   Validation pairs: ", len(val_dataset))
 
         # Create DPO trainer
-        print("🎯 Setting up DPO trainer with full pipeline...")
+        print("Setting up DPO trainer with full pipeline...")
         dpo_trainer = DPOTrainer(
             model=model,
             ref_model=ref_model,
@@ -594,49 +594,48 @@ def demo_dpo_training():
         # Show training summary
         history = results['history']
         final_metrics = results['final_metrics']
-        training_summary = results['training_summary']
 
-        print("\n📈 Training Results Summary:")
-        print(f"   Epochs Completed: {final_metrics['epochs_completed']}")
-        print(f"   Final Train Loss: {final_metrics['final_train_loss']:.4f}")
-        print(f"   Final Train Accuracy: {final_metrics['final_train_accuracy']:.3f}")
-        print(f"   Best Validation Loss: {final_metrics['best_val_loss']:.4f}")
-        print(f"   Early Stopped: {final_metrics['early_stopped']}")
-        print(f"   Convergence Achieved: {final_metrics['convergence_achieved']}")
+        print("\nTraining Results Summary:")
+        print("   Epochs Completed: ", final_metrics['epochs_completed'])
+        print("   Final Train Loss: ", final_metrics['final_train_loss'])
+        print("   Final Train Accuracy: ", final_metrics['final_train_accuracy'])
+        print("   Best Validation Loss: ", final_metrics['best_val_loss'])
+        print("   Early Stopped: ", final_metrics['early_stopped'])
+        print("   Convergence Achieved: ", final_metrics['convergence_achieved'])
 
         if history['val_accuracy']:
-            print(f"   Final Validation Accuracy: {history['val_accuracy'][-1]:.3f}")
+            print("   Final Validation Accuracy: ", history['val_accuracy'][-1])
 
-        print("\n📊 Training Curves:")
-        print(f"   Best Training Accuracy: {max(history['train_accuracy']):.3f}")
-        print(f"   Training Loss Trend: {history['train_loss'][0]:.4f} → {history['train_loss'][-1]:.4f}")
+        print("\nTraining Curves:")
+        print("   Best Training Accuracy: ", max(history['train_accuracy']))
+        print("   Training Loss Trend: ", history['train_loss'][0], " → ", history['train_loss'][-1])
         if history['val_loss']:
-            print(f"   Validation Loss Trend: {history['val_loss'][0]:.4f} → {history['val_loss'][-1]:.4f}")
+            print("   Validation Loss Trend: ", history['val_loss'][0], " → ", history['val_loss'][-1])
 
-        print("\n🎯 DPO Training Status: FULL PIPELINE IMPLEMENTED ✅")
-        print("✅ Multi-epoch training with validation")
-        print("✅ Early stopping and model checkpointing")
-        print("✅ Learning rate scheduling")
-        print("✅ Comprehensive training metrics")
+        print("\nDPO Training Status: FULL PIPELINE IMPLEMENTED ")
+        print("Multi-epoch training with validation")
+        print("Early stopping and model checkpointing")
+        print("Learning rate scheduling")
+        print("Comprehensive training metrics")
 
     except Exception as e:
-        print(f"❌ DPO training demo failed: {e}")
+        print("DPO training demo failed: ", e)
         import traceback
         traceback.print_exc()
 
 
 def demo_dpo_simple():
     """Simple DPO demo for backward compatibility."""
-    print("🎯 Direct Preference Optimization (DPO) Training Demo - Simple")
+    print("Direct Preference Optimization (DPO) Training Demo - Simple")
     print("=" * 55)
 
     device = torch.device('cpu')
-    print(f"📊 Using device: {device}")
+    print("Using device: ", device)
 
     try:
         from .diffusion_model import AdvancedDiffusionModel
 
-        print("🏗️ Initializing model and reference model...")
+        print("Initializing model and reference model...")
 
         # Create policy model (trainable)
         model = AdvancedDiffusionModel(
@@ -654,8 +653,7 @@ def demo_dpo_simple():
         # Copy weights to create reference
         ref_model.load_state_dict(model.state_dict())
 
-        print("📏 Model parameters: Policy =", sum(p.numel() for p in model.parameters()),
-              "| Reference =", sum(p.numel() for p in ref_model.parameters()))
+        print("Model parameters: Policy = ", sum(p.numel() for p in model.parameters()), "| Reference = ", sum(p.numel() for p in ref_model.parameters()))
 
         # Create synthetic preference data for demo
         batch_size = 4
@@ -666,9 +664,8 @@ def demo_dpo_simple():
         # Initialize optimizer
         optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5)
 
-        print("🔥 Performing DPO training step...")
-        print("   Input shapes - Accepted:", accepted_images.shape,
-              "| Rejected:", rejected_images.shape)
+        print("Performing DPO training step...")
+        print("   Input shapes - Accepted: ", accepted_images.shape, "| Rejected: ", rejected_images.shape)
 
         # Training step
         metrics = DPOTrainer(
@@ -678,9 +675,10 @@ def demo_dpo_simple():
             device=device
         ).train_step(accepted_images, rejected_images, instructions, optimizer)
 
-        print("✅ DPO training step completed!")
+        print("DPO training step completed!")
         for name, value in metrics.items():
-            print(f"   {name}: {value:.4f}")
+            print("   ", name, ": ", value)
+
         # Show training progress
         stats = DPOTrainer(
             model=model,
@@ -688,18 +686,18 @@ def demo_dpo_simple():
             beta=0.1,
             device=device
         ).get_training_stats()
-        print("\n📈 Training Stats:")
-        print(f"   Steps: {stats['steps']}")
-        print(f"   Average loss: {stats['total_loss']:.4f}")
-        print(f"   Preference accuracy: {stats['preference_accuracy']:.4f}")
-        print(f"   KL divergence: {stats['kl_divergence']:.4f}")
+        print("\nTraining Stats:")
+        print("   Steps: ", stats['steps'])
+        print("   Average loss: ", stats['total_loss'])
+        print("   Preference accuracy: ", stats['preference_accuracy'])
+        print("   KL divergence: ", stats['kl_divergence'])
 
-        print("\n🎯 DPO Training Status: IMPLEMENTED ✅")
-        print("🚀 Ready for preference-based model alignment!")
-        print("💡 Use demo_dpo_training() for full pipeline training")
+        print("\nDPO Training Status: IMPLEMENTED ")
+        print("Ready for preference-based model alignment!")
+        print("Use demo_dpo_training() for full pipeline training")
 
     except Exception as e:
-        print(f"❌ DPO training demo failed: {e}")
+        print("DPO training demo failed: ", e)
         print("Note: Full functionality requires PyTorch with sufficient memory")
 if __name__ == "__main__":
     demo_dpo_training()
