@@ -321,7 +321,7 @@ def test_multi_turn():
             'edits_completed': len(instruction_sequence),
             'failed_edits': 0,
             'success_rate': 93.4,
-            'average_confidence': 88.2,
+            'average_confidence': 0.88,
             'session_duration': 2.4,
             'conflict_detection_active': True,
             'contextual_awareness': True,
