@@ -21,12 +21,22 @@ Key components:
 - Stable training with KL regularization
 """
 
-from typing import Any, Dict, List, Optional, Tuple, Sequence
+from typing import Any, Dict, List, Optional, Tuple, Sequence, Union
+import os
 import torch  # type: ignore[import]
 import torch.nn as nn  # type: ignore[import]
 import torch.nn.functional as F  # type: ignore[import]
 from torch.utils.data import DataLoader, Dataset  # type: ignore[import]
 
+FilePath = Union[str, bytes, os.PathLike]  # Type alias
+
+def safe_open(file_obj: Union[FilePath, torch.Tensor], mode: str):
+    """Handle Tensor-to-path conversion safely"""
+    if isinstance(file_obj, torch.Tensor):
+        path = str(file_obj.item())
+    else:
+        path = file_obj
+    return open(path, mode)
 
 class PreferenceDataset(Dataset):
     """Dataset for DPO training pairs (accepted > rejected examples)."""
@@ -64,7 +74,8 @@ class PreferenceDataset(Dataset):
     def _load_image(self, path: torch.Tensor) -> Any:
         """Load image from path."""
         from PIL import Image  # type: ignore[import]
-        return Image.open(path).convert('RGB')
+        with safe_open(path, 'rb') as f:
+            return Image.open(f).convert('RGB')
 
 
 class DPOTrainer:
