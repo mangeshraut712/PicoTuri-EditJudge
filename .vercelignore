@@ -1,0 +1,62 @@
+# Python cache and build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+
+# Development files
+.git/
+.gitignore
+.gitattributes
+.python-version
+.flake8
+pyrightconfig.json
+requirements-dev.txt
+verify_all.sh
+
+# Source code not needed for deployment
+src_main/
+src/
+setup.py
+LICENSE
+README.md
+
+# Large dependencies
+node_modules/
+package-lock.json
+
+# Build artifacts
+dist/
+outputs/
+artifacts/
+coreml_output/
+*.log
+
+# Models and checkpoints
+models/
+*.joblib
+*.pt
+*.mlmodel
+*.h5
+*.pb
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# macOS
+.DS_Store
+.AppleDouble
+
+# Third-party
+third_party/
+data/
+
+# Root requirements (not needed, API has its own)
+requirements.txt
+requirements-root.txt
