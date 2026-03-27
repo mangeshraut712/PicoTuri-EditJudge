@@ -440,3 +440,20 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 [🚀 Live Demo](http://localhost:3000) • [📖 Documentation](README.md) • [🐛 Issues](https://github.com/mangeshraut712/PicoTuri-EditJudge/issues) • [💬 Discussions](https://github.com/mangeshraut712/PicoTuri-EditJudge/discussions)
 
 </div>
+
+---
+
+<!-- codex:project-diagram:start -->
+
+## Project Diagram
+
+```mermaid
+flowchart LR
+    A["Browser"] --> B["Frontend App"]
+    B --> C["API / Serverless"]
+    C --> D["Deploy"]
+```
+
+_High-level flow of the deployed web experience and supporting services._
+
+<!-- codex:project-diagram:end -->
