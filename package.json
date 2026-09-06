@@ -2,6 +2,7 @@
   "name": "picoturi-editjudge-dashboard",
   "version": "1.0.0",
   "description": "Advanced 2025 Dashboard for PicoTuri-EditJudge with Real-time Algorithm Testing",
+  "homepage": "https://mangeshraut712.github.io/PicoTuri-EditJudge/",
   "type": "module",
   "private": true,
   "scripts": {
