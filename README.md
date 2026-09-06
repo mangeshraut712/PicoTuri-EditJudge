@@ -1,6 +1,6 @@
 # 🤖 PicoTuri - AI Algorithm Quality Assessment Platform
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/mangeshraut712/PicoTuri-EditJudge)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-live-success)](https://mangeshraut712.github.io/PicoTuri-EditJudge/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![React](https://img.shields.io/badge/React-18.2.0-blue.svg)](https://reactjs.org/)
 [![Flask](https://img.shields.io/badge/Flask-2.3.0-red.svg)](https://flask.palletsprojects.com/)
@@ -23,8 +23,8 @@ PicoTuri is a comprehensive full-stack platform for testing, benchmarking, and v
 
 ### 🚀 Live Demo
 
-- **Frontend:** [View Live Application](http://localhost:3000)
-- **Backend API:** [API Documentation](http://localhost:5001)
+- **Frontend:** [View Live Application](https://mangeshraut712.github.io/PicoTuri-EditJudge/)
+- **Backend API:** run locally (`python api/index.py`) — GitHub Pages hosts the static frontend only
 - **Repository:** [GitHub](https://github.com/mangeshraut712/PicoTuri-EditJudge)
 
 ## 🎯 Algorithm Testing Suite
@@ -109,7 +109,7 @@ Our platform includes comprehensive testing for 7 cutting-edge AI/ML algorithms:
 - **Babel 7** - JavaScript compiler
 - **ESLint** - Code linting and formatting
 - **Pyright 1.1** - Python type checking
-- **Vercel** - Zero-config deployment platform
+- **GitHub Pages** - Static frontend hosting via GitHub Actions
 - **Git** - Version control with branching strategy
 
 ### Testing & Quality
@@ -279,14 +279,12 @@ __mocks__/
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
-```bash
-# Install Vercel CLI
-npm i -g vercel
+### GitHub Pages (Recommended)
+The Vite frontend deploys automatically from `main` via GitHub Actions (`npm ci && npm run build`, then `dist/` to Pages).
 
-# Deploy with zero configuration
-vercel --prod
-```
+Live site: https://mangeshraut712.github.io/PicoTuri-EditJudge/
+
+The Python API is not hosted on Pages. Run it locally (`python api/index.py`) for live algorithm endpoints.
 
 ### Docker Deployment
 ```dockerfile
