@@ -2,7 +2,7 @@
 # Advanced embeddings and cross-platform deployment
 
 # Core ML and AI
-torch==2.2.0
+torch==2.13.0
 torchvision==0.17.0
 transformers>=4.35.0
 open-clip-torch>=2.20.0
