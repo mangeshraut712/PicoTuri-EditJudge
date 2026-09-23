@@ -82,7 +82,7 @@ def performance_status():
         }), 200
     except Exception as exc:
         logger.error("Error in performance_status: %s", exc)
-        return jsonify({'error': str(exc)}), 500
+        return jsonify({'error': 'Request failed'}), 500
 
 @api_bp.route('/test/quality-scorer', methods=['POST'])
 def test_quality_scorer():
@@ -108,7 +108,7 @@ def test_quality_scorer():
         return jsonify(response), 200
     except Exception as exc:
         logger.error("Error in test_quality_scorer: %s", exc)
-        return jsonify({'success': False, 'error': str(exc)}), 500
+        return jsonify({'success': False, 'error': 'Request failed'}), 500
 
 @api_bp.route('/test/diffusion-model', methods=['POST'])
 def test_diffusion_model():
@@ -125,7 +125,7 @@ def test_diffusion_model():
         return jsonify(response), 200
     except Exception as exc:
         logger.error("Error in test_diffusion_model: %s", exc)
-        return jsonify({'success': False, 'error': str(exc)}), 500
+        return jsonify({'success': False, 'error': 'Request failed'}), 500
 
 @api_bp.route('/test/dpo-training', methods=['POST'])
 def test_dpo_training():
@@ -141,7 +141,7 @@ def test_dpo_training():
         return jsonify(response), 200
     except Exception as exc:
         logger.error("Error in test_dpo_training: %s", exc)
-        return jsonify({'success': False, 'error': str(exc)}), 500
+        return jsonify({'success': False, 'error': 'Request failed'}), 500
 
 @api_bp.route('/test/multi-turn', methods=['POST'])
 def test_multi_turn():
@@ -157,7 +157,7 @@ def test_multi_turn():
         return jsonify(response), 200
     except Exception as exc:
         logger.error("Error in test_multi_turn: %s", exc)
-        return jsonify({'success': False, 'error': str(exc)}), 500
+        return jsonify({'success': False, 'error': 'Request failed'}), 500
 
 @api_bp.route('/test/coreml', methods=['POST'])
 def test_coreml():
@@ -177,7 +177,7 @@ def test_coreml():
         return jsonify(response), 200
     except Exception as exc:
         logger.error("Error in test_coreml: %s", exc)
-        return jsonify({'success': False, 'error': str(exc)}), 500
+        return jsonify({'success': False, 'error': 'Request failed'}), 500
 
 @api_bp.route('/test/baseline', methods=['POST'])
 def test_baseline():
@@ -196,7 +196,7 @@ def test_baseline():
         return jsonify(response), 200
     except Exception as exc:
         logger.error("Error in test_baseline: %s", exc)
-        return jsonify({'success': False, 'error': str(exc)}), 500
+        return jsonify({'success': False, 'error': 'Request failed'}), 500
 
 @api_bp.route('/test/features', methods=['POST'])
 def test_features():
@@ -217,7 +217,7 @@ def test_features():
         return jsonify(response), 200
     except Exception as exc:
         logger.error("Error in test_features: %s", exc)
-        return jsonify({'success': False, 'error': str(exc)}), 500
+        return jsonify({'success': False, 'error': 'Request failed'}), 500
 
 # Error handlers
 def not_found(_: Exception) -> Any:
