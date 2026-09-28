@@ -8,14 +8,6 @@
 
 > **Professional AI Algorithm Testing & Quality Assessment Platform** - Real-time interactive visualizations for machine learning model evaluation and benchmarking.
 
-<p align="center">
-  <img src="docs/screenshots/01-home.png" alt="PicoTuri EditJudge home — algorithm testing suite" width="900" />
-</p>
-<p align="center">
-  <img src="docs/screenshots/02-feature.png" alt="Quality Scorer results — radar and score breakdown for edit judging" width="900" />
-</p>
-<p align="center"><em>Live UI: algorithm testing suite (home) and Quality Scorer judge results.</em></p>
-
 ## ✨ Overview
 
 PicoTuri is a comprehensive full-stack platform for testing, benchmarking, and visualizing AI/ML algorithms. Built for researchers, data scientists, and machine learning engineers who need to evaluate and compare different ML models across multiple performance metrics.
@@ -34,6 +26,22 @@ PicoTuri is a comprehensive full-stack platform for testing, benchmarking, and v
 - **Frontend:** [View Live Application](https://mangeshraut712.github.io/PicoTuri-EditJudge/)
 - **Backend API:** run locally (`python api/index.py`) — GitHub Pages hosts the static frontend only
 - **Repository:** [GitHub](https://github.com/mangeshraut712/PicoTuri-EditJudge)
+
+## Screenshots
+
+Framed captures of the live app (current UI).
+
+<div align="center">
+
+<img src="docs/screenshots/01-home.webp" alt="Test seven algorithms — PicoTuri algorithm testing suite" width="720" />
+
+<img src="docs/screenshots/02-quality.webp" alt="See quality in charts — Quality Scorer radar and score breakdown" width="720" />
+
+<img src="docs/screenshots/03-performance.webp" alt="Watch live metrics — performance monitoring dashboard" width="720" />
+
+<img src="docs/screenshots/04-dpo.webp" alt="See the loss drop — DPO training results" width="720" />
+
+</div>
 
 ## 🎯 Algorithm Testing Suite
 
