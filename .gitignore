@@ -50,3 +50,6 @@ models/
 # Temporary files
 *.tmp
 .cache/
+# Local agent tooling
+.agents/
+skills-lock.json
