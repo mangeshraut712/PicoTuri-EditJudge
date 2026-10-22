@@ -4,3 +4,5 @@ Pillow==13.0.0
 numpy==1.26.0
 requests==2.33.0
 vercel-wsgi==0.1.0
+# emSign CA advisory: require patched CA bundle
+certifi>=2026.10.19
