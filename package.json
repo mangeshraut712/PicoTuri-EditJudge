@@ -10,7 +10,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "vite",
-    "test": "jest --watchAll --verbose",
+    "test": "jest --verbose --passWithNoTests",
+    "test:watch": "jest --watchAll --verbose",
     "test:coverage": "jest --coverage",
     "test:update": "jest --updateSnapshot"
   },
