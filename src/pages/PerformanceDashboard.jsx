@@ -1,79 +1,92 @@
 import React, { useState, useEffect } from 'react'
-import { Activity, TrendingUp, Brain, Cpu, HardDrive, Zap, BarChart3, LineChart as LineChartIcon, Clock, AlertTriangle, CheckCircle, Server, Database } from 'lucide-react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts'
+import { Activity, Brain, BarChart3, LineChart as LineChartIcon, AlertTriangle, CheckCircle, Server, Database } from 'lucide-react'
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts'
 import api from '../utils/api'
+
+const validPerformanceData = (data) => {
+  if (!data || typeof data !== 'object') return false
+
+  const ranges = {
+    cpu_usage: 100,
+    memory_usage: 100,
+    uptime: 100,
+    error_rate: 1,
+    requests_per_second: Infinity,
+    average_response_time: Infinity,
+    models_loaded: Infinity,
+  }
+  return Number.isInteger(data.models_loaded) && Object.entries(ranges).every(([key, maximum]) => (
+    Number.isFinite(data[key]) && data[key] >= 0 && data[key] <= maximum
+  ))
+}
 
 const PerformanceDashboard = () => {
   const [performanceData, setPerformanceData] = useState(null)
   const [realTimeData, setRealTimeData] = useState([])
   const [isLive, setIsLive] = useState(true)
   const [systemStatus, setSystemStatus] = useState('connecting')
-
-  useEffect(() => {
-    fetchPerformanceData()
-    const interval = setInterval(fetchPerformanceData, 5000) // Update every 5 seconds
-    return () => clearInterval(interval)
-  }, [])
+  const statusLabel = !isLive ? 'UPDATES PAUSED' : {
+    connecting: 'CONNECTING',
+    online: 'API CONNECTED',
+    offline: 'API UNAVAILABLE',
+  }[systemStatus]
+  const statusColor = !isLive || systemStatus === 'connecting'
+    ? 'border-gray-500/50 bg-gray-500/10 text-gray-300'
+    : systemStatus === 'online'
+      ? 'border-green-500/50 bg-green-500/10 text-green-400'
+      : 'border-red-500/50 bg-red-500/10 text-red-400'
 
   useEffect(() => {
     if (!isLive) return
 
-    const interval = setInterval(() => {
-      const newDataPoint = {
-        timestamp: new Date().toLocaleTimeString(),
-        cpu: (performanceData?.cpu_usage || 35) + (Math.random() - 0.5) * 10,
-        memory: (performanceData?.memory_usage || 55) + (Math.random() - 0.5) * 10,
-        gpu: Math.max(1200, 2000 + (Math.random() - 0.5) * 1000),
-        requests_per_second: Math.max(5, (performanceData?.requests_per_second || 25) + (Math.random() - 0.5) * 15)
+    let stopped = false
+    let timer
+    const controller = new AbortController()
+
+    const poll = async () => {
+      try {
+        const response = await api.get('/api/performance/status', { signal: controller.signal })
+        if (stopped) return
+        if (!validPerformanceData(response.data)) throw new Error('Invalid performance data')
+
+        const data = response.data
+        setPerformanceData(data)
+        setSystemStatus('online')
+        setRealTimeData(previous => {
+          const isDemo = data.data_source === 'demo'
+          // A source change starts a new series so demo history is never
+          // presented alongside measured samples without its demo label.
+          const history = previous.at(-1)?.isDemo === isDemo ? previous : []
+          return [...history.slice(-29), {
+            timestamp: new Date().toLocaleTimeString(),
+            cpu: data.cpu_usage,
+            memory: data.memory_usage,
+            requests_per_second: data.requests_per_second,
+            isDemo,
+          }]
+        })
+      } catch {
+        if (!stopped) setSystemStatus('offline')
+      } finally {
+        // Schedule after completion so slow requests cannot overlap or reorder samples.
+        if (!stopped) timer = setTimeout(poll, 5000)
       }
-      setRealTimeData(prev => [...prev.slice(-29), newDataPoint])
-    }, 2000)
-
-    return () => clearInterval(interval)
-  }, [performanceData, isLive])
-
-  const fetchPerformanceData = async () => {
-    try {
-      const response = await api.get('/api/performance/status')
-      setPerformanceData(response.data)
-      setSystemStatus('online')
-
-      // Initialize chart data
-      if (realTimeData.length === 0) {
-        const initialData = Array.from({ length: 15 }, (_, i) => ({
-          timestamp: new Date(Date.now() - (14 - i) * 4000).toLocaleTimeString(),
-          cpu: response.data.cpu_usage + (Math.random() - 0.5) * 10,
-          memory: response.data.memory_usage + (Math.random() - 0.5) * 10,
-          gpu: response.data.gpu_memory_mb || 1500 + Math.random() * 1000,
-          requests_per_second: response.data.requests_per_second + (Math.random() - 0.5) * 10
-        }))
-        setRealTimeData(initialData)
-      }
-    } catch (error) {
-      console.error('Failed to fetch performance data:', error)
-      setSystemStatus('offline')
-      // Use fallback mock data
-      setPerformanceData({
-        timestamp: Date.now(),
-        uptime: 99.1,
-        cpu_usage: 42.3,
-        memory_usage: 58.7,
-        requests_per_second: 23.4,
-        average_response_time: 95.2,
-        total_requests: 19234,
-        error_rate: 0.015,
-        algorithms_active: 7,
-        models_loaded: 3
-      })
     }
-  }
+
+    poll()
+    return () => {
+      stopped = true
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [isLive])
 
   // Create statistics for the system
   const systemMetrics = performanceData ? [
-    { name: 'CPU Usage', value: performanceData.cpu_usage || 0, unit: '%', status: 'normal', color: '#3b82f6' },
-    { name: 'Memory Usage', value: performanceData.memory_usage || 0, unit: '%', status: 'warning', color: '#f59e0b' },
-    { name: 'Requests/sec', value: performanceData.requests_per_second || 0, unit: '/s', status: 'good', color: '#10b981' },
-    { name: 'Response Time', value: performanceData.average_response_time || 0, unit: 'ms', status: 'normal', color: '#8b5cf6' }
+    { name: 'CPU Usage', value: performanceData.cpu_usage, unit: '%', color: '#3b82f6' },
+    { name: 'Memory Usage', value: performanceData.memory_usage, unit: '%', color: '#f59e0b' },
+    { name: 'Requests/sec', value: performanceData.requests_per_second, unit: '/s', color: '#10b981' },
+    { name: 'Response Time', value: performanceData.average_response_time, unit: 'ms', color: '#8b5cf6' }
   ] : []
 
   // Mock data for algorithm performance
@@ -105,26 +118,29 @@ const PerformanceDashboard = () => {
               Performance Monitoring
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Real-time dashboards for system performance, algorithm metrics, and operational health
+              System performance samples and example algorithm metrics
             </p>
 
             {/* System Status Indicator */}
             <div className="mt-6 flex justify-center">
-              <div className={`px-4 py-2 rounded-full glass border flex items-center gap-2 ${
-                systemStatus === 'online'
-                  ? 'border-green-500/50 bg-green-500/10'
-                  : 'border-red-500/50 bg-red-500/10'
-              }`}>
-                <div className={`w-3 h-3 rounded-full animate-pulse ${
-                  systemStatus === 'online' ? 'bg-green-400' : 'bg-red-400'
-                }`}></div>
-                <span className={`text-sm font-bold ${
-                  systemStatus === 'online' ? 'text-green-400' : 'text-red-400'
-                }`}>
-                  {systemStatus === 'online' ? 'SYSTEM ONLINE' : 'SYSTEM OFFLINE'}
+              <div role="status" className={`px-4 py-2 rounded-full glass border flex items-center gap-2 ${statusColor}`}>
+                <div className={`w-3 h-3 rounded-full bg-current ${isLive ? 'animate-pulse' : ''}`}></div>
+                <span className="text-sm font-bold">
+                  {statusLabel}
                 </span>
               </div>
             </div>
+            {performanceData?.data_source === 'demo' && (
+              <p className="mt-4 text-amber-300">Demo data: these samples are simulated, not measured system performance.</p>
+            )}
+            {systemStatus === 'offline' && (
+              <p role="alert" className="mt-4 text-red-300">
+                {performanceData
+                  ? 'Performance data unavailable. Showing the last successful sample. '
+                  : 'Performance data unavailable. '}
+                {isLive ? 'Updates will retry automatically.' : 'Resume updates to retry.'}
+              </p>
+            )}
           </div>
         </div>
 
@@ -136,7 +152,6 @@ const PerformanceDashboard = () => {
               title={metric.name}
               value={metric.value}
               unit={metric.unit}
-              status={metric.status}
               color={metric.color}
               delay={index * 100}
             />
@@ -151,19 +166,21 @@ const PerformanceDashboard = () => {
               <div>
                 <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-3">
                   <LineChartIcon className="w-6 h-6 text-blue-400" />
-                  Real-time Metrics
+                  Performance Samples
                 </h2>
-                <p className="text-gray-400">Live system performance tracking</p>
+                <p className="text-gray-400">One sample per successful API update</p>
               </div>
               <button
-                onClick={() => setIsLive(!isLive)}
+                onClick={() => setIsLive(previous => !previous)}
+                aria-label={isLive ? 'Pause updates' : 'Resume updates'}
+                aria-pressed={isLive}
                 className={`px-4 py-2 rounded-lg font-medium transition-all ${
                   isLive
                     ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                     : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
                 }`}
               >
-                {isLive ? '🔴 Live' : '⏸️ Paused'}
+                {isLive ? 'Pause' : 'Resume'}
               </button>
             </div>
 
@@ -219,7 +236,7 @@ const PerformanceDashboard = () => {
                   <BarChart3 className="w-6 h-6 text-purple-400" />
                   Algorithm Usage
                 </h2>
-                <p className="text-gray-400">Request distribution by algorithm</p>
+                <p className="text-gray-400">Demo request distribution; these counts are illustrative.</p>
               </div>
             </div>
 
@@ -275,10 +292,11 @@ const PerformanceDashboard = () => {
 
         {/* Algorithm Performance Table */}
         <div className="glass rounded-3xl p-8">
-          <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-3">
             <Brain className="w-6 h-6 text-purple-400" />
-            Algorithm Performance Metrics
+            Sample Algorithm Performance Metrics
           </h2>
+          <p className="text-amber-300 mb-6">Demonstration values, not measured algorithm results.</p>
 
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -292,7 +310,7 @@ const PerformanceDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {algorithmPerformance.map((algo, index) => (
+                {algorithmPerformance.map(algo => (
                   <tr key={algo.name} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                     <td className="py-4 pr-6">
                       <div className="flex items-center gap-3">
@@ -334,21 +352,18 @@ const PerformanceDashboard = () => {
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatusCard
             title="System Uptime"
-            value={`${performanceData?.uptime || 99.1}%`}
+            value={performanceData ? `${performanceData.uptime}%` : '—'}
             icon={<Server className="w-5 h-5" />}
-            status="excellent"
           />
           <StatusCard
             title="Active Models"
-            value={performanceData?.models_loaded || 3}
+            value={performanceData?.models_loaded ?? '—'}
             icon={<Database className="w-5 h-5" />}
-            status="good"
           />
           <StatusCard
             title="Error Rate"
-            value={`${(performanceData?.error_rate || 0.015) * 100}%`}
+            value={performanceData ? `${(performanceData.error_rate * 100).toFixed(2)}%` : '—'}
             icon={<AlertTriangle className="w-5 h-5" />}
-            status="excellent"
           />
         </div>
       </div>
@@ -356,7 +371,7 @@ const PerformanceDashboard = () => {
   )
 }
 
-const MetricCard = ({ title, value, unit, status, color, delay = 0 }) => (
+const MetricCard = ({ title, value, unit, color, delay = 0 }) => (
   <div
     className="glass rounded-2xl p-6 hover:scale-105 transition-all duration-300 card-hover"
     style={{ animationDelay: `${delay}ms` }}
@@ -365,7 +380,7 @@ const MetricCard = ({ title, value, unit, status, color, delay = 0 }) => (
       <div className="text-sm font-medium text-gray-400">{title}</div>
       <div
         className={`w-3 h-3 rounded-full animate-pulse`}
-        style={{ backgroundColor: status === 'good' ? '#10b981' : status === 'warning' ? '#f59e0b' : '#3b82f6' }}
+        style={{ backgroundColor: color }}
       ></div>
     </div>
 
@@ -374,32 +389,21 @@ const MetricCard = ({ title, value, unit, status, color, delay = 0 }) => (
         className="text-3xl font-bold"
         style={{ color }}
       >
-        {typeof value === 'number' ? value.toFixed(1) : value}
+        {value.toFixed(1)}
       </div>
       <div className="text-sm text-gray-400 pb-1">{unit}</div>
     </div>
 
-    <div className="flex items-center gap-1 mt-3">
-      <TrendingUp className="w-4 h-4 text-green-400" />
-      <span className="text-xs text-green-400 font-medium">+2.3%</span>
-      <span className="text-xs text-gray-400 ml-2">vs last hour</span>
-    </div>
   </div>
 )
 
-const StatusCard = ({ title, value, icon, status }) => (
+const StatusCard = ({ title, value, icon }) => (
   <div className="glass rounded-xl p-6 text-center">
-    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
-      status === 'excellent' ? 'bg-green-500/20' :
-      status === 'good' ? 'bg-blue-500/20' : 'bg-gray-500/20'
-    }`}>
+    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-blue-500/20">
       {icon}
     </div>
     <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
-    <p className={`text-2xl font-bold ${
-      status === 'excellent' ? 'text-green-400' :
-      status === 'good' ? 'text-blue-400' : 'text-gray-400'
-    }`}>
+    <p className="text-2xl font-bold text-blue-400">
       {value}
     </p>
   </div>

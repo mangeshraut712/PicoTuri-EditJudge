@@ -121,7 +121,7 @@ Our platform includes comprehensive testing for 7 cutting-edge AI/ML algorithms:
 - **Scikit-learn** - Machine learning algorithms
 
 ### Development & Deployment
-- **Jest 29** - JavaScript testing framework
+- **Jest 30** - JavaScript testing framework
 - **Babel 7** - JavaScript compiler
 - **ESLint** - Code linting and formatting
 - **Pyright 1.1** - Python type checking
@@ -137,18 +137,16 @@ Our platform includes comprehensive testing for 7 cutting-edge AI/ML algorithms:
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ and npm/yarn
-- Python 3.8+ and pip
+- Node.js 22.12+ and npm
+- Python 3.10+ and pip
 - Git for version control
 
-### One-Command Setup
+### Clone the repository
 ```bash
 # Clone repository
 git clone https://github.com/mangeshraut712/PicoTuri-EditJudge.git
 cd PicoTuri-EditJudge
 
-# Install all dependencies and start development servers
-npm run setup
 ```
 
 ### Manual Setup
@@ -156,7 +154,7 @@ npm run setup
 #### Frontend Setup
 ```bash
 # Install dependencies
-npm install
+npm ci
 
 # Start development server
 npm run dev
@@ -165,14 +163,13 @@ npm run dev
 
 #### Backend Setup
 ```bash
-# Navigate to API directory
-cd api
-
-# Install Python dependencies
-pip install -r requirements.txt
+# From the repository root, install the lightweight demo API dependencies
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r api/requirements.txt
 
 # Start Flask server
-python index.py
+python api/index.py
 # 🟢 Backend API available at http://localhost:5001
 ```
 
@@ -191,8 +188,8 @@ npm run lint         # ESLint code analysis
 # Backend
 cd api && python index.py  # Start Flask API
 
-# Full Setup
-npm run setup        # Install all deps + start both servers
+# Backend regression tests (after activating .venv)
+python -m unittest discover -s tests -v
 ```
 
 ### Project Structure
@@ -282,6 +279,8 @@ npm run test:coverage
 
 ### Test Structure
 ```
+src/__tests__/          # Navigation, API client, polling, chart, and page regressions
+tests/test_api.py       # Demo contracts, CORS, HTTP errors, and server defaults
 __mocks__/
 ├── fileMock.js         # Static file mocks
 └── ...                 # Additional mocks
@@ -300,7 +299,18 @@ The Vite frontend deploys automatically from `main` via GitHub Actions (`npm ci 
 
 Live site: https://mangeshraut712.github.io/PicoTuri-EditJudge/
 
-The Python API is not hosted on Pages. Run it locally (`python api/index.py`) for live algorithm endpoints.
+The Python API is not hosted on Pages. For a deployed frontend, set
+`VITE_API_BASE_URL=https://your-api.example.com` when building and allow the frontend
+origin with `CORS_ORIGINS=https://mangeshraut712.github.io` on the API server.
+With no API origin configured, requests use same-origin `/api` routes. During local
+development Vite proxies those routes to `http://127.0.0.1:5001`; production hosting
+must provide an API or reverse proxy at `/api`, or set the build-time API origin.
+
+The included API returns demonstration algorithm results and simulated performance
+metrics, identified by `data_source: "demo"`. These are labeled in the dashboard.
+Unavailable performance data stays unavailable; the history includes only successful
+API samples. Offline algorithm examples are labeled as demo results and do not count
+as completed tests.
 
 ### Docker Deployment
 ```dockerfile
@@ -334,15 +344,21 @@ COPY --from=backend /app/api /app/api
 
 ### Environment Variables
 ```bash
-# Backend Configuration
-FLASK_ENV=production
-FLASK_DEBUG=false
-PORT=5001
+# Backend shell environment (defaults shown)
+export HOST=127.0.0.1
+export PORT=5001
+export CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+python api/index.py
 
-# Frontend Configuration
-VITE_API_BASE_URL=http://localhost:5001
-VITE_ENV=production
+# Frontend build environment (omit for same-origin /api)
+VITE_API_BASE_URL=https://your-api.example.com npm run build
 ```
+
+`VITE_API_BASE_URL` is a public API origin without the `/api` suffix and is embedded
+at build time. It can also be set in `.env.local` before running Vite. CORS only
+allows the configured, comma-separated origins on `/api/*`, with GET, POST, OPTIONS
+and the Content-Type request header; credentials are disabled. The development
+server binds to loopback unless `HOST` is explicitly changed.
 
 ### VSCode Settings
 Pre-configured development environment:

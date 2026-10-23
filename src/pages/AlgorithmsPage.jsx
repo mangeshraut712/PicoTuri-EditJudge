@@ -1,31 +1,55 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { CheckCircle, PauseCircle, PlayCircle } from 'lucide-react'
 import api from '../utils/api'
-import ChartVisualization from '../components/algorithms/ChartVisualization'
+import ChartVisualization, { isValidAlgorithmResult } from '../components/algorithms/ChartVisualization'
 
 const AlgorithmsPage = () => {
   const [testResults, setTestResults] = useState({})
   const [testing, setTesting] = useState({})
   const [selectedAlgorithm, setSelectedAlgorithm] = useState(null)
 
+  const requests = useRef(new Map())
+
+  useEffect(() => {
+    const activeRequests = requests.current
+    return () => {
+      activeRequests.forEach(controller => controller.abort())
+      activeRequests.clear()
+    }
+  }, [])
+
   const testAlgorithm = async (name, endpoint) => {
+    if (requests.current.has(name)) return
+    const controller = new AbortController()
+    requests.current.set(name, controller)
     setTesting(prev => ({ ...prev, [name]: true }))
     try {
-      const response = await api.post(endpoint)
+      const response = await api.post(endpoint, undefined, { signal: controller.signal })
+      if (controller.signal.aborted) return
+      if (!isValidAlgorithmResult(name, response.data)) {
+        setTestResults(prev => ({
+          ...prev,
+          [name]: { success: false, error: 'The API returned an unsuccessful or invalid result. Please try again.' }
+        }))
+        return
+      }
+      const isDemo = response.data.data_source === 'demo'
       setTestResults(prev => ({
         ...prev,
-        [name]: { ...response.data, isRealData: true }
+        [name]: { ...response.data, isRealData: !isDemo, isMockData: isDemo }
       }))
     } catch (error) {
-      console.error(`Failed to test ${name}:`, error)
-      // Use mock data as fallback when API is down
-      const mockData = getMockResponse(name)
-      setTestResults(prev => ({
-        ...prev,
-        [name]: { ...mockData, isRealData: false, isMockData: true }
-      }))
+      if (controller.signal.aborted) return
+      // Keep the offline demo available, but never mask an API rejection as success.
+      const result = error.response
+        ? { success: false, error: `The API request failed (${error.response.status}). Please try again.` }
+        : { ...getMockResponse(name), isRealData: false, isMockData: true, offline: true }
+      setTestResults(prev => ({ ...prev, [name]: result }))
     } finally {
-      setTesting(prev => ({ ...prev, [name]: false }))
+      requests.current.delete(name)
+      if (!controller.signal.aborted) {
+        setTesting(prev => ({ ...prev, [name]: false }))
+      }
     }
   }
 
@@ -186,9 +210,9 @@ const AlgorithmsPage = () => {
         {/* Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 max-w-6xl mx-auto">
           <StatCard number="7" label="Algorithms" color="blue" />
-          <StatCard number="12" label="Tested" color="green" />
-          <StatCard number="100%" label="Coverage" color="purple" />
-          <StatCard number="A+" label="Avg Grade" color="orange" />
+          <StatCard number={Object.values(testResults).filter(result => result.success && !result.isMockData).length} label="Completed" color="green" />
+          <StatCard number={Object.values(testResults).filter(result => result.isMockData).length} label="Demo Results" color="purple" />
+          <StatCard number={Object.values(testResults).filter(result => !result.success).length} label="Failed" color="orange" />
         </div>
 
         {/* Algorithm Grid */}
@@ -219,21 +243,28 @@ const AlgorithmsPage = () => {
   )
 }
 
+const statColors = {
+  blue: 'text-blue-400',
+  green: 'text-green-400',
+  purple: 'text-purple-400',
+  orange: 'text-orange-400'
+}
+
 const StatCard = ({ number, label, color }) => (
   <div className="glass rounded-xl p-6 text-center">
-    <div className={`text-3xl font-bold text-${color}-400 mb-2`}>{number}</div>
+    <div className={`text-3xl font-bold ${statColors[color]} mb-2`}>{number}</div>
     <div className="text-sm text-gray-400">{label}</div>
   </div>
 )
 
 const AlgorithmCard = ({ name, icon, description, color, category, onTest, testing, result, onSelect, index }) => (
   <div className={`glass rounded-xl p-6 hover:scale-105 transition-all duration-300 ${
-    result ? 'ring-2 ring-green-400/50' : ''
+    result?.isMockData ? 'ring-2 ring-blue-400/50' : result?.success ? 'ring-2 ring-green-400/50' : ''
   } ${testing ? 'animate-pulse' : ''}`}
        style={{ animationDelay: `${index * 100}ms` }}
   >
     <div className="flex flex-col items-center text-center">
-      <div className={`text-4xl ${result ? 'animate-bounce' : ''}`} style={{ animationDelay: `${index * 50}ms` }}>
+      <div className={`text-4xl ${result?.success && !result.isMockData ? 'animate-bounce' : ''}`} style={{ animationDelay: `${index * 50}ms` }}>
         {icon}
       </div>
 
@@ -251,7 +282,7 @@ const AlgorithmCard = ({ name, icon, description, color, category, onTest, testi
           className={`px-4 py-2 rounded-lg font-medium transition-all w-full ${
             testing
               ? 'bg-gray-500/50 cursor-not-allowed'
-              : result
+              : result?.success && !result.isMockData
               ? 'bg-green-500/50 hover:bg-green-500/70'
               : `bg-gradient-to-r ${color} hover:scale-105`
           }`}
@@ -261,7 +292,7 @@ const AlgorithmCard = ({ name, icon, description, color, category, onTest, testi
               <PauseCircle className="w-4 h-4 inline mr-2" />
               Testing...
             </>
-          ) : result ? (
+          ) : result?.success && !result.isMockData ? (
             <>
               <CheckCircle className="w-4 h-4 inline mr-2" />
               Tested
@@ -269,12 +300,13 @@ const AlgorithmCard = ({ name, icon, description, color, category, onTest, testi
           ) : (
             <>
               <PlayCircle className="w-4 h-4 inline mr-2" />
-              Test Now
+              {result ? 'Try Again' : 'Test Now'}
             </>
           )}
         </button>
 
-        {result && (
+        {result?.error && <p role="alert" className="text-sm text-red-300">{result.error}</p>}
+        {result?.success && (
           <button
             onClick={onSelect}
             className="px-4 py-2 rounded-lg font-medium transition-all w-full bg-blue-500/50 hover:bg-blue-500/70"
@@ -288,10 +320,10 @@ const AlgorithmCard = ({ name, icon, description, color, category, onTest, testi
       <div className="mt-4 flex items-center gap-2">
         <div className={`w-2 h-2 rounded-full ${
           testing ? 'bg-yellow-400 animate-pulse' :
-          result ? 'bg-green-400' : 'bg-gray-400'
+          result?.isMockData ? 'bg-blue-400' : result?.success ? 'bg-green-400' : result ? 'bg-red-400' : 'bg-gray-400'
         }`}></div>
         <span className="text-xs text-gray-400">
-          {testing ? 'Running...' : result ? 'Complete' : 'Ready to test'}
+          {testing ? 'Running...' : result?.isMockData ? 'Demo data' : result?.success ? 'Complete' : result ? 'Failed' : 'Ready to test'}
         </span>
       </div>
     </div>
@@ -299,7 +331,7 @@ const AlgorithmCard = ({ name, icon, description, color, category, onTest, testi
 )
 
 const AlgorithmResultsModal = ({ algorithm, result, onClose }) => (
-  <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  <div role="dialog" aria-modal="true" aria-label={`${algorithm.name} results`} className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div className="glass rounded-3xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
       <div className="flex justify-between items-start mb-6">
         <div>
@@ -310,12 +342,18 @@ const AlgorithmResultsModal = ({ algorithm, result, onClose }) => (
         </div>
         <button
           onClick={onClose}
+          aria-label="Close results"
           className="text-gray-400 hover:text-white transition-colors"
         >
           ✕
         </button>
       </div>
 
+      {result.isMockData && (
+        <p role="status" className="mb-4 text-amber-300">
+          {result.offline ? 'API unavailable. Showing demo data.' : 'Demo data supplied by the API.'} These values are illustrative, not measured algorithm results.
+        </p>
+      )}
       <ChartVisualization algorithm={algorithm} result={result} />
     </div>
   </div>

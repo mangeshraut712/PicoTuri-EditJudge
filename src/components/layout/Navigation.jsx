@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Brain, Activity, BookOpen, Settings, BarChart3, Zap, Menu, X } from 'lucide-react'
+import { Brain, Activity, BookOpen, Menu, X } from 'lucide-react'
 
 const Navigation = ({ isOpen, onToggle }) => {
   const location = useLocation()
@@ -35,20 +35,24 @@ const Navigation = ({ isOpen, onToggle }) => {
     <>
       {/* Mobile Menu Button */}
       <button
-        onClick={onToggle}
+        type="button"
+        onClick={() => onToggle(!isOpen)}
+        aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        aria-expanded={isOpen}
+        aria-controls="primary-navigation"
         className="fixed top-4 left-4 z-50 lg:hidden p-3 rounded-xl bg-black/20 backdrop-blur-sm border border-white/10 text-white hover:bg-black/30 transition-all"
       >
         {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </button>
 
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full w-80 bg-black/20 backdrop-blur-xl border-r border-white/10 transform transition-transform duration-300 z-40 ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0`}>
+      <div id="primary-navigation" className={`fixed left-0 top-0 h-full w-80 bg-black/20 backdrop-blur-xl border-r border-white/10 transform transition-transform duration-300 z-40 ${
+        isOpen ? 'visible translate-x-0' : 'invisible -translate-x-full'
+      } lg:visible lg:translate-x-0`}>
         <div className="p-6 h-full overflow-y-auto">
           {/* Logo and Title */}
           <div className="mb-8">
-            <Link to="/" className="block group">
+            <Link to="/" onClick={() => onToggle(false)} className="block group">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 group-hover:scale-110 transition-transform duration-300">
                   <Brain className="w-8 h-8 text-white" />
@@ -67,13 +71,14 @@ const Navigation = ({ isOpen, onToggle }) => {
           </div>
 
           {/* Navigation Items */}
-          <nav className="space-y-3 mb-8">
+          <nav aria-label="Primary" className="space-y-3 mb-8">
             {navItems.map((item) => {
               const Icon = item.icon
               return (
                 <Link
                   key={item.path}
                   to={item.path}
+                  aria-current={isActive(item.path) ? 'page' : undefined}
                   onClick={() => onToggle(false)}
                   className={`block p-4 rounded-xl transition-all duration-300 group ${
                     isActive(item.path)
@@ -123,7 +128,7 @@ const Navigation = ({ isOpen, onToggle }) => {
                   <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
                   <span className="text-sm text-blue-400">Backend</span>
                 </div>
-                <span className="text-xs text-blue-400">Port 5001</span>
+                <span className="text-xs text-blue-400">API configured</span>
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
                 <div className="flex items-center gap-2">
@@ -139,7 +144,9 @@ const Navigation = ({ isOpen, onToggle }) => {
 
       {/* Mobile Overlay */}
       {isOpen && (
-        <div
+        <button
+          type="button"
+          aria-label="Dismiss navigation menu"
           className="fixed inset-0 bg-black/50 z-30 lg:hidden"
           onClick={() => onToggle(false)}
         />

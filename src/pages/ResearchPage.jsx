@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { BookOpen, FileText, Users, Award, TrendingUp, Brain, Code, BarChart3, ExternalLink, Search, Filter, Calendar } from 'lucide-react'
+import { useState } from 'react'
+import { BookOpen, FileText, Users, Award, TrendingUp, Brain, Code, BarChart3, ExternalLink, Search } from 'lucide-react'
 
 const ResearchPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all')

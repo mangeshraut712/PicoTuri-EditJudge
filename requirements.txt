@@ -1,6 +1,9 @@
 # PicoTuri-EditJudge Requirements
 # Advanced embeddings and cross-platform deployment
 
+# Demo API runtime (also installable independently).
+-r api/requirements.txt
+
 # Core ML and AI
 torch==2.13.0
 torchvision==0.17.0
