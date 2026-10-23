@@ -12,7 +12,8 @@ numpy>=1.26.0
 pandas>=2.0.0
 
 # Image Processing
-Pillow>=12.3.0
+# Pillow 13.0.0 fixes the open image-decoder advisories (GHSA-8g5g-8vmr-9782 and the related 12.3.0 CVEs)
+Pillow>=13.0.0
 opencv-python>=4.8.0
 
 # ONNX and Deployment
@@ -28,7 +29,8 @@ pydantic>=2.5.0
 # Data Processing
 pyyaml>=6.0
 tqdm>=4.66.0
-requests>=2.31.0
+# requests 2.33.0 fixes GHSA-9wx4-h78v-vm56, GHSA-9hjg-9r4m-mvj7, and GHSA-gc5v-m9x4-r6x2
+requests>=2.33.0
 
 # Calibration and Metrics
 scipy>=1.11.0
