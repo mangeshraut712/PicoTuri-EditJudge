@@ -1,25 +1,19 @@
 """
-PicoTuri-EditJudge API Backend - Fixed and Working
+PicoTuri-EditJudge demo API backend
 Lightweight Flask API for demonstration and testing
 """
 
-from flask import Flask, jsonify, Blueprint
 import importlib
 import logging
+import os
 import random
 import time
-import warnings
-
-# Optional import for type checking tools
 from typing import Any
+from urllib.parse import urlparse
 
-# Setup CORS
-try:
-    from flask_cors import CORS
-    cors_available = True
-except ImportError:
-    cors_available = False
-    warnings.filterwarnings("ignore", category=UserWarning, module='flask_cors')
+from flask import Blueprint, Flask, current_app, jsonify
+from flask_cors import CORS
+from werkzeug.exceptions import HTTPException
 
 # Setup logging
 logging.basicConfig(
@@ -36,6 +30,7 @@ def health_check():
     """Health check endpoint - returns basic service status."""
     return jsonify({
         'status': 'healthy',
+        'data_source': 'demo',
         'service': 'PicoTuri-EditJudge API',
         'version': '1.0.0',
         'timestamp': int(time.time() * 1000)
@@ -43,21 +38,23 @@ def health_check():
 
 @api_bp.route('/stats', methods=['GET'])
 def get_stats():
-    """Get dashboard statistics."""
+    """Return endpoint counts without claiming unmeasured quality statistics."""
     return jsonify({
+        'data_source': 'demo',
         'algorithms_count': 7,
-        'code_quality': 100,
-        'test_coverage': 100,
-        'error_count': 0,
-        'commit_count': 12,
-        'last_updated': '2025-01-01'
+        'code_quality': None,
+        'test_coverage': None,
+        'error_count': None,
+        'commit_count': None,
+        'last_updated': None
     }), 200
 
 @api_bp.route('/performance/status', methods=['GET'])
 def performance_status():
-    """Get performance monitoring status."""
+    """Return explicitly labeled, simulated performance metrics."""
     try:
         return jsonify({
+            'data_source': 'demo',
             'timestamp': int(time.time() * 1000),
             'uptime': random.uniform(98.5, 99.9),
             'cpu_usage': random.uniform(20.0, 45.0),
@@ -86,9 +83,10 @@ def performance_status():
 
 @api_bp.route('/test/quality-scorer', methods=['POST'])
 def test_quality_scorer():
-    """Test the quality scorer algorithm."""
+    """Return simulated quality scorer results."""
     try:
         response = {
+            'data_source': 'demo',
             'success': True,
             'overall_score': 0.91,
             'components': {
@@ -112,9 +110,10 @@ def test_quality_scorer():
 
 @api_bp.route('/test/diffusion-model', methods=['POST'])
 def test_diffusion_model():
-    """Test the diffusion model algorithm."""
+    """Return simulated diffusion model results."""
     try:
         response = {
+            'data_source': 'demo',
             'success': True,
             'parameters': 10_900_000,
             'architecture': 'U-Net with cross-attention',
@@ -129,9 +128,10 @@ def test_diffusion_model():
 
 @api_bp.route('/test/dpo-training', methods=['POST'])
 def test_dpo_training():
-    """Test the DPO training algorithm."""
+    """Return simulated DPO training results."""
     try:
         response = {
+            'data_source': 'demo',
             'success': True,
             'loss': 0.61,
             'preference_accuracy': 0.68,
@@ -145,9 +145,10 @@ def test_dpo_training():
 
 @api_bp.route('/test/multi-turn', methods=['POST'])
 def test_multi_turn():
-    """Test the multi-turn editor algorithm."""
+    """Return simulated multi-turn editor results."""
     try:
         response = {
+            'data_source': 'demo',
             'success': True,
             'instructions_processed': 3,
             'edits_completed': 3,
@@ -161,9 +162,10 @@ def test_multi_turn():
 
 @api_bp.route('/test/coreml', methods=['POST'])
 def test_coreml():
-    """Test the Core ML optimizer algorithm."""
+    """Return simulated Core ML optimizer results."""
     try:
         response = {
+            'data_source': 'demo',
             'success': True,
             'ios_files_generated': 3,
             'apple_silicon': True,
@@ -181,9 +183,10 @@ def test_coreml():
 
 @api_bp.route('/test/baseline', methods=['POST'])
 def test_baseline():
-    """Test the baseline model algorithm."""
+    """Return simulated baseline model results."""
     try:
         response = {
+            'data_source': 'demo',
             'success': True,
             'classifier': 'LogisticRegression',
             'training_accuracy': 0.982,
@@ -200,9 +203,10 @@ def test_baseline():
 
 @api_bp.route('/test/features', methods=['POST'])
 def test_features():
-    """Test the feature extraction algorithm."""
+    """Return simulated feature extraction results."""
     try:
         response = {
+            'data_source': 'demo',
             'success': True,
             'similarity_score': 0.87,
             'semantic_accuracy': 0.67,
@@ -243,35 +247,104 @@ def internal_error(_: Exception) -> Any:
     """Handle 500 errors."""
     return jsonify({'error': 'Internal server error', 'status_code': 500}), 500
 
+def http_error(error: HTTPException) -> Any:
+    """Keep HTTP status and headers while returning the API's JSON format."""
+    response = error.get_response()
+    response.data = current_app.json.dumps({
+        'error': error.name,
+        'status_code': error.code
+    })
+    response.content_type = 'application/json'
+    return response
+
 # Root endpoint
 def root() -> Any:
     """Root endpoint for API information."""
     return jsonify({
+        'data_source': 'demo',
         'name': 'PicoTuri-EditJudge API',
         'version': '1.0.0',
         'description': 'AI Quality Assessment Platform API',
         'endpoints': '/api/* routes available'
     }), 200
 
+def normalize_origins(value: Any) -> list[str]:
+    """Keep explicit http(s) origins and drop wildcards, paths, and malformed entries."""
+    if isinstance(value, str):
+        candidates = value.split(',')
+    elif isinstance(value, (list, tuple)):
+        candidates = [str(item) for item in value]
+    else:
+        return []
+
+    origins: list[str] = []
+    for item in candidates:
+        candidate = item.strip()
+        if not candidate or any(char in candidate for char in '*?[]()\\^$'):
+            continue
+        parsed = urlparse(candidate)
+        try:
+            hostname = parsed.hostname
+            if parsed.port is not None and not 1 <= parsed.port <= 65535:
+                continue
+        except ValueError:
+            continue
+        if parsed.scheme not in {'http', 'https'} or not hostname:
+            continue
+        if parsed.username or parsed.password or parsed.query or parsed.fragment:
+            continue
+        if parsed.path not in {'', '/'}:
+            continue
+        origin = f'{parsed.scheme}://{parsed.netloc}'
+        if origin not in origins:
+            origins.append(origin)
+    return origins
+
+def configured_cors_origins() -> list[str]:
+    """Read the deployment allow-list, defaulting to the local Vite servers."""
+    return normalize_origins(os.environ.get(
+        'CORS_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000'
+    ))
+
+def add_security_headers(response):
+    """Stop browsers and proxies from caching or reframing API responses."""
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['Referrer-Policy'] = 'no-referrer'
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
 # Create app
-def create_app():
+def create_app(config=None):
     """Factory function to create Flask app."""
     app = Flask(__name__)
+    app.config['CORS_ORIGINS'] = configured_cors_origins()
+    if config is not None:
+        app.config.update(config)
+    app.config['CORS_ORIGINS'] = normalize_origins(app.config['CORS_ORIGINS'])
 
-    if cors_available:
-        CORS(app)
-        logger.info("CORS enabled for development")
+    CORS(
+        app,
+        resources={r'/api/.*': {'origins': app.config['CORS_ORIGINS']}},
+        methods=['GET', 'POST', 'OPTIONS'],
+        allow_headers=['Content-Type'],
+        supports_credentials=False,
+        always_send=False
+    )
 
     app.register_blueprint(api_bp, url_prefix='/api')
     app.add_url_rule('/', 'root', root)
     app.register_error_handler(404, not_found)
     app.register_error_handler(500, internal_error)
+    app.register_error_handler(HTTPException, http_error)
+    app.after_request(add_security_headers)
 
     return app
 
 app = create_app()
 
-if __name__ == '__main__':
+def main() -> int:
+    """Run the development server on loopback unless explicitly configured."""
     logger.info("Starting PicoTuri-EditJudge API server...")
     logger.info("Available endpoints:\n"
                 "  - GET  /api/health\n"
@@ -280,11 +353,16 @@ if __name__ == '__main__':
                 "  - POST /api/test/* (7 test endpoints)")
 
     try:
-        logger.info("Server starting on http://localhost:5001")
-        app.run(host='0.0.0.0', port=5001, debug=False, threaded=False)
+        host = os.environ.get('HOST', '127.0.0.1').strip() or '127.0.0.1'
+        port = int(os.environ.get('PORT', '5001').strip())
+        if not 1 <= port <= 65535:
+            raise ValueError('PORT must be between 1 and 65535')
+        logger.info("Server starting on http://%s:%s", host, port)
+        app.run(host=host, port=port, debug=False, threaded=False)
+        return 0
     except Exception as e:
         logger.error(f"Failed to start server: {e}")
-        exit(1)
+        return 1
 
 # Vercel WSGI handler (for deployment)
 vercel_wsgi_module = None
@@ -294,3 +372,6 @@ except ImportError:
     handler = None
 else:
     handler = vercel_wsgi_module.handle_wsgi(app)
+
+if __name__ == '__main__':
+    raise SystemExit(main())

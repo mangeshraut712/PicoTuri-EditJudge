@@ -1,6 +1,7 @@
 module.exports = {
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.cjs'],
+  testMatch: ['<rootDir>/src/**/*.test.[jt]s?(x)'],
   moduleNameMapper: {
     '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
     '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/__mocks__/fileMock.js',
@@ -10,16 +11,15 @@ module.exports = {
     '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
   },
   testPathIgnorePatterns: [
-    '/node_modules/',
-    '/.next/'
+    '/node_modules/'
   ],
   collectCoverage: true,
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
+    '!src/**/__tests__/**',
+    '!src/main.jsx',
     '!src/**/*.d.ts',
     '!src/**/*.stories.{js,jsx,ts,tsx}',
-    '!src/pages/_app.js',
-    '!src/pages/_document.js',
   ],
   coverageThreshold: {
     global: {
@@ -29,8 +29,4 @@ module.exports = {
       statements: 80
     }
   },
-  // Add this to handle ES modules
-  transformIgnorePatterns: [
-    'node_modules/(?!(react-icons|@react-icons|@testing-library|@babel)/)'
-  ]
 };

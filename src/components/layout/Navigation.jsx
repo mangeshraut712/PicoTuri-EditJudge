@@ -1,9 +1,28 @@
-import React from 'react'
+import { useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Brain, Activity, BookOpen, Settings, BarChart3, Zap, Menu, X } from 'lucide-react'
+import { Brain, Activity, BookOpen, Menu, X } from 'lucide-react'
+import { trapTabKey } from '../../utils/focusTrap'
 
 const Navigation = ({ isOpen, onToggle }) => {
   const location = useLocation()
+  const menuRef = useRef(null)
+  const toggleRef = useRef(null)
+
+  useEffect(() => {
+    if (!isOpen) return undefined
+    const menu = menuRef.current
+    const onKey = (event) => {
+      if (event.key === 'Escape') {
+        if (event.defaultPrevented) return
+        onToggle(false)
+        return
+      }
+      trapTabKey(event, menu)
+    }
+    document.addEventListener('keydown', onKey)
+    toggleRef.current?.focus()
+    return () => document.removeEventListener('keydown', onKey)
+  }, [isOpen, onToggle])
 
   const navItems = [
     {
@@ -17,14 +36,14 @@ const Navigation = ({ isOpen, onToggle }) => {
       name: 'Performance',
       path: '/performance',
       icon: Activity,
-      description: 'Real-time monitoring dashboard',
+      description: 'Performance samples and demo metrics',
       color: 'from-green-500 to-emerald-500'
     },
     {
       name: 'Research',
       path: '/research',
       icon: BookOpen,
-      description: 'Academic papers and documentation',
+      description: 'Sample bibliography',
       color: 'from-purple-500 to-pink-500'
     }
   ]
@@ -32,23 +51,28 @@ const Navigation = ({ isOpen, onToggle }) => {
   const isActive = (path) => location.pathname === path
 
   return (
-    <>
+    <div ref={menuRef}>
       {/* Mobile Menu Button */}
       <button
-        onClick={onToggle}
+        ref={toggleRef}
+        type="button"
+        onClick={() => onToggle(!isOpen)}
+        aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        aria-expanded={isOpen}
+        aria-controls="primary-navigation"
         className="fixed top-4 left-4 z-50 lg:hidden p-3 rounded-xl bg-black/20 backdrop-blur-sm border border-white/10 text-white hover:bg-black/30 transition-all"
       >
-        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        {isOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
       </button>
 
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full w-80 bg-black/20 backdrop-blur-xl border-r border-white/10 transform transition-transform duration-300 z-40 ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0`}>
+      <div id="primary-navigation" className={`fixed left-0 top-0 h-full w-80 bg-black/20 backdrop-blur-xl border-r border-white/10 transform transition-transform duration-300 z-40 ${
+        isOpen ? 'visible translate-x-0' : 'invisible -translate-x-full'
+      } lg:visible lg:translate-x-0`}>
         <div className="p-6 h-full overflow-y-auto">
           {/* Logo and Title */}
           <div className="mb-8">
-            <Link to="/" className="block group">
+            <Link to="/" onClick={() => onToggle(false)} className="block group">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 group-hover:scale-110 transition-transform duration-300">
                   <Brain className="w-8 h-8 text-white" />
@@ -67,13 +91,14 @@ const Navigation = ({ isOpen, onToggle }) => {
           </div>
 
           {/* Navigation Items */}
-          <nav className="space-y-3 mb-8">
+          <nav aria-label="Primary" className="space-y-3 mb-8">
             {navItems.map((item) => {
               const Icon = item.icon
               return (
                 <Link
                   key={item.path}
                   to={item.path}
+                  aria-current={isActive(item.path) ? 'page' : undefined}
                   onClick={() => onToggle(false)}
                   className={`block p-4 rounded-xl transition-all duration-300 group ${
                     isActive(item.path)
@@ -105,32 +130,24 @@ const Navigation = ({ isOpen, onToggle }) => {
             })}
           </nav>
 
-          {/* System Status */}
+          {/* Demo contents. These are not probed from a health check. */}
           <div className="mb-8">
-            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-              System Status
+            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-1">
+              Demo contents
             </h3>
+            <p className="text-xs text-gray-500 mb-3">Not a live health check.</p>
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 rounded-lg bg-green-500/10 border border-green-500/20">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-green-400">Frontend</span>
-                </div>
-                <span className="text-xs text-green-400">Active</span>
+                <span className="text-sm text-green-400">Frontend</span>
+                <span className="text-xs text-green-400">This page</span>
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-blue-400">Backend</span>
-                </div>
-                <span className="text-xs text-blue-400">Port 5001</span>
+                <span className="text-sm text-blue-400">API</span>
+                <span className="text-xs text-blue-400">Optional local server</span>
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-purple-400">Algorithms</span>
-                </div>
-                <span className="text-xs text-purple-400">7 Available</span>
+                <span className="text-sm text-purple-400">Algorithms</span>
+                <span className="text-xs text-purple-400">7 sample tests</span>
               </div>
             </div>
           </div>
@@ -139,12 +156,15 @@ const Navigation = ({ isOpen, onToggle }) => {
 
       {/* Mobile Overlay */}
       {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-label="Dismiss navigation menu"
+          className="fixed inset-0 z-30 border-0 bg-black/50 p-0 lg:hidden"
           onClick={() => onToggle(false)}
         />
       )}
-    </>
+    </div>
   )
 }
 

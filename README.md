@@ -3,8 +3,8 @@
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-live-success)](https://mangeshraut712.github.io/PicoTuri-EditJudge/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![React](https://img.shields.io/badge/React-18.2.0-blue.svg)](https://reactjs.org/)
-[![Flask](https://img.shields.io/badge/Flask-2.3.0-red.svg)](https://flask.palletsprojects.com/)
-[![Vite](https://img.shields.io/badge/Vite-4.3.0-purple.svg)](https://vitejs.dev/)
+[![Flask](https://img.shields.io/badge/Flask-3.1.3-red.svg)](https://flask.palletsprojects.com/)
+[![Vite](https://img.shields.io/badge/Vite-7.3-purple.svg)](https://vitejs.dev/)
 
 > **Professional AI Algorithm Testing & Quality Assessment Platform** - Real-time interactive visualizations for machine learning model evaluation and benchmarking.
 
@@ -107,21 +107,21 @@ Our platform includes comprehensive testing for 7 cutting-edge AI/ML algorithms:
 
 ### Frontend
 - **React 18** - Modern component-based UI
-- **Vite 4.3** - Lightning-fast build tool with HMR
+- **Vite 7.3** - Build tool with HMR
 - **Tailwind CSS 3** - Utility-first styling framework
-- **Recharts 2.5** - Interactive charting library
-- **Lucide React** - Beautiful icon system
-- **Axios 1.4** - HTTP client with request/response interceptors
+- **Recharts 2.15** - Interactive charting library
+- **Lucide React** - Icon system
+- **Axios 1.20** - HTTP client
 
 ### Backend
-- **Python 3.8+** - Core programming language
-- **Flask 2.3** - Lightweight REST API framework
+- **Python 3.10+** - Core programming language
+- **Flask 3.1** - Lightweight REST API framework
 - **Flask-CORS** - Cross-origin resource sharing
 - **NumPy/Pandas** - Scientific computing and data manipulation
 - **Scikit-learn** - Machine learning algorithms
 
 ### Development & Deployment
-- **Jest 29** - JavaScript testing framework
+- **Jest 30** - JavaScript testing framework
 - **Babel 7** - JavaScript compiler
 - **ESLint** - Code linting and formatting
 - **Pyright 1.1** - Python type checking
@@ -137,18 +137,16 @@ Our platform includes comprehensive testing for 7 cutting-edge AI/ML algorithms:
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ and npm/yarn
-- Python 3.8+ and pip
+- Node.js 22.12+ and npm
+- Python 3.10+ and pip
 - Git for version control
 
-### One-Command Setup
+### Clone the repository
 ```bash
 # Clone repository
 git clone https://github.com/mangeshraut712/PicoTuri-EditJudge.git
 cd PicoTuri-EditJudge
 
-# Install all dependencies and start development servers
-npm run setup
 ```
 
 ### Manual Setup
@@ -156,7 +154,7 @@ npm run setup
 #### Frontend Setup
 ```bash
 # Install dependencies
-npm install
+npm ci
 
 # Start development server
 npm run dev
@@ -165,14 +163,13 @@ npm run dev
 
 #### Backend Setup
 ```bash
-# Navigate to API directory
-cd api
-
-# Install Python dependencies
-pip install -r requirements.txt
+# From the repository root, install the lightweight demo API dependencies
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r api/requirements.txt
 
 # Start Flask server
-python index.py
+python api/index.py
 # 🟢 Backend API available at http://localhost:5001
 ```
 
@@ -191,8 +188,8 @@ npm run lint         # ESLint code analysis
 # Backend
 cd api && python index.py  # Start Flask API
 
-# Full Setup
-npm run setup        # Install all deps + start both servers
+# Backend regression tests (after activating .venv)
+python -m unittest discover -s tests -v
 ```
 
 ### Project Structure
@@ -222,48 +219,28 @@ PicoTuri-EditJudge/
 
 ## 📡 API Documentation
 
-All endpoints return interactive visualization data with rich chart configurations.
+Algorithm endpoints are POST requests and return demonstration JSON. Every payload includes `data_source: "demo"`.
 
 ### Core Endpoints
 
-| Algorithm | Endpoint | Method | Description |
-|-----------|----------|--------|-------------|
-| Quality Scorer | `/api/quality-scorer` | GET | Multi-dimensional quality metrics |
-| Diffusion Model | `/api/diffusion` | GET | U-Net architecture analysis |
-| Multi-Turn Editor | `/api/multi-turn` | GET | Conversation flow metrics |
-| DPO Training | `/api/dpo` | GET | Optimization convergence data |
-| Core ML Optimizer | `/api/coreml` | GET | Performance optimization metrics |
-| Baseline Model | `/api/baseline` | GET | Traditional ML comparisons |
-| Feature Extraction | `/api/feature-extraction` | GET | Text similarity analysis |
+| Resource | Endpoint | Method | Description |
+|----------|----------|--------|-------------|
+| Health | `/api/health` | GET | Service status |
+| Stats | `/api/stats` | GET | Algorithm count; unmeasured stats are null |
+| Performance | `/api/performance/status` | GET | Simulated system samples |
+| Quality Scorer | `/api/test/quality-scorer` | POST | Sample quality metrics |
+| Diffusion Model | `/api/test/diffusion-model` | POST | Sample diffusion metrics |
+| Multi-Turn Editor | `/api/test/multi-turn` | POST | Sample editor metrics |
+| DPO Training | `/api/test/dpo-training` | POST | Sample training metrics |
+| Core ML Optimizer | `/api/test/coreml` | POST | Sample optimizer metrics |
+| Baseline Model | `/api/test/baseline` | POST | Sample classifier metrics |
+| Feature Extraction | `/api/test/features` | POST | Sample similarity metrics |
 
-### Response Format
+### Example
 
-```json
-{
-  "status": "success",
-  "data": {
-    "chartType": "radar|line|bar|pie",
-    "datasets": [...],
-    "config": {
-      "title": "Chart Title",
-      "interactive": true,
-      "responsive": true
-    }
-  }
-}
-```
-
-### Example Usage
-
-```javascript
-// Quality Scorer Analysis
-const response = await fetch('/api/quality-scorer');
-const data = await response.json();
-// Returns radar chart data with 4 quality dimensions
-
-// Multi-turn Conversation Analysis
-const conversation = await fetch('/api/multi-turn');
-// Returns real-time conversation flow visualization
+```bash
+curl -s http://127.0.0.1:5001/api/health
+curl -s -X POST http://127.0.0.1:5001/api/test/quality-scorer
 ```
 
 ## 🧪 Testing
@@ -282,6 +259,8 @@ npm run test:coverage
 
 ### Test Structure
 ```
+src/__tests__/          # Navigation, API client, polling, chart, and page regressions
+tests/test_api.py       # Demo contracts, CORS, HTTP errors, and server defaults
 __mocks__/
 ├── fileMock.js         # Static file mocks
 └── ...                 # Additional mocks
@@ -300,19 +279,30 @@ The Vite frontend deploys automatically from `main` via GitHub Actions (`npm ci 
 
 Live site: https://mangeshraut712.github.io/PicoTuri-EditJudge/
 
-The Python API is not hosted on Pages. Run it locally (`python api/index.py`) for live algorithm endpoints.
+The Python API is not hosted on Pages. For a deployed frontend, set
+`VITE_API_BASE_URL=https://your-api.example.com` when building and allow the frontend
+origin with `CORS_ORIGINS=https://mangeshraut712.github.io` on the API server.
+With no API origin configured, requests use same-origin `/api` routes. During local
+development Vite proxies those routes to `http://127.0.0.1:5001`; production hosting
+must provide an API or reverse proxy at `/api`, or set the build-time API origin.
+
+The included API returns demonstration algorithm results and simulated performance
+metrics, identified by `data_source: "demo"`. These are labeled in the dashboard.
+Unavailable performance data stays unavailable; the history includes only successful
+API samples. Offline algorithm examples are labeled as demo results and do not count
+as completed tests.
 
 ### Docker Deployment
 ```dockerfile
-# Multi-stage Dockerfile example
-FROM node:18-alpine AS frontend
+# Example only. The frontend build needs the dev dependencies (Vite).
+FROM node:22-alpine AS frontend
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM python:3.8-slim AS backend
+FROM python:3.12-slim AS backend
 WORKDIR /app
 COPY api/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -320,8 +310,7 @@ COPY api/ .
 
 FROM nginx:alpine AS production
 COPY --from=frontend /app/dist /usr/share/nginx/html
-COPY --from=backend /app/api /app/api
-# Nginx config for API proxying
+COPY --from=backend /app /app/api
 ```
 
 ### Manual Deployment
@@ -334,15 +323,21 @@ COPY --from=backend /app/api /app/api
 
 ### Environment Variables
 ```bash
-# Backend Configuration
-FLASK_ENV=production
-FLASK_DEBUG=false
-PORT=5001
+# Backend shell environment (defaults shown)
+export HOST=127.0.0.1
+export PORT=5001
+export CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+python api/index.py
 
-# Frontend Configuration
-VITE_API_BASE_URL=http://localhost:5001
-VITE_ENV=production
+# Frontend build environment (omit for same-origin /api)
+VITE_API_BASE_URL=https://your-api.example.com npm run build
 ```
+
+`VITE_API_BASE_URL` is a public API origin without the `/api` suffix and is embedded
+at build time. It can also be set in `.env.local` before running Vite. CORS only
+allows the configured, comma-separated origins on `/api/*`, with GET, POST, OPTIONS
+and the Content-Type request header; credentials are disabled. The development
+server binds to loopback unless `HOST` is explicitly changed.
 
 ### VSCode Settings
 Pre-configured development environment:
@@ -369,23 +364,7 @@ To add a new algorithm:
 
 ## 📊 Performance Monitoring
 
-```javascript
-// Real-time performance metrics
-const metrics = {
-  apiResponseTime: '<100ms',
-  chartRenderTime: '<50ms',
-  memoryUsage: 'optimized',
-  networkRequests: '30ms average'
-};
-```
-
-## 📈 Metrics & Analytics
-
-- **API Response Times:** <100ms average
-- **Chart Rendering:** <50ms for complex visualizations
-- **Network Efficiency:** Optimized requests with caching
-- **Memory Usage:** Efficient chart components
-- **Load Times:** <3 seconds for full application
+The performance page polls `GET /api/performance/status` and plots only successful samples. The included API marks those samples with `data_source: "demo"`. Responses send `Cache-Control: no-store` so browsers do not reuse a simulated reading.
 
 ## 🐛 Troubleshooting
 
@@ -402,7 +381,7 @@ npm run dev
 **API Connection Issues:**
 ```bash
 # Check if backend is running
-curl http://localhost:5001/api/quality-scorer
+curl -s http://127.0.0.1:5001/api/health
 ```
 
 **Build Failures:**
@@ -426,10 +405,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🎯 Roadmap
 
-### Phase 1 (Current) ✅
-- Complete 7 algorithm implementations
-- Interactive visualizations for all algorithms
-- Production deployment ready
+### Phase 1 (Current)
+- Demonstration results for 7 algorithms, labeled in the UI
+- Charts that plot reported metrics only
+- GitHub Pages frontend and a local Flask API
 
 ### Phase 2 (Next) 🔄
 - [ ] WebSocket real-time updates

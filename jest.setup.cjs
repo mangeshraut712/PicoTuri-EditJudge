@@ -1,4 +1,6 @@
-import '@testing-library/jest-dom';
+require('@testing-library/jest-dom');
+const { TextEncoder, TextDecoder } = require('node:util');
+Object.assign(globalThis, { TextEncoder, TextDecoder });
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {

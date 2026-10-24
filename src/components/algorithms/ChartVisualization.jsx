@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   LineChart,
   Line,
@@ -18,16 +17,19 @@ import {
   Pie,
   Cell
 } from 'recharts'
+import { isValidAlgorithmResult } from './algorithmResult'
 
 const ChartVisualization = ({ algorithm, result }) => {
   if (!result) return <div className="text-gray-400">No data available</div>
+  if (!isValidAlgorithmResult(algorithm?.name, result)) {
+    return <div role="alert" className="text-red-300">No valid algorithm results available.</div>
+  }
 
   // Quality Scorer - Component breakdown
-  if (result.components) {
+  if (algorithm.name === 'Quality Scorer') {
     const chartData = Object.entries(result.components).map(([key, value]) => ({
-      name: key.split('_').map(w => w[0].toUpperCase() + w.slice(1)).join(' '),
-      value: parseFloat((value * 100).toFixed(1)),
-      weight: (result.weights || {})[key] || 0.25
+      name: key.split('_').filter(Boolean).map(w => w[0].toUpperCase() + w.slice(1)).join(' '),
+      value: parseFloat((value * 100).toFixed(1))
     }))
 
     return (
@@ -79,7 +81,7 @@ const ChartVisualization = ({ algorithm, result }) => {
           </div>
           <div className="text-xl text-white mb-1">Overall Score</div>
           <div className="text-sm text-gray-400">
-            Grade: {result.grade} | {result.recommendation}
+            Grade: {result.grade || 'Not reported'}{result.recommendation && ` | ${result.recommendation}`}
           </div>
         </div>
       </div>
@@ -87,19 +89,18 @@ const ChartVisualization = ({ algorithm, result }) => {
   }
 
   // Diffusion Model - Architecture info with Line Chart
-  if (result.parameters) {
+  if (algorithm.name === 'Diffusion Model') {
     const architectureData = [
       { name: 'Parameter Count', value: result.parameters / 1000000, unit: 'M', color: '#8884d8' },
       { name: 'Inference Time', value: result.inference_time_ms, unit: 'ms', color: '#82ca9d' },
-      { name: 'Quality Score', value: result.quality_score * 10, unit: '/50', color: '#ffc658' }
+      { name: 'Quality Score', value: result.quality_score, unit: '/5', color: '#ffc658' }
     ]
 
-    // Mock performance data for line chart
-    const performanceData = Array.from({ length: 10 }, (_, i) => ({
-      time: i + 1,
-      latency: result.inference_time_ms + (Math.random() - 0.5) * 10,
-      quality: (result.quality_score * 10) + (Math.random() - 0.5) * 2
-    }))
+    const performanceData = [{
+      sample: 'Reported result',
+      latency: result.inference_time_ms,
+      quality: result.quality_score
+    }]
 
     return (
       <div className="space-y-6">
@@ -123,12 +124,13 @@ const ChartVisualization = ({ algorithm, result }) => {
 
           {/* Performance Line Chart */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Performance Trends</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Reported Performance</h3>
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={performanceData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-                <XAxis dataKey="time" tick={{ fill: '#9ca3af', fontSize: 11 }} />
-                <YAxis tick={{ fill: '#9ca3af', fontSize: 11 }} />
+                <XAxis dataKey="sample" tick={{ fill: '#9ca3af', fontSize: 11 }} />
+                <YAxis yAxisId="latency" unit=" ms" tick={{ fill: '#9ca3af', fontSize: 11 }} />
+                <YAxis yAxisId="quality" orientation="right" domain={[0, 5]} tick={{ fill: '#9ca3af', fontSize: 11 }} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: 'rgba(17, 24, 39, 0.95)',
@@ -137,20 +139,22 @@ const ChartVisualization = ({ algorithm, result }) => {
                   }}
                 />
                 <Line
+                  yAxisId="latency"
                   type="monotone"
                   dataKey="latency"
                   stroke="#8884d8"
                   strokeWidth={2}
                   name="Latency (ms)"
-                  dot={false}
+                  dot={{ r: 4 }}
                 />
                 <Line
+                  yAxisId="quality"
                   type="monotone"
                   dataKey="quality"
                   stroke="#82ca9d"
                   strokeWidth={2}
-                  name="Quality Score"
-                  dot={false}
+                  name="Quality Score (/5)"
+                  dot={{ r: 4 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -158,9 +162,10 @@ const ChartVisualization = ({ algorithm, result }) => {
         </div>
 
         <div className="text-center p-6 glass rounded-xl">
-          <div className="text-xl text-white mb-2">{result.architecture}</div>
+          <div className="text-xl text-white mb-2">{result.architecture || 'Architecture not reported'}</div>
           <div className="text-sm text-gray-400">
-            {result.supports_text_to_image && result.supports_image_to_image ? 'Full generation support' : 'Limited capabilities'}
+            Text-to-image: {result.supports_text_to_image == null ? 'Not reported' : result.supports_text_to_image ? 'Supported' : 'Not supported'}
+            {' | '}Image-to-image: {result.supports_image_to_image == null ? 'Not reported' : result.supports_image_to_image ? 'Supported' : 'Not supported'}
           </div>
         </div>
       </div>
@@ -168,20 +173,16 @@ const ChartVisualization = ({ algorithm, result }) => {
   }
 
   // Multi-Turn Editor - Session flow visualization
-  if (result.instructions_processed !== undefined) {
+  if (algorithm.name === 'Multi-Turn Editor') {
     const sessionData = [
-      { name: 'Start', value: 1, color: '#10b981' },
-      { name: 'Processing', value: Math.max(result.instructions_processed - 1, 1), color: '#3b82f6' },
       { name: 'Completed', value: result.edits_completed, color: '#8b5cf6' },
-      { name: 'Failed', value: result.failed_edits || 0, color: '#ef4444' }
+      ...(result.failed_edits == null ? [] : [{ name: 'Failed', value: result.failed_edits, color: '#ef4444' }])
     ]
 
-    // Response time distribution
-    const responseTimes = Array.from({ length: 20 }, (_, i) => ({
-      request: i + 1,
-      time: result.processing_time_ms / 20 + (Math.random() - 0.5) * 20,
-      confidence: result.average_confidence + (Math.random() - 0.5) * 0.1
-    }))
+    const responseTimes = [{
+      request: 'Session total',
+      time: result.processing_time_ms
+    }]
 
     return (
       <div className="space-y-6">
@@ -189,6 +190,8 @@ const ChartVisualization = ({ algorithm, result }) => {
           {/* Session Flow Pie Chart */}
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">Session Flow</h3>
+            {result.failed_edits == null && <p className="text-sm text-gray-400">Failed edit count was not reported.</p>}
+            {sessionData.every(entry => entry.value === 0) && <p className="text-sm text-gray-400">No completed or failed edits reported.</p>}
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
@@ -217,7 +220,7 @@ const ChartVisualization = ({ algorithm, result }) => {
 
           {/* Performance Scatter Plot */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Response Pattern</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Session Processing Time</h3>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={responseTimes}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
@@ -253,7 +256,7 @@ const ChartVisualization = ({ algorithm, result }) => {
             <div className="text-sm text-gray-400">Edits</div>
           </div>
           <div className="glass p-4 rounded-xl text-center">
-            <div className="text-2xl font-bold text-purple-400">{(result.average_confidence * 100)?.toFixed(0)}%</div>
+            <div className="text-2xl font-bold text-purple-400">{Number.isFinite(result.average_confidence) ? `${(result.average_confidence * 100).toFixed(0)}%` : 'Not reported'}</div>
             <div className="text-sm text-gray-400">Confidence</div>
           </div>
           <div className="glass p-4 rounded-xl text-center">
@@ -266,18 +269,16 @@ const ChartVisualization = ({ algorithm, result }) => {
   }
 
   // DPO Training - Loss and accuracy over time
-  if (result.loss !== undefined) {
-    const trainingData = result.training_history ? result.training_history : {
-      loss: [0.94, 0.88, 0.81, 0.75, 0.69, 0.64, 0.6, 0.59, 0.58, 0.59, 0.6, 0.61],
-      accuracy: [39, 46, 53, 58, 63, 66, 69, 71, 72, 71, 70, 68]
-    }
-
-    const steps = Array.from({ length: 12 }, (_, i) => i + 1)
-    const chartData = steps.map(step => ({
-      step,
-      loss: trainingData.loss[step - 1],
-      accuracy: trainingData.accuracy[step - 1] / 100
-    }))
+  if (algorithm.name === 'DPO Training') {
+    const history = result.training_history
+    const chartData = history
+      ? history.loss.map((loss, index) => ({
+        step: index + 1,
+        loss,
+        // Training history reports percentages; the final accuracy is a fraction.
+        accuracy: history.accuracy[index] / 100
+      }))
+      : [{ step: result.training_steps, loss: result.loss, accuracy: result.preference_accuracy }]
 
     return (
       <div className="space-y-6">
@@ -286,19 +287,21 @@ const ChartVisualization = ({ algorithm, result }) => {
             <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
             <XAxis dataKey="step" tick={{ fill: '#9ca3af' }} />
             <YAxis yAxisId="left" tick={{ fill: '#9ca3af' }} />
-            <YAxis yAxisId="right" orientation="right" tick={{ fill: '#9ca3af', formatter: (v) => `${(v * 100).toFixed(0)}%` }} />
+            <YAxis yAxisId="right" orientation="right" domain={[0, 1]} tick={{ fill: '#9ca3af' }} tickFormatter={value => `${(value * 100).toFixed(0)}%`} />
             <Tooltip
               contentStyle={{
                 backgroundColor: 'rgba(17, 24, 39, 0.95)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '8px'
               }}
+              formatter={(value, name) => [name === 'Accuracy' ? `${(value * 100).toFixed(1)}%` : value, name]}
             />
             <Line yAxisId="left" type="monotone" dataKey="loss" stroke="#ef4444" strokeWidth={2} name="Loss" />
             <Line yAxisId="right" type="monotone" dataKey="accuracy" stroke="#10b981" strokeWidth={2} name="Accuracy" />
           </LineChart>
         </ResponsiveContainer>
 
+        {!history && <p className="text-sm text-gray-400">Only the final result was supplied; per-step training history is unavailable.</p>}
         <div className="grid grid-cols-3 gap-4">
           <div className="glass p-6 rounded-xl text-center">
             <div className="text-2xl font-bold text-red-400">
@@ -324,17 +327,15 @@ const ChartVisualization = ({ algorithm, result }) => {
   }
 
   // Core ML Optimizer - Optimization visualization
-  if (result.ios_files_generated !== undefined) {
+  if (algorithm.name === 'Core ML Optimizer') {
     const optimizationData = [
-      { metric: 'Size Reduction', before: 100, after: (result.model_size_reduction * 100).toFixed(0) },
-      { metric: 'Speed Improvement', before: 100, after: 85 },
-      { metric: 'Compatibility', before: 60, after: 95 }
+      { metric: 'Model Size (%)', before: 100, after: Number(((1 - result.model_size_reduction) * 100).toFixed(1)) }
     ]
 
     const featuresData = [
-      { name: 'Apple Silicon', available: result.apple_silicon ? 1 : 0, color: '#10b981' },
-      { name: 'Neural Engine', available: result.neural_engine_support ? 1 : 0, color: '#3b82f6' },
-      { name: 'Quantization', available: result.quantization_applied ? 1 : 0, color: '#8b5cf6' }
+      { name: 'Apple Silicon', available: result.apple_silicon },
+      { name: 'Neural Engine', available: result.neural_engine_support },
+      { name: 'Quantization', available: result.quantization_applied }
     ]
 
     return (
@@ -361,32 +362,16 @@ const ChartVisualization = ({ algorithm, result }) => {
             </ResponsiveContainer>
           </div>
 
-          {/* Feature Availability Pie Chart */}
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">Feature Support</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={featuresData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  dataKey="available"
-                >
-                  {featuresData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.available ? entry.color : '#ffffff20'} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '8px'
-                  }}
-                  formatter={(value) => [value ? 'Available' : 'Not Available', '']}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            <dl className="space-y-3">
+              {featuresData.map(feature => (
+                <div key={feature.name} className="glass p-4 rounded-lg flex justify-between">
+                  <dt className="text-gray-400">{feature.name}</dt>
+                  <dd className="text-white">{feature.available == null ? 'Not reported' : feature.available ? 'Available' : 'Not available'}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </div>
 
@@ -400,11 +385,11 @@ const ChartVisualization = ({ algorithm, result }) => {
             <div className="text-sm text-gray-400">Size Reduction</div>
           </div>
           <div className="glass p-4 rounded-xl text-center">
-            <div className="text-2xl font-bold text-blue-400">{result.target_ios_version}</div>
+            <div className="text-2xl font-bold text-blue-400">{result.target_ios_version || 'Not reported'}</div>
             <div className="text-sm text-gray-400">Target Version</div>
           </div>
           <div className="glass p-4 rounded-xl text-center">
-            <div className="text-2xl font-bold text-purple-400">{result.coreml_version}</div>
+            <div className="text-2xl font-bold text-purple-400">{result.coreml_version || 'Not reported'}</div>
             <div className="text-sm text-gray-400">Core ML Version</div>
           </div>
         </div>
@@ -413,21 +398,10 @@ const ChartVisualization = ({ algorithm, result }) => {
   }
 
   // Baseline Model - Performance scatter plot
-  if (result.classifier !== undefined || (result.training_accuracy && result.validation_accuracy)) {
+  if (algorithm.name === 'Baseline Model') {
     const classifierName = result.classifier || 'Baseline Model'
     const modelComparisonData = [
-      { model: 'LogisticRegression', accuracy: 0.982, f1: 0.924 },
-      { model: 'RandomForest', accuracy: 0.967, f1: 0.901 },
-      { model: 'SVM', accuracy: 0.943, f1: 0.868 },
-      { model: 'NaiveBayes', accuracy: 0.901, f1: 0.812 },
-      { model: classifierName, accuracy: result.training_accuracy || 0, f1: result.f1_score || 0 }
-    ]
-
-    const processingStepsData = [
-      { step: 'Load Data', time: Math.random() * 2.3 },
-      { step: 'Preprocess', time: Math.random() * 5.1 },
-      { step: 'Training', time: Math.random() * 6.8 },
-      { step: 'Validation', time: Math.random() * 0.8 }
+      { model: classifierName, accuracy: result.training_accuracy, validation: result.validation_accuracy, f1: result.f1_score }
     ]
 
     return (
@@ -435,28 +409,29 @@ const ChartVisualization = ({ algorithm, result }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Model Comparison Scatter Plot */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Model Performance Comparison</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Reported Model Performance</h3>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={modelComparisonData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
                 <XAxis dataKey="model" tick={{ fill: '#9ca3af', fontSize: 10 }} />
-                <YAxis domain={[0.85, 1]} tick={{ fill: '#9ca3af', fontSize: 11 }} />
+                <YAxis domain={[0, 1]} tick={{ fill: '#9ca3af', fontSize: 11 }} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: 'rgba(17, 24, 39, 0.95)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     borderRadius: '8px'
                   }}
-                  formatter={(value) => [`${(value * 100).toFixed(2)}%`, 'Accuracy']}
+                  formatter={(value, name) => [`${(value * 100).toFixed(2)}%`, name]}
                 />
                 <Line
                   type="monotone"
                   dataKey="accuracy"
                   stroke="#10b981"
                   strokeWidth={3}
-                  name="Accuracy"
+                  name="Training Accuracy"
                   dot={{ fill: '#10b981', r: 5 }}
                 />
+                <Line type="monotone" dataKey="validation" stroke="#8b5cf6" name="Validation Accuracy" />
                 <Line
                   type="monotone"
                   dataKey="f1"
@@ -469,32 +444,9 @@ const ChartVisualization = ({ algorithm, result }) => {
             </ResponsiveContainer>
           </div>
 
-          {/* Processing Pipeline Pie Chart */}
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">Processing Pipeline</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={processingStepsData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  dataKey="time"
-                  nameKey="step"
-                >
-                  {processingStepsData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b'][index % 4]} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '8px'
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            <p className="text-sm text-gray-400">Per-stage processing times were not supplied.</p>
           </div>
         </div>
 
@@ -521,13 +473,13 @@ const ChartVisualization = ({ algorithm, result }) => {
   }
 
   // Feature Extraction - Similarity matrix visualization
-  if (result.tfidf_features !== undefined || result.similarity_score !== undefined) {
+  if (algorithm.name === 'Feature Extraction') {
     const similarityData = [
-      { pair: 'brighten-darken', similarity: -Math.abs(result.between_group_similarity ?? 0.23) },
-      { pair: 'brighten-increase', similarity: result.within_group_similarity_brighten || 0.91 },
-      { pair: 'darken-brighten', similarity: result.within_group_similarity_darken || 0.89 },
-      { pair: 'general-similarity', similarity: result.similarity_score || 0.87 }
-    ]
+      { pair: 'between-groups', similarity: result.between_group_similarity ?? null },
+      { pair: 'within-brighten', similarity: result.within_group_similarity_brighten ?? null },
+      { pair: 'within-darken', similarity: result.within_group_similarity_darken ?? null },
+      { pair: 'similarity-score', similarity: result.similarity_score }
+    ].filter(entry => entry.similarity != null)
 
     const featureData = [
       { feature: 'TF-IDF Vectors', value: result.tfidf_features ?? 0, unit: 'dimensions', color: '#3b82f6' },
@@ -562,8 +514,8 @@ const ChartVisualization = ({ algorithm, result }) => {
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">Feature Extraction Metrics</h3>
             <div className="space-y-3">
-              {featureData.map((item, index) => (
-                <div key={index} className="glass p-4 rounded-lg">
+              {featureData.map(item => (
+                <div key={item.feature} className="glass p-4 rounded-lg">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-400">{item.feature}</span>
                     <span className="text-lg font-bold" style={{ color: item.color }}>
@@ -584,12 +536,12 @@ const ChartVisualization = ({ algorithm, result }) => {
         </div>
 
         <div className="text-center p-6 glass rounded-xl">
-          <div className="text-xl text-white mb-2">{result.embedding_model || 'Sentence Transformer'}</div>
+          <div className="text-xl text-white mb-2">{result.embedding_model || 'Embedding model not reported'}</div>
           <div className="text-sm text-gray-400 mb-4">
             {(result.tfidf_features ?? 0)}D TF-IDF features with {(result.vocabulary_size ?? 0)} vocabulary terms
           </div>
           <div className="text-sm text-gray-400">
-            Method: {result.method || 'TF-IDF + Cosine Similarity'}
+            Method: {result.method || 'Not reported'}
           </div>
         </div>
       </div>
