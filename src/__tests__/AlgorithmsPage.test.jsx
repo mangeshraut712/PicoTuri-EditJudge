@@ -1,4 +1,3 @@
-import React from 'react'
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import api from '../utils/api'
 import AlgorithmsPage from '../pages/AlgorithmsPage'
@@ -40,6 +39,31 @@ test.each(Object.keys(algorithmResults))('labels offline %s fallback as demo dat
   expect(screen.getByText('Demo Results').previousSibling).toHaveTextContent('1')
   fireEvent.click(card(name).getByRole('button', { name: 'View Results' }))
   expect(screen.getByRole('status')).toHaveTextContent('API unavailable. Showing demo data.')
+})
+
+test('closes results from the keyboard, the backdrop, and keeps focus in the dialog', async () => {
+  api.post.mockResolvedValue({ data: algorithmResults['Quality Scorer'] })
+  render(<AlgorithmsPage />)
+  fireEvent.click(card('Quality Scorer').getByRole('button', { name: 'Test Now' }))
+  fireEvent.click(await card('Quality Scorer').findByRole('button', { name: 'View Results' }))
+  const dialog = screen.getByRole('dialog', { name: 'Quality Scorer results' })
+  const close = screen.getByRole('button', { name: 'Close results' })
+  expect(close).toHaveFocus()
+  fireEvent.keyDown(dialog, { key: 'Tab' })
+  expect(close).toHaveFocus()
+  fireEvent.keyDown(dialog, { key: 'Escape' })
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+  fireEvent.click(card('Quality Scorer').getByRole('button', { name: 'View Results' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Dismiss results' }))
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+  fireEvent.click(card('Quality Scorer').getByRole('button', { name: 'View Results' }))
+  fireEvent(
+    screen.getByRole('dialog', { name: 'Quality Scorer results' }),
+    new Event('cancel', { bubbles: true, cancelable: true })
+  )
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 })
 
 test('labels API-supplied demonstration results and allows another attempt', async () => {

@@ -3,17 +3,17 @@ PicoTuri-EditJudge demo API backend
 Lightweight Flask API for demonstration and testing
 """
 
-from flask import Flask, jsonify, Blueprint, current_app
-from flask_cors import CORS
-from werkzeug.exceptions import HTTPException
 import importlib
 import logging
 import os
 import random
 import time
-
-# Optional import for type checking tools
 from typing import Any
+from urllib.parse import urlparse
+
+from flask import Blueprint, Flask, current_app, jsonify
+from flask_cors import CORS
+from werkzeug.exceptions import HTTPException
 
 # Setup logging
 logging.basicConfig(
@@ -268,17 +268,60 @@ def root() -> Any:
         'endpoints': '/api/* routes available'
     }), 200
 
+def normalize_origins(value: Any) -> list[str]:
+    """Keep explicit http(s) origins and drop wildcards, paths, and malformed entries."""
+    if isinstance(value, str):
+        candidates = value.split(',')
+    elif isinstance(value, (list, tuple)):
+        candidates = [str(item) for item in value]
+    else:
+        return []
+
+    origins: list[str] = []
+    for item in candidates:
+        candidate = item.strip()
+        if not candidate or any(char in candidate for char in '*?[]()\\^$'):
+            continue
+        parsed = urlparse(candidate)
+        try:
+            hostname = parsed.hostname
+            if parsed.port is not None and not 1 <= parsed.port <= 65535:
+                continue
+        except ValueError:
+            continue
+        if parsed.scheme not in {'http', 'https'} or not hostname:
+            continue
+        if parsed.username or parsed.password or parsed.query or parsed.fragment:
+            continue
+        if parsed.path not in {'', '/'}:
+            continue
+        origin = f'{parsed.scheme}://{parsed.netloc}'
+        if origin not in origins:
+            origins.append(origin)
+    return origins
+
+def configured_cors_origins() -> list[str]:
+    """Read the deployment allow-list, defaulting to the local Vite servers."""
+    return normalize_origins(os.environ.get(
+        'CORS_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000'
+    ))
+
+def add_security_headers(response):
+    """Stop browsers and proxies from caching or reframing API responses."""
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['Referrer-Policy'] = 'no-referrer'
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
 # Create app
 def create_app(config=None):
     """Factory function to create Flask app."""
     app = Flask(__name__)
-    app.config['CORS_ORIGINS'] = [
-        origin.strip() for origin in os.environ.get(
-            'CORS_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000'
-        ).split(',') if origin.strip()
-    ]
+    app.config['CORS_ORIGINS'] = configured_cors_origins()
     if config is not None:
         app.config.update(config)
+    app.config['CORS_ORIGINS'] = normalize_origins(app.config['CORS_ORIGINS'])
 
     CORS(
         app,
@@ -294,6 +337,7 @@ def create_app(config=None):
     app.register_error_handler(404, not_found)
     app.register_error_handler(500, internal_error)
     app.register_error_handler(HTTPException, http_error)
+    app.after_request(add_security_headers)
 
     return app
 
@@ -309,8 +353,8 @@ def main() -> int:
                 "  - POST /api/test/* (7 test endpoints)")
 
     try:
-        host = os.environ.get('HOST', '127.0.0.1')
-        port = int(os.environ.get('PORT', '5001'))
+        host = os.environ.get('HOST', '127.0.0.1').strip() or '127.0.0.1'
+        port = int(os.environ.get('PORT', '5001').strip())
         if not 1 <= port <= 65535:
             raise ValueError('PORT must be between 1 and 65535')
         logger.info("Server starting on http://%s:%s", host, port)

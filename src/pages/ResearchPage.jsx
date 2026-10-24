@@ -1,5 +1,12 @@
 import { useState } from 'react'
-import { BookOpen, FileText, Users, Award, TrendingUp, Brain, Code, BarChart3, ExternalLink, Search } from 'lucide-react'
+import { BookOpen, FileText, Users, Award, TrendingUp, Brain, Code, BarChart3, Search } from 'lucide-react'
+
+const tones = {
+  blue: { text: 'text-blue-400', background: 'bg-blue-500/20' },
+  green: { text: 'text-green-400', background: 'bg-green-500/20' },
+  purple: { text: 'text-purple-400', background: 'bg-purple-500/20' },
+  orange: { text: 'text-orange-400', background: 'bg-orange-500/20' },
+}
 
 const ResearchPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -127,8 +134,10 @@ const ResearchPage = () => {
               Research Hub
             </h1>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Academic publications, research findings, and scientific validation for our
-              AI-powered image editing quality assessment platform
+              Sample bibliography for the quality-assessment themes in this demo.
+            </p>
+            <p role="note" className="mt-4 text-amber-300 max-w-3xl mx-auto">
+              Sample bibliography. These papers, citation counts, and experiment notes are illustrative and are not published research.
             </p>
 
             {/* Stats */}
@@ -146,16 +155,18 @@ const ResearchPage = () => {
           <div className="glass rounded-2xl p-6">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" aria-hidden="true" />
+                <label htmlFor="publication-search" className="sr-only">Search publications</label>
                 <input
-                  type="text"
+                  id="publication-search"
+                  type="search"
                   placeholder="Search publications, authors, keywords..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
                 />
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {[
                   { id: 'all', label: 'All Papers', icon: BookOpen },
                   { id: 'assessment', label: 'Quality Assessment', icon: BarChart3 },
@@ -166,6 +177,8 @@ const ResearchPage = () => {
                 ].map(category => (
                   <button
                     key={category.id}
+                    type="button"
+                    aria-pressed={selectedCategory === category.id}
                     onClick={() => setSelectedCategory(category.id)}
                     className={`px-4 py-2 rounded-lg font-medium transition-all ${
                       selectedCategory === category.id
@@ -187,11 +200,15 @@ const ResearchPage = () => {
           {filteredPapers.map((paper, index) => (
             <ResearchPaper key={paper.doi} paper={paper} index={index} />
           ))}
+          {filteredPapers.length === 0 && (
+            <p className="text-gray-300 lg:col-span-2">No sample publications match this search.</p>
+          )}
         </div>
 
         {/* Experiments Section */}
         <div className="max-w-6xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">Current Research Experiments</h2>
+          <h2 className="text-3xl font-bold text-white mb-2 text-center">Sample experiment notes</h2>
+          <p className="text-center text-amber-300 mb-8">Illustrative scenarios, not measured studies.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {experiments.map((experiment, index) => (
@@ -202,7 +219,8 @@ const ResearchPage = () => {
 
         {/* Research Metrics */}
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">Research Impact Metrics</h2>
+          <h2 className="text-3xl font-bold text-white mb-2 text-center">Illustrative impact figures</h2>
+          <p className="text-center text-amber-300 mb-8">These totals are not measured citations.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <MetricCard
@@ -237,10 +255,10 @@ const ResearchPage = () => {
 
           {/* Citation Trends Chart would go here */}
           <div className="glass rounded-2xl p-8 mt-8">
-            <h3 className="text-xl font-semibold text-white mb-6 text-center">Citation Trends (2024)</h3>
-            <div className="text-center text-gray-400">
-              Monthly citation growth visualization would be displayed here
-            </div>
+            <h3 className="text-xl font-semibold text-white mb-6 text-center">Citation trends</h3>
+            <p className="text-center text-gray-400">
+              No citation trend data is available for this sample bibliography.
+            </p>
           </div>
         </div>
       </div>
@@ -251,8 +269,10 @@ const ResearchPage = () => {
 const ResearchPaper = ({ paper, index }) => {
   const [expanded, setExpanded] = useState(false)
 
+  const summary = paper.abstract.length > 150 ? `${paper.abstract.slice(0, 150)}...` : paper.abstract
+
   return (
-    <div className={`glass rounded-2xl p-6 hover:scale-105 transition-all duration-300 ${
+    <article className={`glass rounded-2xl p-6 hover:scale-105 transition-all duration-300 ${
       expanded ? 'ring-2 ring-blue-400/50' : ''
     }`} style={{ animationDelay: `${index * 100}ms` }}>
       <div className="flex justify-between items-start mb-4">
@@ -284,7 +304,7 @@ const ResearchPaper = ({ paper, index }) => {
       </div>
 
       <p className="text-gray-300 text-sm mb-4 leading-relaxed">
-        {expanded ? paper.abstract : paper.abstract.substring(0, 150) + '...'}
+        {expanded ? paper.abstract : summary}
       </p>
 
       <div className="flex flex-wrap gap-2 mb-4">
@@ -297,23 +317,17 @@ const ResearchPaper = ({ paper, index }) => {
 
       <div className="flex items-center justify-between">
         <button
+          type="button"
+          aria-expanded={expanded}
           onClick={() => setExpanded(!expanded)}
           className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
         >
           {expanded ? 'Show Less' : 'Read More'}
         </button>
 
-        <a
-          href={`https://doi.org/${paper.doi}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1 px-3 py-1 bg-purple-500/20 text-purple-400 rounded-lg text-sm hover:bg-purple-500/30 transition-colors"
-        >
-          <ExternalLink className="w-4 h-4" />
-          DOI Link
-        </a>
+        <p className="text-sm text-gray-400">DOI {paper.doi}</p>
       </div>
-    </div>
+    </article>
   )
 }
 
@@ -353,23 +367,28 @@ const ExperimentCard = ({ experiment, index }) => (
   </div>
 )
 
-const MetricCard = ({ title, value, subtitle, color, icon }) => (
+const MetricCard = ({ title, value, subtitle, color, icon }) => {
+  const tone = tones[color]
+  return (
   <div className="glass rounded-xl p-6 text-center">
-    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-${color}-500/20`}>
-      <div className={`text-${color}-400`}>
+    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${tone.background}`}>
+      <div className={tone.text}>
         {icon}
       </div>
     </div>
-    <div className={`text-3xl font-bold text-${color}-400 mb-1`}>{value}</div>
+    <div className={`text-3xl font-bold mb-1 ${tone.text}`}>{value}</div>
     <div className="text-lg font-semibold text-white mb-1">{title}</div>
     <div className="text-sm text-gray-400">{subtitle}</div>
   </div>
-)
+  )
+}
 
-const StatCard = ({ icon, label, value, color }) => (
+const StatCard = ({ icon, label, value, color }) => {
+  const tone = tones[color]
+  return (
   <div className="flex items-center gap-3">
-    <div className={`p-3 rounded-xl bg-${color}-500/20`}>
-      <div className={`text-${color}-400 w-6 h-6`}>
+    <div className={`p-3 rounded-xl ${tone.background}`}>
+      <div className={`${tone.text} w-6 h-6`}>
         {icon}
       </div>
     </div>
@@ -378,6 +397,7 @@ const StatCard = ({ icon, label, value, color }) => (
       <div className="text-sm text-gray-400">{label}</div>
     </div>
   </div>
-)
+  )
+}
 
 export default ResearchPage

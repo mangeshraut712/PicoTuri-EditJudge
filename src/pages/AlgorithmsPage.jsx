@@ -1,7 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { CheckCircle, PauseCircle, PlayCircle } from 'lucide-react'
 import api from '../utils/api'
-import ChartVisualization, { isValidAlgorithmResult } from '../components/algorithms/ChartVisualization'
+import { trapTabKey } from '../utils/focusTrap'
+import ChartVisualization from '../components/algorithms/ChartVisualization'
+import { isValidAlgorithmResult } from '../components/algorithms/algorithmResult'
+
+const supportsDialogModal = typeof HTMLDialogElement !== 'undefined'
+  && typeof HTMLDialogElement.prototype.showModal === 'function'
 
 const AlgorithmsPage = () => {
   const [testResults, setTestResults] = useState({})
@@ -9,6 +14,7 @@ const AlgorithmsPage = () => {
   const [selectedAlgorithm, setSelectedAlgorithm] = useState(null)
 
   const requests = useRef(new Map())
+  const closeResults = useCallback(() => setSelectedAlgorithm(null), [])
 
   useEffect(() => {
     const activeRequests = requests.current
@@ -235,7 +241,7 @@ const AlgorithmsPage = () => {
           <AlgorithmResultsModal
             algorithm={selectedAlgorithm}
             result={testResults[selectedAlgorithm.name]}
-            onClose={() => setSelectedAlgorithm(null)}
+            onClose={closeResults}
           />
         )}
       </div>
@@ -277,6 +283,7 @@ const AlgorithmCard = ({ name, icon, description, color, category, onTest, testi
 
       <div className="flex flex-col gap-3 w-full">
         <button
+          type="button"
           onClick={onTest}
           disabled={testing}
           className={`px-4 py-2 rounded-lg font-medium transition-all w-full ${
@@ -308,6 +315,7 @@ const AlgorithmCard = ({ name, icon, description, color, category, onTest, testi
         {result?.error && <p role="alert" className="text-sm text-red-300">{result.error}</p>}
         {result?.success && (
           <button
+            type="button"
             onClick={onSelect}
             className="px-4 py-2 rounded-lg font-medium transition-all w-full bg-blue-500/50 hover:bg-blue-500/70"
           >
@@ -330,9 +338,55 @@ const AlgorithmCard = ({ name, icon, description, color, category, onTest, testi
   </div>
 )
 
-const AlgorithmResultsModal = ({ algorithm, result, onClose }) => (
-  <div role="dialog" aria-modal="true" aria-label={`${algorithm.name} results`} className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div className="glass rounded-3xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+const AlgorithmResultsModal = ({ algorithm, result, onClose }) => {
+  const dialogRef = useRef(null)
+  const closeRef = useRef(null)
+
+  useEffect(() => {
+    const dialog = dialogRef.current
+    const previouslyFocused = document.activeElement
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    if (dialog && supportsDialogModal) dialog.showModal()
+    closeRef.current?.focus()
+    const onKey = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        onClose()
+        return
+      }
+      trapTabKey(event, dialog)
+    }
+    const onCancel = (event) => {
+      event.preventDefault()
+      onClose()
+    }
+    document.addEventListener('keydown', onKey, true)
+    dialog?.addEventListener('cancel', onCancel)
+    return () => {
+      document.removeEventListener('keydown', onKey, true)
+      dialog?.removeEventListener('cancel', onCancel)
+      document.body.style.overflow = previousOverflow
+      if (dialog?.open && typeof dialog.close === 'function') dialog.close()
+      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus()
+    }
+  }, [onClose])
+
+  return (
+  <dialog
+    ref={dialogRef}
+    open={supportsDialogModal ? undefined : true}
+    aria-label={`${algorithm.name} results`}
+    className="fixed inset-0 z-50 m-0 flex h-full max-h-none w-full max-w-none items-center justify-center border-0 bg-black/80 p-4 text-white backdrop:bg-black/80"
+  >
+    <button
+      type="button"
+      tabIndex={-1}
+      aria-label="Dismiss results"
+      className="absolute inset-0 border-0 bg-transparent p-0"
+      onClick={onClose}
+    />
+    <div className="glass relative z-10 max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-3xl p-8">
       <div className="flex justify-between items-start mb-6">
         <div>
           <h2 className="text-3xl font-bold text-white mb-2">
@@ -341,6 +395,8 @@ const AlgorithmResultsModal = ({ algorithm, result, onClose }) => (
           <p className="text-gray-400">{algorithm.description}</p>
         </div>
         <button
+          ref={closeRef}
+          type="button"
           onClick={onClose}
           aria-label="Close results"
           className="text-gray-400 hover:text-white transition-colors"
@@ -356,7 +412,8 @@ const AlgorithmResultsModal = ({ algorithm, result, onClose }) => (
       )}
       <ChartVisualization algorithm={algorithm} result={result} />
     </div>
-  </div>
-)
+  </dialog>
+  )
+}
 
 export default AlgorithmsPage

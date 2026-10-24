@@ -1,16 +1,25 @@
-import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { Line, Tooltip, YAxis } from 'recharts'
-import ChartVisualization, { isValidAlgorithmResult } from '../components/algorithms/ChartVisualization'
+import ChartVisualization from '../components/algorithms/ChartVisualization'
+import { isValidAlgorithmResult } from '../components/algorithms/algorithmResult'
 import { algorithmResults } from './algorithmFixtures'
 
 // Inspect the chart's data and scale contract without depending on SVG layout in jsdom.
 jest.mock('recharts', () => {
   const React = require('react')
-  const chart = name => ({ children, data }) => React.createElement('div', {
-    'data-testid': name,
-    'data-points': data ? JSON.stringify(data) : undefined
-  }, children)
+  const chart = (name) => {
+    function MockChart({ children, data }) {
+      return React.createElement('div', {
+        'data-testid': name,
+        'data-points': data ? JSON.stringify(data) : undefined
+      }, children)
+    }
+    MockChart.displayName = name
+    return MockChart
+  }
+  function EmptyChart() {
+    return null
+  }
   return {
     ResponsiveContainer: chart('container'),
     LineChart: chart('line-chart'),
@@ -21,14 +30,14 @@ jest.mock('recharts', () => {
     Line: jest.fn(() => null),
     YAxis: jest.fn(() => null),
     Tooltip: jest.fn(() => null),
-    XAxis: () => null,
-    CartesianGrid: () => null,
-    PolarGrid: () => null,
-    PolarAngleAxis: () => null,
-    PolarRadiusAxis: () => null,
-    Radar: () => null,
-    Bar: () => null,
-    Cell: () => null
+    XAxis: EmptyChart,
+    CartesianGrid: EmptyChart,
+    PolarGrid: EmptyChart,
+    PolarAngleAxis: EmptyChart,
+    PolarRadiusAxis: EmptyChart,
+    Radar: EmptyChart,
+    Bar: EmptyChart,
+    Cell: EmptyChart
   }
 })
 
@@ -164,12 +173,22 @@ test('does not add synthetic baseline competitors or pipeline timings', () => {
   expect(tooltip.formatter(0.924, 'F1-Score')).toEqual(['92.40%', 'F1-Score'])
 })
 
+test('labels similarity pairs from the reported fields', () => {
+  show('Feature Extraction')
+  expect(points('bar-chart').map(point => point.pair)).toEqual([
+    'between-groups',
+    'within-brighten',
+    'within-darken',
+    'similarity-score',
+  ])
+})
+
 test('preserves similarity signs and zeros and omits unreported comparison pairs', () => {
   show('Feature Extraction', { between_group_similarity: 0, within_group_similarity_brighten: -0.5, within_group_similarity_darken: null })
   expect(points('bar-chart')).toEqual([
-    { pair: 'brighten-darken', similarity: 0 },
-    { pair: 'brighten-increase', similarity: -0.5 },
-    { pair: 'general-similarity', similarity: 0.87 }
+    { pair: 'between-groups', similarity: 0 },
+    { pair: 'within-brighten', similarity: -0.5 },
+    { pair: 'similarity-score', similarity: 0.87 }
   ])
   expect(screen.getByText('Embedding model not reported')).toBeInTheDocument()
   expect(screen.getByText('Method: Not reported')).toBeInTheDocument()

@@ -1,4 +1,4 @@
-import React, { StrictMode } from 'react'
+import { StrictMode } from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import PerformanceDashboard from '../pages/PerformanceDashboard'
 import api from '../utils/api'
@@ -264,6 +264,16 @@ test('clearly labels static algorithm counts and success rates as demonstration 
 
   expect(screen.getByText('Demo request distribution; these counts are illustrative.')).toBeInTheDocument()
   expect(screen.getByText('Demonstration values, not measured algorithm results.')).toBeInTheDocument()
+  expect(screen.getAllByRole('row')).toHaveLength(8)
+  expect(screen.queryByRole('columnheader', { name: 'Uptime' })).not.toBeInTheDocument()
+  expect(screen.queryByText('99.9%')).not.toBeInTheDocument()
+})
+
+test('formats uptime to one decimal place', async () => {
+  api.get.mockResolvedValue({ data: sample({ uptime: 99.126 }) })
+  render(<PerformanceDashboard />)
+  await settle()
+  expect(screen.getByText('System Uptime').parentElement).toHaveTextContent('99.1%')
 })
 
 test('aborts requests on unmount and never schedules another poll', async () => {

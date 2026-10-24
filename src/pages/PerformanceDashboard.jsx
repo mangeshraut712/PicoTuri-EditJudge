@@ -1,93 +1,12 @@
-import React, { useState, useEffect } from 'react'
 import { Activity, Brain, BarChart3, LineChart as LineChartIcon, AlertTriangle, CheckCircle, Server, Database } from 'lucide-react'
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts'
-import api from '../utils/api'
-
-const validPerformanceData = (data) => {
-  if (!data || typeof data !== 'object') return false
-
-  const ranges = {
-    cpu_usage: 100,
-    memory_usage: 100,
-    uptime: 100,
-    error_rate: 1,
-    requests_per_second: Infinity,
-    average_response_time: Infinity,
-    models_loaded: Infinity,
-  }
-  return Number.isInteger(data.models_loaded) && Object.entries(ranges).every(([key, maximum]) => (
-    Number.isFinite(data[key]) && data[key] >= 0 && data[key] <= maximum
-  ))
-}
+import { connectionStatus, systemMetrics, unavailableMessage, usePerformanceMonitor } from './usePerformanceMonitor'
 
 const PerformanceDashboard = () => {
-  const [performanceData, setPerformanceData] = useState(null)
-  const [realTimeData, setRealTimeData] = useState([])
-  const [isLive, setIsLive] = useState(true)
-  const [systemStatus, setSystemStatus] = useState('connecting')
-  const statusLabel = !isLive ? 'UPDATES PAUSED' : {
-    connecting: 'CONNECTING',
-    online: 'API CONNECTED',
-    offline: 'API UNAVAILABLE',
-  }[systemStatus]
-  const statusColor = !isLive || systemStatus === 'connecting'
-    ? 'border-gray-500/50 bg-gray-500/10 text-gray-300'
-    : systemStatus === 'online'
-      ? 'border-green-500/50 bg-green-500/10 text-green-400'
-      : 'border-red-500/50 bg-red-500/10 text-red-400'
-
-  useEffect(() => {
-    if (!isLive) return
-
-    let stopped = false
-    let timer
-    const controller = new AbortController()
-
-    const poll = async () => {
-      try {
-        const response = await api.get('/api/performance/status', { signal: controller.signal })
-        if (stopped) return
-        if (!validPerformanceData(response.data)) throw new Error('Invalid performance data')
-
-        const data = response.data
-        setPerformanceData(data)
-        setSystemStatus('online')
-        setRealTimeData(previous => {
-          const isDemo = data.data_source === 'demo'
-          // A source change starts a new series so demo history is never
-          // presented alongside measured samples without its demo label.
-          const history = previous.at(-1)?.isDemo === isDemo ? previous : []
-          return [...history.slice(-29), {
-            timestamp: new Date().toLocaleTimeString(),
-            cpu: data.cpu_usage,
-            memory: data.memory_usage,
-            requests_per_second: data.requests_per_second,
-            isDemo,
-          }]
-        })
-      } catch {
-        if (!stopped) setSystemStatus('offline')
-      } finally {
-        // Schedule after completion so slow requests cannot overlap or reorder samples.
-        if (!stopped) timer = setTimeout(poll, 5000)
-      }
-    }
-
-    poll()
-    return () => {
-      stopped = true
-      clearTimeout(timer)
-      controller.abort()
-    }
-  }, [isLive])
-
-  // Create statistics for the system
-  const systemMetrics = performanceData ? [
-    { name: 'CPU Usage', value: performanceData.cpu_usage, unit: '%', color: '#3b82f6' },
-    { name: 'Memory Usage', value: performanceData.memory_usage, unit: '%', color: '#f59e0b' },
-    { name: 'Requests/sec', value: performanceData.requests_per_second, unit: '/s', color: '#10b981' },
-    { name: 'Response Time', value: performanceData.average_response_time, unit: 'ms', color: '#8b5cf6' }
-  ] : []
+  const { performanceData, realTimeData, isLive, setIsLive, systemStatus } = usePerformanceMonitor()
+  const status = connectionStatus(isLive, systemStatus)
+  const metrics = systemMetrics(performanceData)
+  const offlineMessage = systemStatus === 'offline' ? unavailableMessage(performanceData, isLive) : null
 
   // Mock data for algorithm performance
   const algorithmPerformance = [
@@ -123,30 +42,25 @@ const PerformanceDashboard = () => {
 
             {/* System Status Indicator */}
             <div className="mt-6 flex justify-center">
-              <div role="status" className={`px-4 py-2 rounded-full glass border flex items-center gap-2 ${statusColor}`}>
-                <div className={`w-3 h-3 rounded-full bg-current ${isLive ? 'animate-pulse' : ''}`}></div>
+              <div role="status" className={`px-4 py-2 rounded-full glass border flex items-center gap-2 ${status.color}`}>
+                <div className={`w-3 h-3 rounded-full bg-current ${isLive ? 'motion-safe:animate-pulse' : ''}`}></div>
                 <span className="text-sm font-bold">
-                  {statusLabel}
+                  {status.label}
                 </span>
               </div>
             </div>
             {performanceData?.data_source === 'demo' && (
               <p className="mt-4 text-amber-300">Demo data: these samples are simulated, not measured system performance.</p>
             )}
-            {systemStatus === 'offline' && (
-              <p role="alert" className="mt-4 text-red-300">
-                {performanceData
-                  ? 'Performance data unavailable. Showing the last successful sample. '
-                  : 'Performance data unavailable. '}
-                {isLive ? 'Updates will retry automatically.' : 'Resume updates to retry.'}
-              </p>
+            {offlineMessage && (
+              <p role="alert" className="mt-4 text-red-300">{offlineMessage}</p>
             )}
           </div>
         </div>
 
         {/* System Metrics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {systemMetrics.map((metric, index) => (
+          {metrics.map((metric, index) => (
             <MetricCard
               key={metric.name}
               title={metric.name}
@@ -171,6 +85,7 @@ const PerformanceDashboard = () => {
                 <p className="text-gray-400">One sample per successful API update</p>
               </div>
               <button
+                type="button"
                 onClick={() => setIsLive(previous => !previous)}
                 aria-label={isLive ? 'Pause updates' : 'Resume updates'}
                 aria-pressed={isLive}
@@ -252,8 +167,8 @@ const PerformanceDashboard = () => {
                     paddingAngle={5}
                     dataKey="value"
                   >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    {pieData.map(entry => (
+                      <Cell key={entry.name} fill={entry.fill} />
                     ))}
                   </Pie>
                   <Tooltip
@@ -269,7 +184,7 @@ const PerformanceDashboard = () => {
               </ResponsiveContainer>
 
               <div className="grid grid-cols-2 gap-3">
-                {algorithmPerformance.slice(0, 4).map(algo => (
+                {algorithmPerformance.map(algo => (
                   <div key={algo.name} className="flex items-center justify-between p-3 glass rounded-lg">
                     <div>
                       <div className="text-sm font-semibold text-white">{algo.name}</div>
@@ -302,11 +217,10 @@ const PerformanceDashboard = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/10">
-                  <th className="text-left py-4 pr-6 text-gray-400 font-medium">Algorithm</th>
-                  <th className="text-right py-4 px-6 text-gray-400 font-medium">Total Calls</th>
-                  <th className="text-right py-4 px-6 text-gray-400 font-medium">Success Rate</th>
-                  <th className="text-right py-4 px-6 text-gray-400 font-medium">Avg Response</th>
-                  <th className="text-right py-4 px-6 text-gray-400 font-medium">Uptime</th>
+                  <th scope="col" className="text-left py-4 pr-6 text-gray-400 font-medium">Algorithm</th>
+                  <th scope="col" className="text-right py-4 px-6 text-gray-400 font-medium">Total Calls</th>
+                  <th scope="col" className="text-right py-4 px-6 text-gray-400 font-medium">Success Rate</th>
+                  <th scope="col" className="text-right py-4 px-6 text-gray-400 font-medium">Avg Response</th>
                 </tr>
               </thead>
               <tbody>
@@ -315,7 +229,7 @@ const PerformanceDashboard = () => {
                     <td className="py-4 pr-6">
                       <div className="flex items-center gap-3">
                         <div
-                          className="w-3 h-3 rounded-full animate-pulse"
+                          className="w-3 h-3 rounded-full"
                           style={{ backgroundColor: algo.color }}
                         ></div>
                         <span className="font-medium text-white">{algo.name}</span>
@@ -336,11 +250,6 @@ const PerformanceDashboard = () => {
                     <td className="text-right py-4 px-6 text-white font-mono">
                       {algo.avgTime.toFixed(1)}ms
                     </td>
-                    <td className="text-right py-4 px-6">
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400">
-                        99.9%
-                      </span>
-                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -352,7 +261,7 @@ const PerformanceDashboard = () => {
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatusCard
             title="System Uptime"
-            value={performanceData ? `${performanceData.uptime}%` : '—'}
+            value={performanceData ? `${performanceData.uptime.toFixed(1)}%` : '—'}
             icon={<Server className="w-5 h-5" />}
           />
           <StatusCard
@@ -379,7 +288,7 @@ const MetricCard = ({ title, value, unit, color, delay = 0 }) => (
     <div className="flex items-center justify-between mb-4">
       <div className="text-sm font-medium text-gray-400">{title}</div>
       <div
-        className={`w-3 h-3 rounded-full animate-pulse`}
+        className="w-3 h-3 rounded-full motion-safe:animate-pulse"
         style={{ backgroundColor: color }}
       ></div>
     </div>

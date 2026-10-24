@@ -187,6 +187,26 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotIn('Access-Control-Allow-Origin', response.headers)
 
+    def test_cors_ignores_wildcards_credentials_and_origins_with_paths(self):
+        configured = '*, null, https://user:secret@bad.example, https://ok.example/path, https://good.example/'
+        with patch.dict(os.environ, {'CORS_ORIGINS': configured}):
+            client = index.create_app({'TESTING': True}).test_client()
+        response = client.get('/api/health', headers={'Origin': 'https://good.example'})
+        self.assertEqual(response.headers['Access-Control-Allow-Origin'], 'https://good.example')
+        for origin in ('https://evil.example', 'https://ok.example', 'https://bad.example', 'null'):
+            with self.subTest(origin=origin):
+                response = client.get('/api/health', headers={'Origin': origin})
+                self.assertNotIn('Access-Control-Allow-Origin', response.headers)
+
+    def test_api_responses_are_not_cached_or_framed(self):
+        for endpoint in ('/api/health', '/api/missing'):
+            with self.subTest(endpoint=endpoint):
+                response = self.client.get(endpoint)
+                self.assertEqual(response.headers['Cache-Control'], 'no-store')
+                self.assertEqual(response.headers['X-Content-Type-Options'], 'nosniff')
+                self.assertEqual(response.headers['X-Frame-Options'], 'DENY')
+                self.assertEqual(response.headers['Referrer-Policy'], 'no-referrer')
+
 
 class ServerConfigurationTests(unittest.TestCase):
     def test_server_binds_to_loopback_by_default_without_debugger(self):
@@ -196,6 +216,19 @@ class ServerConfigurationTests(unittest.TestCase):
 
     def test_server_honors_explicit_host_and_port(self):
         with patch.dict(os.environ, {'HOST': '0.0.0.0', 'PORT': '8123'}):
+            with patch.object(index.app, 'run') as run:
+                self.assertEqual(index.main(), 0)
+        run.assert_called_once_with(host='0.0.0.0', port=8123, debug=False, threaded=False)
+
+    def test_blank_host_stays_on_loopback(self):
+        for host in ('', '   '):
+            with self.subTest(host=host), patch.dict(os.environ, {'HOST': host}):
+                with patch.object(index.app, 'run') as run:
+                    self.assertEqual(index.main(), 0)
+                run.assert_called_once_with(host='127.0.0.1', port=5001, debug=False, threaded=False)
+
+    def test_host_and_port_whitespace_is_stripped(self):
+        with patch.dict(os.environ, {'HOST': ' 0.0.0.0 ', 'PORT': ' 8123 '}):
             with patch.object(index.app, 'run') as run:
                 self.assertEqual(index.main(), 0)
         run.assert_called_once_with(host='0.0.0.0', port=8123, debug=False, threaded=False)
