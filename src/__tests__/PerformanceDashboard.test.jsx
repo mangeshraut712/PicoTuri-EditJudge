@@ -1,11 +1,12 @@
+import { vi } from 'vitest'
 import { StrictMode } from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import PerformanceDashboard from '../pages/PerformanceDashboard'
 import api from '../utils/api'
 
-jest.mock('../utils/api', () => ({ __esModule: true, default: { get: jest.fn() } }))
-jest.mock('recharts', () => {
-  const React = require('react')
+vi.mock('../utils/api', () => ({ __esModule: true, default: { get: vi.fn() } }))
+vi.mock('recharts', async () => {
+  const React = await import('react')
   const Container = ({ children }) => React.createElement('div', null, children)
   const Empty = () => null
   return {
@@ -38,7 +39,7 @@ const sample = (changes = {}) => ({
 const samples = () => JSON.parse(screen.getByTestId('performance-samples').dataset.samples)
 const settle = async () => { await act(async () => {}) }
 const tick = async (milliseconds = 5000) => {
-  await act(async () => { jest.advanceTimersByTime(milliseconds) })
+  await act(async () => { vi.advanceTimersByTime(milliseconds) })
 }
 const deferred = () => {
   let resolve
@@ -51,13 +52,13 @@ const deferred = () => {
 }
 
 beforeEach(() => {
-  jest.useFakeTimers()
+  vi.useFakeTimers()
   api.get.mockReset()
 })
 
 afterEach(() => {
-  jest.clearAllTimers()
-  jest.useRealTimers()
+  vi.clearAllTimers()
+  vi.useRealTimers()
 })
 
 test('shows connecting without inventing samples while the first request is pending', () => {

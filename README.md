@@ -18,7 +18,7 @@ PicoTuri is a comprehensive full-stack platform for testing, benchmarking, and v
 - **11 Interactive Chart Types** for rich data visualization
 - **Real-time Performance Monitoring** with live metrics
 - **Production-Ready Architecture** with automated deployment
-- **Comprehensive Testing Suite** with Jest & mock data
+- **Comprehensive Testing Suite** with Vitest & mock data
 - **Modern Glass Morphism UI** with responsive design
 
 ### 🚀 Live Demo
@@ -121,7 +121,7 @@ Our platform includes comprehensive testing for 7 cutting-edge AI/ML algorithms:
 - **Scikit-learn** - Machine learning algorithms
 
 ### Development & Deployment
-- **Jest 30** - JavaScript testing framework
+- **Vitest 5** - JavaScript testing framework
 - **Babel 7** - JavaScript compiler
 - **ESLint** - Code linting and formatting
 - **Pyright 1.1** - Python type checking
@@ -129,7 +129,7 @@ Our platform includes comprehensive testing for 7 cutting-edge AI/ML algorithms:
 - **Git** - Version control with branching strategy
 
 ### Testing & Quality
-- **Jest Testing Framework** - Component and integration tests
+- **Vitest Testing Framework** - Component and integration tests
 - **Mock Data Fallbacks** - Reliable offline functionality
 - **Static Type Checking** - TypeScript-style Python hints
 - **Code Analysis** - Flake8 and ESLint configurations
@@ -182,7 +182,7 @@ python api/index.py
 npm run dev          # Start Vite dev server
 npm run build        # Production build
 npm run preview      # Preview production build
-npm run test         # Run Jest tests
+npm run test         # Run Vitest tests
 npm run lint         # ESLint code analysis
 
 # Backend
@@ -208,12 +208,12 @@ PicoTuri-EditJudge/
 │   ├── utils/            # API utilities and helpers
 │   └── App.jsx           # Main React application
 │
-├── 📁 __mocks__/          # Jest test mocks
+├── 📁 __mocks__/          # Vitest test mocks
 ├── 📁 .vscode/           # Development environment settings
 ├── 📄 package.json       # Node.js dependencies and scripts
 ├── 📄 vite.config.js     # Vite build configuration
 ├── 📄 vercel.json        # Vercel deployment configuration
-├── 📄 jest.config.cjs    # Testing configuration
+├── 📄 vitest.config.js    # Testing configuration
 └── 📄 README.md          # This documentation
 ```
 

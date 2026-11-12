@@ -1,12 +1,13 @@
+import { vi } from 'vitest'
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import api from '../utils/api'
 import AlgorithmsPage from '../pages/AlgorithmsPage'
 import { algorithmEndpoints, algorithmResults } from './algorithmFixtures'
 
-jest.mock('../utils/api', () => ({ __esModule: true, default: { post: jest.fn() } }))
+vi.mock('../utils/api', () => ({ __esModule: true, default: { post: vi.fn() } }))
 // The chart suite verifies rendering and numerical mappings separately.
-jest.mock('../components/algorithms/ChartVisualization', () => ({
-  ...jest.requireActual('../components/algorithms/ChartVisualization'),
+vi.mock('../components/algorithms/ChartVisualization', async () => ({
+  ...await vi.importActual('../components/algorithms/ChartVisualization'),
   __esModule: true,
   default: ({ result }) => <div data-testid="result-data">{JSON.stringify(result)}</div>
 }))

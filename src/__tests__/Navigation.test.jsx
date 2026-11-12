@@ -1,16 +1,17 @@
+import { vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import App from '../App'
 
-jest.mock('../pages/AlgorithmsPage', () => function AlgorithmsPageMock() {
+vi.mock('../pages/AlgorithmsPage', () => ({ default: function AlgorithmsPageMock() {
   return <h2>Algorithms page</h2>
-})
-jest.mock('../pages/PerformanceDashboard', () => function PerformanceDashboardMock() {
+} }))
+vi.mock('../pages/PerformanceDashboard', () => ({ default: function PerformanceDashboardMock() {
   return <h2>Performance page</h2>
-})
-jest.mock('../pages/ResearchPage', () => function ResearchPageMock() {
+} }))
+vi.mock('../pages/ResearchPage', () => ({ default: function ResearchPageMock() {
   return <h2>Research page</h2>
-})
+} }))
 
 const renderApp = () => render(<MemoryRouter><App /></MemoryRouter>)
 const openMenu = () => fireEvent.click(screen.getByRole('button', { name: 'Open navigation menu' }))

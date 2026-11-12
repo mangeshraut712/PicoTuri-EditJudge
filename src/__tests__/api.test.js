@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import axios from 'axios'
 import api, { createApiClient } from '../utils/api'
 
@@ -14,13 +15,12 @@ test('routes requests to a configured deployment origin', () => {
   expect(api.defaults.baseURL).toBe('')
 })
 
-test('loads the build-time API origin when configured by Vite', () => {
+test('loads the build-time API origin when configured by Vite', async () => {
   globalThis.__API_BASE_URL__ = 'https://api.example.com'
   try {
-    jest.isolateModules(() => {
-      const configured = require('../utils/api').default
+    vi.resetModules()
+    const configured = (await import('../utils/api')).default
       expect(configured.getUri({ url: '/api/health' })).toBe('https://api.example.com/api/health')
-    })
   } finally {
     delete globalThis.__API_BASE_URL__
   }

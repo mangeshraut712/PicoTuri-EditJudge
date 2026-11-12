@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { Line, Tooltip, YAxis } from 'recharts'
 import ChartVisualization from '../components/algorithms/ChartVisualization'
@@ -5,8 +6,8 @@ import { isValidAlgorithmResult } from '../components/algorithms/algorithmResult
 import { algorithmResults } from './algorithmFixtures'
 
 // Inspect the chart's data and scale contract without depending on SVG layout in jsdom.
-jest.mock('recharts', () => {
-  const React = require('react')
+vi.mock('recharts', async () => {
+  const React = await import('react')
   const chart = (name) => {
     function MockChart({ children, data }) {
       return React.createElement('div', {
@@ -27,9 +28,9 @@ jest.mock('recharts', () => {
     RadarChart: chart('radar-chart'),
     PieChart: chart('pie-chart'),
     Pie: chart('pie'),
-    Line: jest.fn(() => null),
-    YAxis: jest.fn(() => null),
-    Tooltip: jest.fn(() => null),
+    Line: vi.fn(() => null),
+    YAxis: vi.fn(() => null),
+    Tooltip: vi.fn(() => null),
     XAxis: EmptyChart,
     CartesianGrid: EmptyChart,
     PolarGrid: EmptyChart,
@@ -46,7 +47,7 @@ const show = (name, overrides = {}) => render(
 )
 const points = type => JSON.parse(screen.getByTestId(type).dataset.points)
 
-beforeEach(() => jest.clearAllMocks())
+beforeEach(() => vi.clearAllMocks())
 
 test.each(Object.keys(algorithmResults))('renders the actual %s API schema without invalid values', name => {
   const { container } = show(name)
