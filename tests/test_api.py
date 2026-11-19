@@ -180,6 +180,17 @@ class ApiTests(unittest.TestCase):
         response = client.get('/api/health', headers={'Origin': 'http://localhost:3000'})
         self.assertNotIn('Access-Control-Allow-Origin', response.headers)
 
+    def test_cors_origins_match_the_browser_origin_form(self):
+        configured = 'https://APP.example:443, http://Local.example:80, http://localhost:8080'
+        with patch.dict(os.environ, {'CORS_ORIGINS': configured}):
+            client = index.create_app({'TESTING': True}).test_client()
+        for origin in ('https://app.example', 'http://local.example', 'http://localhost:8080'):
+            with self.subTest(origin=origin):
+                response = client.get('/api/health', headers={'Origin': origin})
+                self.assertEqual(response.headers['Access-Control-Allow-Origin'], origin)
+        response = client.get('/api/health', headers={'Origin': 'http://localhost:9090'})
+        self.assertNotIn('Access-Control-Allow-Origin', response.headers)
+
     def test_empty_cors_configuration_allows_same_origin_only(self):
         with patch.dict(os.environ, {'CORS_ORIGINS': ''}):
             client = index.create_app({'TESTING': True}).test_client()

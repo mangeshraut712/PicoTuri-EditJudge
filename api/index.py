@@ -285,7 +285,8 @@ def normalize_origins(value: Any) -> list[str]:
         parsed = urlparse(candidate)
         try:
             hostname = parsed.hostname
-            if parsed.port is not None and not 1 <= parsed.port <= 65535:
+            port = parsed.port
+            if port is not None and not 1 <= port <= 65535:
                 continue
         except ValueError:
             continue
@@ -295,7 +296,11 @@ def normalize_origins(value: Any) -> list[str]:
             continue
         if parsed.path not in {'', '/'}:
             continue
-        origin = f'{parsed.scheme}://{parsed.netloc}'
+        # Browsers send lowercase hosts and omit default ports in Origin; match that form.
+        host = hostname
+        if port is not None and port != {'http': 80, 'https': 443}[parsed.scheme]:
+            host = f'{host}:{port}'
+        origin = f'{parsed.scheme}://{host}'
         if origin not in origins:
             origins.append(origin)
     return origins
