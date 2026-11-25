@@ -71,7 +71,7 @@ aiofiles>=23.2.0
 asyncio>=3.4.3
 
 # Model Versioning
-gitpython>=3.1.0
+gitpython>=3.2.1  # GHSA-83vg-56qc-22m7 and earlier GitPython advisories
 
 # Security
 cryptography>=41.0.0
